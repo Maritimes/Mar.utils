@@ -21,7 +21,13 @@ If TRUE, only the rejected points are returned.}
 data.frame contents depend of the return.bad parameter
 }
 \description{
-This function drops points that can't be plotted from a data frame.
+This function identifies points that aren't in the northern 
+hemisphere (i.e. LAT between 0 and 90) and aren't in the western hemisphere 
+(i.e. LON between 0 and 180).  By default, it returns the "good" points, but 
+the "return.bad" flag allows it to return only the "bad" points.
+}
+\seealso{
+Other general_use: \code{\link{df_to_sp}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

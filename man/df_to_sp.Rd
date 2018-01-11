@@ -26,6 +26,9 @@ spatialpointsdataframe
 \description{
 This function takes a dataframe and converts in to a spatialpointsdataframe
 }
+\seealso{
+Other general_use: \code{\link{df_qc_spatial}}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
