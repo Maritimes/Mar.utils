@@ -8,7 +8,10 @@ Depends:
     R (>= 2.10)
 Imports:
     RODBC,
-    sp
+    sp,
+    RColorBrewer,
+    classInt,
+    rgdal
 Enhances: 
     ROracle,
     DBI

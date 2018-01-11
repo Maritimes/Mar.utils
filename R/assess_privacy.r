@@ -62,6 +62,9 @@
 #' @importFrom sp merge
 #' @importFrom classInt classIntervals
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom grDevices dev.off
+#' @importFrom grDevices png
+#' @importFrom graphics plot.new
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @note If sensitive fields have names that are 
 #' different than what is provided in the \code{sen.fields}, they will not be detected, or 
@@ -193,8 +196,8 @@ assess_privacy <- function(
 
       if(show.plot | save.plot){
         if (save.plot) {
-          plot.new()
-          png(paste0(this.df.name,'.png'), width = 1600, height=1600)
+          graphics::plot.new()
+          grDevices::png(paste0(this.df.name,'.png'), width = 1600, height=1600)
           sp::plot(POLY.agg, col=NA, border="gray85")
         }else{
           sp::plot(POLY.agg, col=NA, border=NA)
@@ -203,7 +206,7 @@ assess_privacy <- function(
         breaks <- classInt::classIntervals(show.this@data[[plotcol]], n = nclasses, style = "fisher", unique = TRUE)$brks
         sp::plot(show.this, main = fun, col = cols[findInterval(show.this@data[[plotcol]], breaks, all.inside = TRUE)], border = NA, add=T)
         sp::plot(POLY.agg, border = "gray85", add=T, col = ifelse(is.na(POLY.agg$CAN_SHOW),"grey65", ifelse(POLY.agg$CAN_SHOW == "YES", NA, "red")))
-        if (save.plot) dev.off()
+        if (save.plot) grDevices::dev.off()
       }
 
 
