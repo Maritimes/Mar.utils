@@ -62,100 +62,110 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   rm(p4)
   isdb.df.long <- isdb.df.long[order(isdb.df.long$FISHSET_ID, isdb.df.long$P),]
 
-  if (do.qc) isdb.df.long$QC <- ""
-
+  if (do.qc) {
+    isdb.df.long$QC <- ""
+    fishsetsWUnplottablePt <- NA
+  }
   pos0 = nrow(isdb.df.long[is.na(isdb.df.long$LAT) | is.na(isdb.df.long$LONG),])
   if (pos0>0) {
-    if (do.qc) isdb.df.long[is.na(isdb.df.long$LAT) | is.na(isdb.df.long$LONG),"QC"] <- 'pos:NA'
-    #cat(paste0(pos0," coords included <NA> and will be ignored\n"))
+    if (do.qc) {
+      isdb.df.long[is.na(isdb.df.long$LAT) | is.na(isdb.df.long$LONG),"QC"] <- 'pos:NA'
+      fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, unique(isdb.df.long[is.na(isdb.df.long$LAT) | is.na(isdb.df.long$LONG),"FISHSET_ID"]))
+    }
+    #Flag for drop
     isdb.df.long[is.na(isdb.df.long$LAT) | is.na(isdb.df.long$LONG),"LONG"] <- NA
   }
   
   posNA = nrow(isdb.df.long[which(isdb.df.long$LAT == 0 | isdb.df.long$LONG==0),])
   if (posNA>0){
-    if (do.qc) isdb.df.long[which(isdb.df.long$LAT == 0 | isdb.df.long$LONG==0),"QC"] <- 'pos:0'
-    #cat(paste0(posNA," coords included 0 and will be ignored\n"))
+    if (do.qc) {
+      isdb.df.long[which(isdb.df.long$LAT == 0 | isdb.df.long$LONG==0),"QC"] <- 'pos:0'
+      fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, unique(isdb.df.long[which(isdb.df.long$LAT == 0 | isdb.df.long$LONG==0),"FISHSET_ID"]))
+    }
+    #Flag for drop
     isdb.df.long[which(isdb.df.long$LAT == 0 | isdb.df.long$LONG==0),"LONG"] <- NA
   }
   posHem = nrow(isdb.df.long[which(isdb.df.long$LONG>0),])
   if (posHem>0) {
-    isdb.df.long[which(isdb.df.long$LONG>0),"QC"] <- 'pos:HEMISPHERE'
+    if (do.qc) isdb.df.long[which(isdb.df.long$LONG>0),"QC"] <- 'pos:HEMISPHERE'
     cat(paste0(posHem," coords seem to be in the wrong hemisphere, but will be plotted as-is\n"))
   }
   
   #These are impossible - capture for QC, but don't try to plot
   posLong = nrow(isdb.df.long[which(isdb.df.long$LONG<=-180 | isdb.df.long$LONG>=180),])
   if (posLong>0){
-    if (do.qc) isdb.df.long[which(isdb.df.long$LONG<=-180 | isdb.df.long$LONG>=180),"QC"] <- 'pos:impossible LONG'
+    if (do.qc) {
+      isdb.df.long[which(isdb.df.long$LONG<=-180 | isdb.df.long$LONG>=180),"QC"] <- 'pos:impossible LONG'
+      fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, unique(isdb.df.long[which(isdb.df.long$LONG<=-180 | isdb.df.long$LONG>=180),"FISHSET_ID"]))
+    }
+    #Flag for drop
     isdb.df.long[which(isdb.df.long$LONG<=-180 | isdb.df.long$LONG>=180),"LONG"] <- NA
   }
   posLat = nrow(isdb.df.long[which(isdb.df.long$LAT<=-90 | isdb.df.long$LAT>=90),])
   if (posLat>0) {
-    if (do.qc) isdb.df.long[which(isdb.df.long$LAT<=-90 | isdb.df.long$LAT>=90),"QC"] <- 'pos:impossible LAT'
+    if (do.qc) {
+      isdb.df.long[which(isdb.df.long$LAT<=-90 | isdb.df.long$LAT>=90),"QC"] <- 'pos:impossible LAT'
+      fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, unique(isdb.df.long[which(isdb.df.long$LAT<=-90 | isdb.df.long$LAT>=90),"FISHSET_ID"]))
+    }
+    #Flag for drop
     isdb.df.long[which(isdb.df.long$LAT<=-90 | isdb.df.long$LAT>=90),"LONG"] <- NA
   }
-  posBad = posLat + posLong
-  if (posBad>0) cat(paste0(posBad," coords had impossible Lats or Longs which have been dropped\n"))
-  
-  # if (nrow(isdb.df.long[which(isdb.df.long$LAT>0 & isdb.df.long$LONG<0),])>0) {
-  #   if (do.qc) isdb.df.long[which(isdb.df.long$LAT>0 & isdb.df.long$LONG<0),]$QC <- 'Valid'
-  # }
-  
+
+  # Do the removal -------------------------------------------------------------
+  isdb.df.long <- isdb.df.long[complete.cases(isdb.df.long),] 
+ 
+  all.sets.lines<-list()
   if (do.qc){
     # Roll up all the comments for each set into one col ----------------------
     isdb.qc <- aggregate(QC ~ FISHSET_ID, isdb.df.long, function(x) paste0(unique(x), collapse = ", "))
     rownames(isdb.qc) <-isdb.qc$FISHET_ID
+    isdb.qc$LEN_KM<-NA
+    isdb.qc$N_VALID_VERT<-NA
     
-    fishsetsWUnplottablePt <- NA
-    # Flag zeroes for removal ----------------------------------------------------
-    fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, unique(isdb.df.long[isdb.df.long$QC == "pos:0","FISHSET_ID"]))
-    isdb.df.long[isdb.df.long$QC == "pos:0","LONG"] <- NA
-  
-    # Flag impossible values for removal -----------------------------------------
-    if (nrow(isdb.df.long[grep(pattern = "pos:impossible", x=isdb.df.long$QC),])>0){
-      fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, unique(isdb.df.long[grep(pattern = "pos:impossible", x=isdb.df.long$QC),"FISHSET_ID"]))
-      isdb.df.long[grep(pattern = "pos:impossible", x=isdb.df.long$QC),"LONG"]<-NA
-    }
-  }
-  # Do the removal -------------------------------------------------------------
-  isdb.df.long <- isdb.df.long[complete.cases(isdb.df.long),] 
-  
-  # With remaining coords, create lines, capture length -------------------------
-  all.sets.lines<-list()
-  if (do.qc)isdb.qc$LEN_KM<-NA
-  if (do.qc)isdb.qc$N_VALID_VERT<-NA
-  for (i in 1:length(unique(isdb.df.long$FISHSET_ID))){
-    this.a <-unique(isdb.df.long$FISHSET_ID)[i]
-    if (length(unique(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2][,1]))==1 &
-        length(unique(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2][,2]))==1){
-      if (do.qc) isdb.qc[isdb.qc$FISHSET_ID==this.a,"LEN_KM"]<-0
-      if (do.qc) fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, isdb.qc[isdb.qc$FISHSET_ID==this.a,"FISHSET_ID"])
-      if (do.qc) isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"]<-paste(c(isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"], 'Zero_Len'), collapse = ", ")
-      all.sets.lines[[i]]<-NULL
-      next
-    }else{
-      li = Line(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2])
-      all.sets.lines[[i]]<-Lines(li,ID=this.a)
-    }
-    this.len = LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
-      if (do.qc){
-        isdb.qc[isdb.qc$FISHSET_ID==this.a,"N_VALID_VERT"]<-length(all.sets.lines[[i]]@Lines[[1]]@coords)/2
-        isdb.qc[isdb.qc$FISHSET_ID==this.a,"LEN_KM"]<-this.len
-        if (this.len == 0) {
-          fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, isdb.qc[isdb.qc$FISHSET_ID==this.a,"FISHSET_ID"])
-          isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"]<-paste(c(isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"], 'Zero_Len'), collapse = ", ")
-        }
+    for (i in 1:length(unique(isdb.df.long$FISHSET_ID))){
+      this.a <-unique(isdb.df.long$FISHSET_ID)[i]
+      if (length(unique(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2][,1]))==1 &
+          length(unique(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2][,2]))==1){
+        #these have same start and end coords
+        isdb.qc[isdb.qc$FISHSET_ID==this.a,"LEN_KM"]<-0
+        fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, isdb.qc[isdb.qc$FISHSET_ID==this.a,"FISHSET_ID"])
+        isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"]<-paste(c(isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"], 'Zero_Len'), collapse = ", ")
+        all.sets.lines[[i]]<-NULL
+        next
+      }else{
+        li = Line(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2])
+        all.sets.lines[[i]]<-Lines(li,ID=this.a)
       }
+      this.len = LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
+      isdb.qc[isdb.qc$FISHSET_ID==this.a,"N_VALID_VERT"]<-length(all.sets.lines[[i]]@Lines[[1]]@coords)/2
+      isdb.qc[isdb.qc$FISHSET_ID==this.a,"LEN_KM"]<-this.len
+      if (this.len == 0) {
+        fishsetsWUnplottablePt = c(fishsetsWUnplottablePt, isdb.qc[isdb.qc$FISHSET_ID==this.a,"FISHSET_ID"])
+        isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"]<-paste(c(isdb.qc[isdb.qc$FISHSET_ID==this.a,"QC"], 'Zero_Len'), collapse = ", ")
+      }
+    }
+    fishsetsWUnplottablePt = unique(fishsetsWUnplottablePt)
+  }else{
+    for (i in 1:length(unique(isdb.df.long$FISHSET_ID))){
+      this.a <-unique(isdb.df.long$FISHSET_ID)[i]
+      if (length(unique(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2][,1]))==1 & 
+          length(unique(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2][,2]))==1){
+        #these have same start and end coords
+        all.sets.lines[[i]]<-NULL
+        next
+      }else{
+        li = Line(isdb.df.long[isdb.df.long$FISHSET_ID==this.a,][3:2])
+        all.sets.lines[[i]]<-Lines(li,ID=this.a)
+      }
+      this.len = LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
+    }
   }
-  if (do.qc) fishsetsWUnplottablePt = unique(fishsetsWUnplottablePt)
-
+  
   #drop any lines that have zero length
   all.sets.lines = all.sets.lines[!sapply(all.sets.lines, is.null)]
-  
   all.sets.lines = SpatialLines(all.sets.lines)
   proj4string(all.sets.lines) <- crs.geo
- 
-  cat(paste0(length(all.sets.lines), " of ", nsets, " sets could be made into lines having at least 2 points\n"))
+  cat(paste0(length(all.sets.lines), " of ", nsets, " sets could be made into lines having at least 2 points.\n"))
   
   if (do.qc){
     #Sort the qc field prior to merging into line df
@@ -167,9 +177,9 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
    
     if (any(!is.na(fishsetsWUnplottablePt))){
       fishsetsWUnplottablePt <- fishsetsWUnplottablePt[!is.na(fishsetsWUnplottablePt)]
-      cat(paste0("The following ",length(fishsetsWUnplottablePt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines.:\n"))
+      cat(paste0("The following ",length(fishsetsWUnplottablePt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:\n"))
       for (j in 1:length(fishsetsWUnplottablePt)){
-        cat(paste0(fishsetsWUnplottablePt[j],": ",isdb.qc[isdb.qc$FISHSET_ID == fishsetsWUnplottablePt[j],"QC"],"\n"))
+        cat(paste0("\t ",fishsetsWUnplottablePt[j],": ",isdb.qc[isdb.qc$FISHSET_ID == fishsetsWUnplottablePt[j],"QC"],"\n"))
       }
     }
   }else{
