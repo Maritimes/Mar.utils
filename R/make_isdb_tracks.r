@@ -46,6 +46,11 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
  
   # Pull out coordinates, stack em, create and populate QC status field ----
   crs.geo <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84") 
+  dup=length(isdb.df[duplicated(isdb.df), "FISHSET_ID"])
+  if (dup>0){
+    isdb.df <- isdb.df[!duplicated(isdb.df), ]
+    cat(paste(dup," duplicate rows were removed from your data\n"))
+  }
   rownames(isdb.df) <- isdb.df$FISHSET_ID
 
   p1=cbind(isdb.df[c("FISHSET_ID","LAT1","LONG1", "DATE_TIME1")],"1")
