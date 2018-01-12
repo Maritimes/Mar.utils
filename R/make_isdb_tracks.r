@@ -101,12 +101,15 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
                             which(isdbPos$LAT>90 | isdbPos$LAT<-90),"LONG"])>0){
         isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
                        which(isdbPos$LAT>90 | isdbPos$LAT<-90),"QC"] <- 'pos:impossible'
+        isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
+                  which(isdbPos$LAT>90 | isdbPos$LAT<-90),"LONG"] <- NA
         fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
                                                                which(isdbPos$LAT>90 | isdbPos$LAT<-90),"FISHSET_ID"]))
       }
       #coordinates of 0 are almost certainly wrong (for ISDB) - these will be dropped
       if (length(isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])>0){
         isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"QC"] <- 'pos:0'
+        isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"] <- NA
         fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"FISHSET_ID"]))
       }
       #wrong hemisphere? not necessarily incorrect
