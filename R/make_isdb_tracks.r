@@ -198,7 +198,7 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   
   if (do.qc){
     #Sort the qc field prior to merging into line df
-    isdb.qc = merge(isdb.qc, isdbTim.qc)
+    isdb.qc = merge(isdbTim.qc, isdb.qc, all.x=TRUE)
     colnames(isdb.qc)[colnames(isdb.qc)=="QC"]<-"QCPOS"
     for (k in 1:nrow(isdb.qc)){
       isdb.qc$QC[k] <- paste(sort(unlist(strsplit(isdb.qc$QCPOS[k], ", ")),decreasing = TRUE), collapse = ", ")
@@ -210,14 +210,14 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
       fishsetsBadPt <- fishsetsBadPt[!is.na(fishsetsBadPt)]
       cat(paste0("The following ",length(fishsetsBadPt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:\n"))
       for (j in 1:length(fishsetsBadPt)){
-        cat(paste0("\t ",fishsetsBadPt[j],": ",isdb.qc[isdb.qc$FISHSET_ID == fishsetsBadPt[j],"QCPOS"],"\n"))
+        cat(paste0("\t ",fishsetsBadPt[j],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadPt[j]),"QCPOS"],"\n"))
       }
     }
     if  (any(!is.na(fishsetsBadTime))){
       fishsetsBadTime <- fishsetsBadTime[!is.na(fishsetsBadTime)]
       cat(paste0("The following ",length(fishsetsBadTime)," sets reported invalid dates/times, due to identical values across positions, or time-order mismatch:\n"))
       for (l in 1:length(fishsetsBadTime)){
-        cat(paste0("\t ",fishsetsBadTime[l],": ",isdb.qc[isdb.qc$FISHSET_ID == fishsetsBadTime[j],"QCTIME"],"\n"))
+        cat(paste0("\t ",fishsetsBadTime[l],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadTime[l]),"QCTIME"],"\n"))
       }
     }
   }else{
