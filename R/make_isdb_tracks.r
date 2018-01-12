@@ -105,7 +105,8 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
         fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"FISHSET_ID"]))
       }
       #wrong hemisphere? not necessarily incorrect
-      if (length(isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"LONG"] )>0){
+      posHem = length(isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"LONG"] )
+      if (posHem>0){
         isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"QC"] <- 'pos:HEMISPHERE'
         cat(paste0(posHem," coords seem to be in the wrong hemisphere, but will be plotted as-is\n"))
       }
@@ -120,8 +121,6 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   isdbPos <- isdbPos[complete.cases(isdbPos),] 
  
   if (do.qc){
-  #' more qc of datetimes
-
     isdbTim <- isdbPos[,c("FISHSET_ID","DATETIME", "P","QCTIME")] 
     isdbTim.qc <- unique(isdbTim[,c("FISHSET_ID","QCTIME")])
     for (k in 1:length(isdbTim.qc[,"FISHSET_ID"])){
