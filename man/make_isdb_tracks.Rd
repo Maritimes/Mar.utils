@@ -36,11 +36,17 @@ spatialLinesDataFrame which can be plotted.If selected, it can also QC them.
 Each line will have the following columns in the resulting data frame:
 \itemize{
  \item \code{FISHSET_ID} This uniquely identifies a set
- \item \code{QC} This field identifies potential issues with the line - 
+ \item \code{QCPOS} This field identifies potential issues with the line - 
  including NA positions, positions that are "0", incorrect hemisphere, or 
  impossible coordinates
+ \item \code{QCTIME} This field identifies potential issues with the timing 
+ of the vertices making up the line.  For example,  P2 should occur after 
+ P1, and 2 vertices cannot occur simultaneously.  Sets less than 5 min or 
+ greater than 24 hr are also noted
  \item \code{LEN_KM} This field shows the calculated distance of the 
  resultant line in kms
+ \item \code{N_VALID_VERT} This field shows how many vertices appear 
+ correct after NAs, 0s and othe problematic values have been dropped
 }
 }
 \author{

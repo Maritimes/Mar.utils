@@ -5,11 +5,17 @@
 #' Each line will have the following columns in the resulting data frame:
 ##' \itemize{
 ##'  \item \code{FISHSET_ID} This uniquely identifies a set
-##'  \item \code{QC} This field identifies potential issues with the line - 
+##'  \item \code{QCPOS} This field identifies potential issues with the line - 
 ##'  including NA positions, positions that are "0", incorrect hemisphere, or 
 ##'  impossible coordinates
+##'  \item \code{QCTIME} This field identifies potential issues with the timing 
+##'  of the vertices making up the line.  For example,  P2 should occur after 
+##'  P1, and 2 vertices cannot occur simultaneously.  Sets less than 5 min or 
+##'  greater than 24 hr are also noted
 ##'  \item \code{LEN_KM} This field shows the calculated distance of the 
 ##'  resultant line in kms
+##'  \item \code{N_VALID_VERT} This field shows how many vertices appear 
+##'  correct after NAs, 0s and othe problematic values have been dropped
 ##' }
 #' @param isdb.df This is the dataframe you want to plot.  isdb dataframes are
 #' characterized by the existence of the following fields:
@@ -47,6 +53,7 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   # Pull out coordinates, stack em, create and populate QC status field ----
   crs.geo <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84") 
   dup=length(isdb.df[duplicated(isdb.df), "FISHSET_ID"])
+  
   if (dup>0){
     isdb.df <- isdb.df[!duplicated(isdb.df), ]
     cat(paste(dup," duplicate rows were removed from your data\n"))
@@ -91,25 +98,22 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   if (posNA>0) isdbPos[is.na(isdbPos$LAT) | is.na(isdbPos$LONG),"LONG"] <- NA
 
   #Following are flagged conditions - capture for QC
-  posBad = length(isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
-                             which(isdbPos$LAT > 90 | isdbPos$LAT < -90) |
-                             which(isdbPos$LONG>0 & isdbPos$LONG < 180) |
-                             which(isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])
+  posBad = length(isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180 | 
+                             isdbPos$LAT > 90 | isdbPos$LAT < -90 |
+                             isdbPos$LONG>0 & isdbPos$LONG < 180 |
+                             isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])
   if (posBad>0){
     if (do.qc) {
-      if (length(isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
-                            which(isdbPos$LAT>90 | isdbPos$LAT<-90),"LONG"])>0){
-        isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
-                       which(isdbPos$LAT>90 | isdbPos$LAT<-90),"QC"] <- 'pos:impossible'
-        isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
-                  which(isdbPos$LAT>90 | isdbPos$LAT<-90),"LONG"] <- NA
-        fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
-                                                               which(isdbPos$LAT>90 | isdbPos$LAT<-90),"FISHSET_ID"]))
+      if (length(isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>= 180 | 
+                            isdbPos$LAT>90 | isdbPos$LAT< -90),"LONG"])>0){
+        isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>=180 | 
+                       isdbPos$LAT>90 | isdbPos$LAT< -90),"QC"] <- 'pos:impossible'
+        fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>=180 | 
+                                                               isdbPos$LAT>90 | isdbPos$LAT< -90),"FISHSET_ID"]))
       }
       #coordinates of 0 are almost certainly wrong (for ISDB) - these will be dropped
       if (length(isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])>0){
         isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"QC"] <- 'pos:0'
-        isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"] <- NA
         fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"FISHSET_ID"]))
       }
       #wrong hemisphere? not necessarily incorrect
@@ -120,9 +124,9 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
       }
     }
     #Flag posBad for drop (except wrong hemisphere)
-    isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180) | 
-                 which(isdbPos$LAT>90 | isdbPos$LAT<-90) |
-                 which(isdbPos$LAT == 0 | isdbPos$LONG==0) ,"LONG"] <- NA
+    isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>=180 | 
+                 isdbPos$LAT>90 | isdbPos$LAT< -90 |
+                 isdbPos$LAT == 0 | isdbPos$LONG==0) ,"LONG"] <- NA
   }
 
   # Do the removal (drop all records which contain an NA -----------------------
@@ -197,11 +201,12 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
       this.len = LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
     }
   }
-  
+  if(length(all.sets.lines)>0){
   #drop any lines that have zero length
   all.sets.lines = all.sets.lines[!sapply(all.sets.lines, is.null)]
   all.sets.lines = SpatialLines(all.sets.lines)
   proj4string(all.sets.lines) <- crs.geo
+  }
   cat(paste0(length(all.sets.lines), " of ", nrow(isdb.df), " sets could be made into lines having at least 2 points.\n"))
   
   if (do.qc){
@@ -209,11 +214,18 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
     isdb.qc = merge(isdbTim.qc, isdb.qc, all.x=TRUE)
     colnames(isdb.qc)[colnames(isdb.qc)=="QC"]<-"QCPOS"
     for (k in 1:nrow(isdb.qc)){
-      isdb.qc$QC[k] <- paste(sort(unlist(strsplit(isdb.qc$QCPOS[k], ", ")),decreasing = TRUE), collapse = ", ")
+      isdb.qc$QCPOS[k] <- paste(sort(unlist(strsplit(isdb.qc$QCPOS[k], ", ")),decreasing = TRUE), collapse = ", ")
       isdb.qc$QCTIME[k] <- paste(sort(unlist(strsplit(isdb.qc$QCTIME[k], ", ")),decreasing = TRUE), collapse = ", ")
+      
     }
+    #clean up fields
+    isdb.qc$QCTIME<-sub(",$","",trimws(isdb.qc$QCTIME))
+    isdb.qc$QCPOS<-sub(",$","",trimws(isdb.qc$QCPOS))
+
+    if(length(all.sets.lines)>0){
     all.sets.lines<-SpatialLinesDataFrame(all.sets.lines, isdb.qc, match.ID = "FISHSET_ID")
     fishsetsBadPt = setdiff(fishsetsBadPt, all.sets.lines@data$FISHSET_ID)
+    }
     if (any(!is.na(fishsetsBadPt))){
       fishsetsBadPt <- fishsetsBadPt[!is.na(fishsetsBadPt)]
       cat(paste0("The following ",length(fishsetsBadPt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:\n"))
@@ -230,13 +242,21 @@ make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
     }
   }else{
     cat("For more info on the lines that failed or other issues, run this with function with 'do.qc=TRUE'")
-    all.sets.lines<-SpatialLinesDataFrame(all.sets.lines, isdb.df[1], match.ID = "FISHSET_ID")
+    if(length(all.sets.lines)>0){
+      all.sets.lines<-SpatialLinesDataFrame(all.sets.lines, isdb.df[1], match.ID = "FISHSET_ID")
+    }
   }
   #add original attribs to line
-  all.sets.lines@data= merge(all.sets.lines@data, isdb.df)
+  if(length(all.sets.lines)>0){
+    all.sets.lines@data= merge(all.sets.lines@data, isdb.df)
+  }
   if (return.choice != "lines" & do.qc){
     return(isdb.qc)
   }else{
+    if(length(all.sets.lines)>0){
     return(all.sets.lines)
+    }else{
+      return(NULL)
+    }
   }
 }
