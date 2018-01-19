@@ -15,9 +15,8 @@
 #' @param rule.of default is \code{5} Whether or not data can be shown (even 
 #' aggregated) depends on the presence of a threshold number of unique values 
 #' for certain sensitive fields.  This parameter sets that threshold.
-#' @param agg.fields the default is \code{NULL}, but if a db is provided, they 
-#' will be guessed.  These are the fields on which to aggregate (i.e. generate 
-#' values of \code{MEAN}, \code{COUNT} and \code{SUM}).
+#' @param agg.fields the default is \code{NULL}.  These are the fields on which 
+#' to aggregate (i.e. generate values of \code{MEAN}, \code{COUNT} and \code{SUM}).
 #' @param sens.fields the defaults are \code{NULL}  These are fields
 #' to which the "rule of 5" should be applied. The Treasury Secretariat states that when data is 
 #' shown to the public, certain fields must have at least 5 unique values for these fields 
@@ -113,7 +112,6 @@ assess_privacy <- function(
   
   
   df@data = cbind(df@data,sp::over( df, agg.poly , fn = NULL))
-  
   for (i in 1:length(agg.fields)) {
     if (nrow(df@data[is.na(df@data[, agg.fields[i]]), ]) > 0) df@data[is.na(df@data[, agg.fields[i]]), ][, agg.fields[i]] <- 0
   }
@@ -146,13 +144,13 @@ assess_privacy <- function(
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,]$CAN_SHOW <- 'YES'
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE<rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE< rule.of,]$CAN_SHOW <- 'NO'
     POLY.agg = merge(POLY.agg, POLY.agg.sens)
-    
+    POLY.agg = sp::merge(agg.poly,POLY.agg)
     rm(POLY.agg.sens) 
   }else{
     POLY.agg$CAN_SHOW = 'YES'
     POLY.agg = sp::merge(agg.poly,POLY.agg)
   }
-  allowed.areas  = POLY.agg[!is.na(POLY.agg$CAN_SHOW) & POLY.agg$CAN_SHOW=='YES',agg.poly.field]@data[[agg.poly.field]]
+  allowed.areas = POLY.agg@data[!is.na(POLY.agg$CAN_SHOW) & POLY.agg$CAN_SHOW=='YES',agg.poly.field]
   allowed.areas.sp = agg.poly[agg.poly@data[[agg.poly.field]] %in% allowed.areas,]
 
   df$ORD_df = seq.int(nrow(df))
@@ -182,14 +180,13 @@ assess_privacy <- function(
             )))
     
     #step 3 -- append the aggregated data back onto the grid 
+
     grid2Min.allowed@data <- data.frame(grid2Min.allowed@data, grid.agg[match(grid2Min.allowed@data[,"ORD_gr"], grid.agg[,"ORD_gr"]),])
     grid2Min.allowed@data$ORD_gr.1 <- NULL
-    test =   grid2Min.allowed[!is.na(grid2Min.allowed[[plotcol]]),]
+   # test =   grid2Min.allowed[!is.na(grid2Min.allowed[[plotcol]]),]
 
-       if (nrow(df.allowed@data)){
+       if (nrow(grid2Min.allowed[!is.na(grid2Min.allowed[[plotcol]]),])){
   
-      show.this = test
-      
       file_id = ifelse(!is.null(file_id),paste0(file_id,"_"),"")
       POLY.agg.name = paste0(file_id,'screened_areas_', ts)
       this.df.name = paste0(file_id,'2MinGrid_', ts)
@@ -203,8 +200,8 @@ assess_privacy <- function(
           sp::plot(POLY.agg, col=NA, border=NA)
         }
         cols <- RColorBrewer::brewer.pal(n = nclasses, name = "Blues")
-        breaks <- classInt::classIntervals(show.this@data[[plotcol]], n = nclasses, style = "fisher", unique = TRUE)$brks
-        sp::plot(show.this, main = fun, col = cols[findInterval(show.this@data[[plotcol]], breaks, all.inside = TRUE)], border = NA, add=T)
+        breaks <- classInt::classIntervals(grid2Min.allowed@data[!is.na(grid2Min.allowed@data[plotcol]),plotcol], n = nclasses, style = "fisher", unique = TRUE)$brks
+        sp::plot(grid2Min.allowed, main = fun, col = cols[findInterval(grid2Min.allowed@data[[plotcol]], breaks, all.inside = TRUE)], border = NA, add=T)
         sp::plot(POLY.agg, border = "gray85", add=T, col = ifelse(is.na(POLY.agg$CAN_SHOW),"grey65", ifelse(POLY.agg$CAN_SHOW == "YES", NA, "red")))
         if (save.plot) grDevices::dev.off()
       }
@@ -213,7 +210,7 @@ assess_privacy <- function(
         
         if (create.shps){
         POLY.agg = prepare_shape_fields(POLY.agg)
-        this.df = prepare_shape_fields(show.this)
+        this.df = prepare_shape_fields(grid2Min.allowed)
         
         rgdal::writeOGR(POLY.agg, ".", POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
         cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp"))
@@ -221,7 +218,7 @@ assess_privacy <- function(
         rgdal::writeOGR(this.df, ".", this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
         cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp"))
       }
-      results= list("POLY_AGG" = POLY.agg, "Grid2Min" = show.this)
+      results= list("POLY_AGG" = POLY.agg, "Grid2Min" = grid2Min.allowed)
     }else{
       print("no data to show")
       results= list("POLY_AGG" = POLY.agg, "Grid2Min" = NULL)
