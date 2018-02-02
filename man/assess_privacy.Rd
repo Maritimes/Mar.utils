@@ -24,9 +24,8 @@ values (in decimal degrees)}
 aggregated) depends on the presence of a threshold number of unique values 
 for certain sensitive fields.  This parameter sets that threshold.}
 
-\item{agg.fields}{the default is \code{NULL}, but if a db is provided, they 
-will be guessed.  These are the fields on which to aggregate (i.e. generate 
-values of \code{MEAN}, \code{COUNT} and \code{SUM}).}
+\item{agg.fields}{the default is \code{NULL}.  These are the fields on which 
+to aggregate (i.e. generate values of \code{MEAN}, \code{COUNT} and \code{SUM}).}
 
 \item{sens.fields}{the defaults are \code{NULL}  These are fields
 to which the "rule of 5" should be applied. The Treasury Secretariat states that when data is 
