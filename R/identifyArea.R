@@ -31,9 +31,10 @@ identifyArea <- function(df = NULL,
                           agg.poly.field = NULL){  
   #retain bad coords so we can alert the user
   df_bad = df_qc_spatial(df = df, lat.field = lat.field, lon.field = lon.field, return.bad = TRUE)
+  
   #get the good ones, and convert to spatial
   df = df_qc_spatial(df = df, lat.field = lat.field, lon.field = lon.field, return.bad = FALSE)
-  df_sp = df_to_sp(df = df, lat.field = lat.field, lon.field = lon.field, the.crs = "+proj=longlat +datum=WGS84")
+  df_sp = df_to_sp(df = df, lat.field = lat.field, lon.field = lon.field, the.crs = "+init=epsg:4326")
   #default to determining the NAFO_BEST column of the NAFO areas if no polygon and/or field is chosen
   if (is.null(agg.poly.shp)){
     agg.poly= NAFOSubunits
@@ -45,15 +46,25 @@ identifyArea <- function(df = NULL,
     agg.poly <- rgdal::readOGR(dsn = agg.poly.shp, verbose = FALSE)
     if (is.na(sp::proj4string(agg.poly))) {
       cat('\nNo projection found for input shapefile - assuming geographic.')
-      sp::proj4string(agg.poly) = sp::CRS("+proj=longlat +datum=WGS84")
+      sp::proj4string(agg.poly) = sp::CRS("+init=epsg:4326")
     }
     #convert the shape to geographic
     agg.poly <- sp::spTransform(agg.poly,sp::CRS("+init=epsg:4326"))
   }
   #append the appropriate value from agg.poly
   df_sp@data = cbind(df_sp@data,sp::over( df_sp, agg.poly , fn = NULL)[agg.poly.field])
+
+  
   #add an error message to the unprocessable fields
-  df_bad[agg.poly.field]<-"Bad coordinate"
+  #if numeric, add -999, otherwise a more informative msg
+  if (nrow(df_bad)>0){
+    if(sapply(df_sp@data[agg.poly.field], is.numeric)[[1]]){
+      df_bad[agg.poly.field]<- -999
+    }else{
+      df_bad[agg.poly.field] <- "Bad coordinate"
+    }
+  }
+  
   #merge good an bad records together
   combined = rbind(df_sp@data, df_bad)
   return(invisible(combined))
