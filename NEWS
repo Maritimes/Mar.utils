@@ -1,0 +1,7 @@
+Mar.utils 2018.04.06 
+==============
+
+Changes:
+
+* Added method for extracting VMS data by area
+* Added function for plotting line segments

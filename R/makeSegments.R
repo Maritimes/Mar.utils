@@ -1,0 +1,119 @@
+#' @title makeSegments
+#' @description This function takes a dataframe with coordinates in decimal 
+#' degrees and a track identifier, and creates line segments for each distinct 
+#' identifier.  If specified, it will plot the results in R and/or create 
+#' shapefiles.
+#' @param df default is \code{NULL}.  This is the dataframe to be processed.  It 
+#' should have coordinates in decimal degrees and they should be in fields 
+#' called "LATITUDE" and "LONGITUDE".  It should also have fields for use by 
+#' \code{objField} and \code{seqField}.
+#' @param objField default is \code{NULL}. This is a field identifying which 
+#' points are part of the same track;
+#' @param seqField default is \code{NULL}. This is a field which can be used to 
+#' correctly order the positions along the track (dates are fine).
+#' @param points default is \code{"orphans"}. While this function generates 
+#' tracks, it's possible that single records can exist from which no track can 
+#' be displayed.  Setting it to "orphans" includes these lone positions in the 
+#' output plots and/or shapefiles.  Setting it to "all" includes all positions
+#' in the output plots and/or shapefiles. Setting it to "none" ignores points
+#' and doesn't output any. 
+#' @param the.crs default is \code{"+init=epsg:4326"}. This is the projection 
+#' you want any generated data to be output in.  Input data is assumed to be 
+#' from a GPS and should be WGS84 (which is what the default value corresponds 
+#' with).
+#' @param filename default is \code{NULL}.  If you are outputting shapefiles, 
+#' you can specify a name for them here.  They will also get a timestamp. 
+#' @param plot default is \code{TRUE}. This determines whether or not generated 
+#' tracks will be plotted.
+#' @param createShp default is \code{TRUE}. This determines whether or not 
+#' shapefiles will be generated in your working directory.
+#' @return a list with 2 items - a SpatialPointsDataFrame, and a 
+#' SpatialLinesDataFrame.  Additionally, shapefiles can also be generated.
+# @importFrom sp CRS
+#' @importFrom plyr count
+# @importFrom sp spTransform
+# @importFrom sp coordinates
+# @importFrom sp proj4string
+# @importFrom rgdal readOGR
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
+#' @export
+makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
+                         points = "orphans", the.crs = "+init=epsg:4326", 
+                         filename = NULL, plot=TRUE, createShp = TRUE){
+  name=""
+  ts = format(Sys.time(), "%Y%m%d_%H%M")
+  if (is.null(filename)) {
+    name = ts
+  }else{
+    name = filename
+    name = gsub('()','',name)
+    name = gsub('\\.','',name)
+    name = paste(name,"_",ts,sep="" )
+  }
+  df = df[order(df[objField],df[seqField]),]
+  # #check for trips that only have one point
+  check = as.data.frame(count(df,objID=df[,objField]))
+  
+  dataLines = df[df[,objField] %in% check[check$n>1,"objID"],]
+  dataPoints = df[df[,objField] %in% check[check$n==1,"objID"],]
+  
+  shapes = NA
+  res=list()
+  if (points == "all") {
+    plotPoints = df_to_sp(df,the.crs = the.crs)
+    res[[1]]=plotPoints
+    if (createShp) {
+      plotPoints = prepare_shape_fields(plotPoints)
+      rgdal::writeOGR(obj = plotPoints, layer =paste0(name,"_pt"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+      shapes = c(shapes,paste0(name,"_pt.shp"))
+    }
+  } else if (points =="none"){
+    # plotPoints = NA
+  } else {
+    if (nrow(dataPoints)==0){
+      cat("No points are orphaned\n")
+      res[["points"]]=NA
+    }else{
+      plotPoints = df_to_sp(dataPoints,the.crs = the.crs)
+      res[["points"]]=plotPoints
+      if (createShp) {
+        plotPoints = prepare_shape_fields(plotPoints)
+        rgdal::writeOGR(obj = plotPoints, layer =paste0(name,"_pt"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+        shapes = c(shapes,paste0(name,"_pt"))
+      }
+    }
+  } 
+  plotLines<-list()
+  segs = unique(dataLines[,objField])
+  for (i in 1:length(segs)){
+    li = sp::Line(dataLines[dataLines$SEGMID==segs[i],][3:2])
+    plotLines[[i]]<-sp::Lines(li,ID=segs[i])
+  }
+  plotLines = sp::SpatialLines(plotLines)
+  sp::proj4string(plotLines) <- sp::CRS(the.crs)
+  plotLinesID = data.frame(SEGMID = sapply(plotLines@lines, function(x) x@ID))
+
+ # dets = df[!is.na(df[shp.field]),]
+  dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
+  names(dets)[1]<-objField
+  #remove LAT, LON
+  #dets = dets[,c(shp.field,objField)]
+  
+  plotLinesID = merge(plotLinesID, dets, all.x = T)
+  
+  plotLines<-sp::SpatialLinesDataFrame(plotLines,data = plotLinesID, match.ID = FALSE)
+  res[["segments"]]=plotLines
+  if (plot == TRUE){
+    sp::plot(plotLines)
+    if (exists("plotPoints"))sp::plot(plotPoints, add=T)
+  }
+  if (createShp) {
+    rgdal::writeOGR(obj = plotLines, layer =paste0(name,"_line"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+    shapes = c(shapes,paste0(name,"_line.shp"))
+    cat(paste0("The following shapefiles were written to ",getwd(),": \n"))
+    shapes=shapes[!is.na(shapes)]
+    print(shapes)
+  }
+  return(invisible(res))
+  #return(invisible(plotLines))
+}
