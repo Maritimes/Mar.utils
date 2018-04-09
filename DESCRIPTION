@@ -13,7 +13,8 @@ Imports:
     classInt,
     rgdal,
     lubridate,
-    plyr
+    plyr,
+    curl
 Enhances: 
     ROracle,
     DBI

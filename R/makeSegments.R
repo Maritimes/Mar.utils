@@ -29,12 +29,7 @@
 #' shapefiles will be generated in your working directory.
 #' @return a list with 2 items - a SpatialPointsDataFrame, and a 
 #' SpatialLinesDataFrame.  Additionally, shapefiles can also be generated.
-# @importFrom sp CRS
 #' @importFrom plyr count
-# @importFrom sp spTransform
-# @importFrom sp coordinates
-# @importFrom sp proj4string
-# @importFrom rgdal readOGR
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
@@ -52,13 +47,18 @@ makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
   }
   df = df[order(df[objField],df[seqField]),]
   # #check for trips that only have one point
-  check = as.data.frame(count(df,objID=df[,objField]))
   
-  dataLines = df[df[,objField] %in% check[check$n>1,"objID"],]
-  dataPoints = df[df[,objField] %in% check[check$n==1,"objID"],]
+  check = plyr::count(df, objField)
+  names(check)[names(check)==objField]<-"objID"
+  dataLines = df[df[,objField] %in% check[check$freq>1,"objID"],]
+  dataPoints = df[df[,objField] %in% check[check$freq==1,"objID"],]
   
-  shapes = NA
   res=list()
+  shapes = NA
+  
+  res[["points"]]=NA
+  res[["segments"]]=NA
+  
   if (points == "all") {
     plotPoints = df_to_sp(df,the.crs = the.crs)
     res[[1]]=plotPoints
@@ -72,7 +72,6 @@ makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
   } else {
     if (nrow(dataPoints)==0){
       cat("No points are orphaned\n")
-      res[["points"]]=NA
     }else{
       plotPoints = df_to_sp(dataPoints,the.crs = the.crs)
       res[["points"]]=plotPoints
@@ -96,6 +95,14 @@ makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
  # dets = df[!is.na(df[shp.field]),]
   dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
   names(dets)[1]<-objField
+  
+  if(objField=="SEGMID"){
+    vrn <- strsplit(dets$SEGMID, split = "_")
+    vrn <- lapply(vrn, "[", 2)
+    vrn <- unlist(vrn)
+    vrn = as.numeric(gsub(pattern = "[[:alpha:]]", replacement = "", x = vrn, perl = TRUE))
+    dets$VR_NUMBER = vrn
+  }
   #remove LAT, LON
   #dets = dets[,c(shp.field,objField)]
   
