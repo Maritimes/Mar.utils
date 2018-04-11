@@ -33,6 +33,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
+                         latField= "LATITUDE",longField="LONGITUDE",
                          points = "orphans", the.crs = "+init=epsg:4326", 
                          filename = NULL, plot=TRUE, createShp = TRUE){
   name=""
@@ -82,41 +83,53 @@ makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
       }
     }
   } 
-  plotLines<-list()
-  segs = unique(dataLines[,objField])
-  for (i in 1:length(segs)){
-    li = sp::Line(dataLines[dataLines$SEGMID==segs[i],][3:2])
-    plotLines[[i]]<-sp::Lines(li,ID=segs[i])
-  }
-  plotLines = sp::SpatialLines(plotLines)
-  sp::proj4string(plotLines) <- sp::CRS(the.crs)
-  plotLinesID = data.frame(SEGMID = sapply(plotLines@lines, function(x) x@ID))
-
- # dets = df[!is.na(df[shp.field]),]
-  dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
-  names(dets)[1]<-objField
+  if (nrow(dataLines)){
+    plotLines<-list()
+    segs = unique(dataLines[,objField])
+    for (i in 1:length(segs)){
+      li = sp::Line(dataLines[dataLines$SEGMID==segs[i],][c(longField,latField)])
+      plotLines[[i]]<-sp::Lines(li,ID=segs[i])
+    }
+    plotLines = sp::SpatialLines(plotLines)
+    sp::proj4string(plotLines) <- sp::CRS(the.crs)
+    plotLinesID = data.frame(SEGMID = sapply(plotLines@lines, function(x) x@ID))
   
-  if(objField=="SEGMID"){
-    vrn <- strsplit(dets$SEGMID, split = "_")
-    vrn <- lapply(vrn, "[", 2)
-    vrn <- unlist(vrn)
-    vrn = as.numeric(gsub(pattern = "[[:alpha:]]", replacement = "", x = vrn, perl = TRUE))
-    dets$VR_NUMBER = vrn
-  }
-  #remove LAT, LON
-  #dets = dets[,c(shp.field,objField)]
-  
-  plotLinesID = merge(plotLinesID, dets, all.x = T)
-  
-  plotLines<-sp::SpatialLinesDataFrame(plotLines,data = plotLinesID, match.ID = FALSE)
-  res[["segments"]]=plotLines
+   # dets = df[!is.na(df[shp.field]),]
+    dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
+    names(dets)[1]<-objField
+    
+    if(objField=="SEGMID"){
+      vrn <- strsplit(dets$SEGMID, split = "_")
+      vrn <- lapply(vrn, "[", 2)
+      vrn <- unlist(vrn)
+      vrn = as.numeric(gsub(pattern = "[[:alpha:]]", replacement = "", x = vrn, perl = TRUE))
+      dets$VR_NUMBER = vrn
+    }
+    #remove LAT, LON
+    #dets = dets[,c(shp.field,objField)]
+    
+    plotLinesID = merge(plotLinesID, dets, all.x = T)
+    
+    plotLines<-sp::SpatialLinesDataFrame(plotLines,data = plotLinesID, match.ID = FALSE)
+    res[["segments"]]=plotLines
+      if (createShp) {
+        rgdal::writeOGR(obj = plotLines, layer =paste0(name,"_line"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+        shapes = c(shapes,paste0(name,"_line.shp"))
+      }
+  }else{
+    cat("No segments could be made\n")
+    }
+    
   if (plot == TRUE){
-    sp::plot(plotLines)
-    if (exists("plotPoints"))sp::plot(plotPoints, add=T)
+    addIt = FALSE
+    if (exists("plotLines")){
+      sp::plot(plotLines)
+      addIt = TRUE
+    }
+    if (exists("plotPoints"))sp::plot(plotPoints, add=addIt)
   }
-  if (createShp) {
-    rgdal::writeOGR(obj = plotLines, layer =paste0(name,"_line"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
-    shapes = c(shapes,paste0(name,"_line.shp"))
+  
+  if (any(!is.na(shapes))) {
     cat(paste0("The following shapefiles were written to ",getwd(),": \n"))
     shapes=shapes[!is.na(shapes)]
     print(shapes)
