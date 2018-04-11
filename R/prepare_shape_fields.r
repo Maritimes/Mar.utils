@@ -27,6 +27,12 @@ prepare_shape_fields <- function(shape){
   names(shape) = gsub('LICENSE','LIC', names(shape))
   names(shape) = gsub('VESSEL','VES', names(shape))
   names(shape) = gsub('MARFIS','MARF', names(shape))
+  names(shape) = gsub('TEMPERATURE','TEMP', names(shape))
+  names(shape) = gsub('BOTTOM','BOTT', names(shape))
+  names(shape) = gsub('SURFACE','SURF', names(shape))
+  names(shape) = gsub('SALINITY','SAL', names(shape))
+  names(shape) = gsub('WEIGHT','WT', names(shape))
+  names(shape) = gsub('DEPTH','DEP', names(shape))
   
   #see if removing the underscores from fields with > 10 chars fixes it
   if (field.names.ok(gsub('_','', names(shape)[nchar(names(shape))>10]))){
