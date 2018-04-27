@@ -5,7 +5,8 @@
 \title{VMSGetRecs}
 \usage{
 VMSGetRecs(usepkg = "roracle", dateStart = NULL, dateEnd = NULL,
-  hrBuffer = 4, shp = NULL, shp.field = NULL, rowNum = 50000)
+  vrnList = NULL, hrBuffer = 4, shp = NULL, shp.field = NULL,
+  rowNum = 50000)
 }
 \arguments{
 \item{usepkg}{default is \code{'roracle'}. This indicates whether the 
@@ -18,6 +19,9 @@ for your VMS data search}
 
 \item{dateEnd}{default is \code{NULL}. This is the end date ('YYYY-MM-DD') 
 for your VMS data search}
+
+\item{vrnList}{default is \code{NULL}.  A vector or VRNs can be added so 
+that the only positions returned match particular vessel(s).}
 
 \item{hrBuffer}{default is \code{4}.  This is the number of hours worth of 
 VMS data you would like to pad your area search by.  For example, if a vessel
@@ -34,11 +38,12 @@ that identifies the area(s).}
 
 \item{rowNum}{default is \code{50000}.  In the event of populating a table 
 with VMS data, no end date is entered.  If this is the case, this value will 
-limit how many VMS records are pulled on each function call.  It is in place 
+limit how many VMS records are pulled on each function call.  It is in place l
 to prevent crashing your application.}
 }
 \value{
-a DataFrame with the column \code{agg.poly.field} added
+a DataFrame with the column \code{agg.poly.field} added (if value for 
+\code{shp} is supplied)
 }
 \description{
 This function extracts VMS data for a given timespan and area.  

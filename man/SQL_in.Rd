@@ -4,10 +4,16 @@
 \alias{SQL_in}
 \title{SQL_in}
 \usage{
-SQL_in(x)
+SQL_in(x, apos = TRUE)
 }
 \arguments{
 \item{x}{The default value is \code{NULL}.}
+
+\item{apos}{The default value is \code{TRUE}. The default of \code{TRUE} 
+results in a series of values where each is surrounded by apostrophes, which 
+is appropriate for character values (e.g. ('Archer', 'Lana', 'Krieger')). 
+Setting it to \code{FALSE} omits the apostrophes, making it appropriate for 
+numeric values (e.g. (1,2,3,4,5))}
 }
 \description{
 Converts a vector of characters into something that an "IN" statement can use

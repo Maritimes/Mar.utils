@@ -11,6 +11,10 @@
 #' points are part of the same track;
 #' @param seqField default is \code{NULL}. This is a field which can be used to 
 #' correctly order the positions along the track (dates are fine).
+#' @param lat.field the default is \code{"LATITUDE"}. the name of the field holding latitude values 
+#' (in decimal degrees)
+#' @param lon.field the default is \code{"LONGITUDE"}.  the name of the field holding longitude 
+#' values (in decimal degrees)
 #' @param points default is \code{"orphans"}. While this function generates 
 #' tracks, it's possible that single records can exist from which no track can 
 #' be displayed.  Setting it to "orphans" includes these lone positions in the 
@@ -33,7 +37,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
-                         latField= "LATITUDE",longField="LONGITUDE",
+                         lat.field= "LATITUDE",lon.field="LONGITUDE",
                          points = "orphans", the.crs = "+init=epsg:4326", 
                          filename = NULL, plot=TRUE, createShp = TRUE){
   name=""
@@ -87,7 +91,7 @@ makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
     plotLines<-list()
     segs = unique(dataLines[,objField])
     for (i in 1:length(segs)){
-      li = sp::Line(dataLines[dataLines$SEGMID==segs[i],][c(longField,latField)])
+      li = sp::Line(dataLines[dataLines$SEGMID==segs[i],][c(lon.field,lat.field)])
       plotLines[[i]]<-sp::Lines(li,ID=segs[i])
     }
     plotLines = sp::SpatialLines(plotLines)

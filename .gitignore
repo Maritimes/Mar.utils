@@ -3,3 +3,9 @@
 .RData
 .Ruserdata
 *.Rproj
+#shapefiles
+*.shp
+*.shx
+*.dbf
+*.prj
+*.lock
