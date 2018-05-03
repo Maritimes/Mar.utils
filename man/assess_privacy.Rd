@@ -6,9 +6,8 @@
 \usage{
 assess_privacy(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE",
   rule.of = 5, agg.fields = NULL, sens.fields = NULL, nclasses = 4,
-  show.plot = TRUE, save.plot = FALSE, fun = "mean",
-  create.shps = FALSE, file_id = NULL, agg.poly.shp = NULL,
-  agg.poly.field = NULL)
+  show.plot = TRUE, save.plot = FALSE, fun = "mean", create.shps = TRUE,
+  file_id = NULL, agg.poly.shp = NULL, agg.poly.field = NULL)
 }
 \arguments{
 \item{df}{a dataframe to be analyzed. If left \code{NULL}, a value for 
@@ -49,7 +48,7 @@ INSTEAD of being shown}
 will be used to symnbolize your plotted data.  Options include "mean", "sum" 
 and "length" (which is a count)}
 
-\item{create.shps}{default is \code{FALSE}.  This indicates whether or not 
+\item{create.shps}{default is \code{TRUE}.  This indicates whether or not 
 shapefiles should be created for 1) the polygon file (with aggregated values 
 for each polygon and an indication of whether or not each polygon meets the 
 privacy constraints), and 2) the 2 min gridded data (only for within those 

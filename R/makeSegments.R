@@ -91,16 +91,17 @@ makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
     plotLines<-list()
     segs = unique(dataLines[,objField])
     for (i in 1:length(segs)){
-      li = sp::Line(dataLines[dataLines$SEGMID==segs[i],][c(lon.field,lat.field)])
+      li = sp::Line(dataLines[dataLines[objField]==segs[i],][c(lon.field,lat.field)])
       plotLines[[i]]<-sp::Lines(li,ID=segs[i])
     }
     plotLines = sp::SpatialLines(plotLines)
     sp::proj4string(plotLines) <- sp::CRS(the.crs)
+
     plotLinesID = data.frame(SEGMID = sapply(plotLines@lines, function(x) x@ID))
   
    # dets = df[!is.na(df[shp.field]),]
     dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
-    names(dets)[1]<-objField
+    names(dets)[1]<-"SEGMID"
     
     if(objField=="SEGMID"){
       vrn <- strsplit(dets$SEGMID, split = "_")

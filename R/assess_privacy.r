@@ -32,7 +32,7 @@
 #' @param fun the default is \code{mean}.  This is the aggregated data that 
 #' will be used to symnbolize your plotted data.  Options include "mean", "sum" 
 #' and "length" (which is a count)
-#' @param create.shps default is \code{FALSE}.  This indicates whether or not 
+#' @param create.shps default is \code{TRUE}.  This indicates whether or not 
 #' shapefiles should be created for 1) the polygon file (with aggregated values 
 #' for each polygon and an indication of whether or not each polygon meets the 
 #' privacy constraints), and 2) the 2 min gridded data (only for within those 
@@ -80,7 +80,7 @@ assess_privacy <- function(
   show.plot = TRUE,
   save.plot = FALSE,
   fun = "mean",
-  create.shps = FALSE,
+  create.shps = TRUE,
   file_id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL
@@ -230,6 +230,6 @@ assess_privacy <- function(
 
   }
   
-  return(results)
+  return(invisible(results))
 }
 

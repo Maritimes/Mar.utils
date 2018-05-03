@@ -19,7 +19,7 @@ numeric values (e.g. (1,2,3,4,5))}
 Converts a vector of characters into something that an "IN" statement can use
 }
 \seealso{
-Other util: \code{\link{na_zero}}, \code{\link{st_err}}
+Other util: \code{\link{st_err}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l
