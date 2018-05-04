@@ -1,4 +1,4 @@
-#' @title identifyArea
+#' @title identify_area
 #' @description This function takes a df with coordinate fields in decimal
 #' degrees, and overlays it a shapefile (agg.poly.shp).  It adds a column to the 
 #' df indicating which polygon within the shapefile each point falls within.
@@ -24,7 +24,7 @@
 #' @importFrom rgdal readOGR
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-identifyArea <- function(df = NULL,
+identify_area <- function(df = NULL,
                           lat.field = "LATITUDE", 
                           lon.field = "LONGITUDE",
                           agg.poly.shp = NULL,

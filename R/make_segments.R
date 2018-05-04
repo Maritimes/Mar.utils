@@ -1,4 +1,4 @@
-#' @title makeSegments
+#' @title make_segments
 #' @description This function takes a dataframe with coordinates in decimal 
 #' degrees and a track identifier, and creates line segments for each distinct 
 #' identifier.  If specified, it will plot the results in R and/or create 
@@ -36,7 +36,7 @@
 #' @importFrom plyr count
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-makeSegments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
+make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
                          lat.field= "LATITUDE",lon.field="LONGITUDE",
                          points = "orphans", the.crs = "+init=epsg:4326", 
                          filename = NULL, plot=TRUE, createShp = TRUE){

@@ -1,4 +1,4 @@
-#' @title make_isdb_tracks
+#' @title make_segments_isdb
 #' @description This function takes a df of the isdb data (including fields
 #' \code{FISHSET_ID} and LAT1:LAT4 and LONG1:LONG4) and makes a 
 #' spatialLinesDataFrame which can be plotted.If selected, it can also QC them.
@@ -48,7 +48,7 @@
 #' @importFrom stats complete.cases
 #' @importFrom lubridate year
 #' @export
-make_isdb_tracks <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
+make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
  
   # Pull out coordinates, stack em, create and populate QC status field ----
   crs.geo <- sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84") 

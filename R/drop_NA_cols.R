@@ -1,4 +1,4 @@
-#' @title drop_NACols
+#' @title drop_NA_cols
 #' @description This function takes a dataframe and removes any columns that are
 #' entirely populated with NAs
 #' @param df default is \code{NULL}. This is the dataframe you want to check
@@ -6,7 +6,7 @@
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-drop_NACols <- function(df){
+drop_NA_cols <- function(df){
   df[sapply(df, function(x) all(is.na(x)))] <- NULL
   return(invisible(df))
 }

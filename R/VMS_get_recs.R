@@ -1,4 +1,4 @@
-#' @title VMSGetRecs
+#' @title VMS_get_recs
 #' @description This function extracts VMS data for a given timespan and area.  
 #' A time buffer can be added returns other points that are not within the area
 #' of interest, but give context to the path.
@@ -35,7 +35,7 @@
 # @importFrom rgdal readOGR
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-VMSGetRecs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
+VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
                        rowNum = 50000){
   if (!is.null(dateEnd)) {
@@ -66,7 +66,7 @@ VMSGetRecs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
     saveRecs = cbind(saveRecs,data.frame(SEGMID=character(), shp.field=character()))
     names(saveRecs)[names(saveRecs) == "shp.field"] <- shp.field
     if (nrow(allRecs)==0) stop("No records returned")
-    areaRecs = identifyArea(allRecs, agg.poly.shp = shp, agg.poly.field = shp.field)
+    areaRecs = identify_area(allRecs, agg.poly.shp = shp, agg.poly.field = shp.field)
     areaRecs = areaRecs[which(!is.na(areaRecs[shp.field]) & areaRecs[shp.field] != "Bad coordinate"),] 
     if (nrow(areaRecs)==0) stop("No records in area detected")
     #maybe this is where we detect old segmid that we need to append to?
