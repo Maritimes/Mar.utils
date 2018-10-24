@@ -5,9 +5,9 @@
 \title{make_segments}
 \usage{
 make_segments(df, objField = "SEGMID", seqField = "POSITION_UTC_DATE",
-  lat.field = "LATITUDE", lon.field = "LONGITUDE", points = "orphans",
-  the.crs = "+init=epsg:4326", filename = NULL, plot = TRUE,
-  createShp = TRUE)
+  lat.field = "LATITUDE", lon.field = "LONGITUDE",
+  points = "orphans", the.crs = "+init=epsg:4326", filename = NULL,
+  plot = TRUE, createShp = TRUE)
 }
 \arguments{
 \item{df}{default is \code{NULL}.  This is the dataframe to be processed.  It 

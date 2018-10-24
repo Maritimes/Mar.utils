@@ -24,3 +24,4 @@ Other util: \code{\link{st_err}}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l
 }
+\concept{util}

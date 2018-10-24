@@ -4,9 +4,10 @@
 \alias{assess_privacy}
 \title{assess_privacy}
 \usage{
-assess_privacy(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE",
-  rule.of = 5, agg.fields = NULL, sens.fields = NULL, nclasses = 4,
-  show.plot = TRUE, save.plot = FALSE, fun = "mean", create.shps = TRUE,
+assess_privacy(df = NULL, lat.field = "LATITUDE",
+  lon.field = "LONGITUDE", rule.of = 5, agg.fields = NULL,
+  sens.fields = NULL, nclasses = 4, show.plot = TRUE,
+  save.plot = FALSE, fun = "mean", create.shps = TRUE,
   file_id = NULL, agg.poly.shp = NULL, agg.poly.field = NULL)
 }
 \arguments{
@@ -87,3 +88,4 @@ included in the checks.  Please make very sure you correctly identify such field
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{aggregation}

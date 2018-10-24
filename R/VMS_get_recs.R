@@ -113,9 +113,9 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
       }
       
     }
-    saveRecs= saveRecs[order(c(saveRecs$VR_NUMER, saveRecs$POSITION_UTC_DATE)),]
+    saveRecs= saveRecs[order(c(saveRecs$VR_NUMBER, saveRecs$POSITION_UTC_DATE)),]
   }else{
-    saveRecs = allRecs[order(c(allRecs$VR_NUMER, allRecs$POSITION_UTC_DATE)),]
+    saveRecs = allRecs[order(c(allRecs$VR_NUMBER, allRecs$POSITION_UTC_DATE)),]
   }
   return(saveRecs)
 }

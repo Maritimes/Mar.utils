@@ -4,8 +4,9 @@
 \alias{identify_area}
 \title{identify_area}
 \usage{
-identify_area(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE",
-  agg.poly.shp = NULL, agg.poly.field = NULL)
+identify_area(df = NULL, lat.field = "LATITUDE",
+  lon.field = "LONGITUDE", agg.poly.shp = NULL,
+  agg.poly.field = NULL)
 }
 \arguments{
 \item{df}{a dataframe to be analyzed. If left \code{NULL}, a value for 

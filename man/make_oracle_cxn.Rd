@@ -37,3 +37,4 @@ allows connection via RODBC or ROracle, depending on the value of usepkg.
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{dfo_extractions}

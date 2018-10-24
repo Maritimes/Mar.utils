@@ -25,3 +25,4 @@ Other general_use: \code{\link{df_qc_spatial}},
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{general_use}
