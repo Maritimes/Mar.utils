@@ -1,7 +1,9 @@
-Mar.utils 2018.04.06 
+Mar.utils 
 ==============
 
 Changes:
-
+2019.03.12
+* Added updateCheck function
+2018.04.06 
 * Added method for extracting VMS data by area
 * Added function for plotting line segments

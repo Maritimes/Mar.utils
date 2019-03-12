@@ -29,7 +29,8 @@ This function takes a dataframe and converts in to a spatialpointsdataframe
 \seealso{
 Other general_use: \code{\link{df_qc_spatial}},
   \code{\link{drop_NA_cols}},
-  \code{\link{prepare_shape_fields}}
+  \code{\link{prepare_shape_fields}},
+  \code{\link{updateCheck}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
