@@ -47,6 +47,8 @@
 #' @param agg.poly.field default is \code{NULL}.  This identifies the field within 
 #' the shapefile provided to agg.poly.shp that should be used to check for 
 #' sufficient unique values of the sens.fields.
+#' @param grid.shape default is \code{"hex"}.  This identifies the shape of the 
+#' you want to aggregate your data into.  The options are "hex" or "square"
 #' @param nclasses default is \code{4} This is how many discrete classes you 
 #' want to use to categorize data on the output plot.
 #' @return a SpatialPolygonsDataFrame, and generates a shapefile
@@ -71,6 +73,7 @@
 #' @export
 assess_privacy <- function(
   df= NULL, 
+  grid.shape = 'hex',
   lat.field = 'LATITUDE',
   lon.field = 'LONGITUDE',
   rule.of = 5,
@@ -154,6 +157,19 @@ assess_privacy <- function(
   allowed.areas.sp = agg.poly[agg.poly@data[[agg.poly.field]] %in% allowed.areas,]
 
   df$ORD_df = seq.int(nrow(df))
+  
+  if (agg.shape =="hex"){
+    grid2Min<-hex
+  } else{
+    
+  }
+  sp::proj4string(grid2Min) = sp::CRS("+proj=longlat +datum=WGS84")
+  # > hex@proj4string
+  # CRS arguments:
+  #   +proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0 
+  # > grid2Min@proj4string
+  # CRS arguments:
+  #   +proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0 
   grid2Min$ORD_gr <-  seq.int(nrow(grid2Min)) 
 
     if (length(allowed.areas)>0){

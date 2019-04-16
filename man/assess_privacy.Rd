@@ -4,7 +4,7 @@
 \alias{assess_privacy}
 \title{assess_privacy}
 \usage{
-assess_privacy(df = NULL, lat.field = "LATITUDE",
+assess_privacy(df = NULL, grid.shape = "hex", lat.field = "LATITUDE",
   lon.field = "LONGITUDE", rule.of = 5, agg.fields = NULL,
   sens.fields = NULL, nclasses = 4, show.plot = TRUE,
   save.plot = FALSE, fun = "mean", create.shps = TRUE,
@@ -13,6 +13,9 @@ assess_privacy(df = NULL, lat.field = "LATITUDE",
 \arguments{
 \item{df}{a dataframe to be analyzed. If left \code{NULL}, a value for 
 \code{db} should be provided}
+
+\item{grid.shape}{default is \code{"hex"}.  This identifies the shape of the 
+you want to aggregate your data into.  The options are "hex" or "square"}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values 
 (in decimal degrees)}
