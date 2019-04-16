@@ -158,7 +158,7 @@ assess_privacy <- function(
 
   df$ORD_df = seq.int(nrow(df))
   
-  if (agg.shape =="hex"){
+  if (grid.shape =="hex"){
     grid2Min<-hex
   } else{
     
