@@ -21,7 +21,7 @@ understood and are not simply truncated.
 \seealso{
 Other general_use: \code{\link{df_qc_spatial}},
   \code{\link{df_to_sp}}, \code{\link{drop_NA_cols}},
-  \code{\link{updateCheck}}
+  \code{\link{pbs2sp_poly}}, \code{\link{updateCheck}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
