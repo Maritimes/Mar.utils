@@ -4,10 +4,16 @@
 \alias{drop_NA_cols}
 \title{drop_NA_cols}
 \usage{
-drop_NA_cols(df)
+drop_NA_cols(df = NULL, dropUninformative = F, keepers = NULL)
 }
 \arguments{
 \item{df}{default is \code{NULL}. This is the dataframe you want to check}
+
+\item{dropUninformative}{default is \code{F}.  This can be set to TRUE to drop
+all columns that have a single unique value throughout the entuire dataframe.}
+
+\item{keepers}{default is \code{NULL}.This is a vector of columns you 
+definitely want to retain, even all values are identical}
 }
 \value{
 dataframe
