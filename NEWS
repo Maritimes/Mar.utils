@@ -2,6 +2,8 @@ Mar.utils
 ==============
 
 Changes:
+2019.06.07
+* Replaced drop_NA_cols with much more flexible drop_cols
 2019.03.28
 * Added hex data
 2019.03.12
