@@ -21,6 +21,7 @@ Imports:
 Enhances: 
     ROracle,
     DBI
+Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/Maritimes/Mar.utils/

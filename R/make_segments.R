@@ -37,9 +37,9 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
-                         lat.field= "LATITUDE",lon.field="LONGITUDE",
-                         points = "orphans", the.crs = "+init=epsg:4326", 
-                         filename = NULL, plot=TRUE, createShp = TRUE){
+                          lat.field= "LATITUDE",lon.field="LONGITUDE",
+                          points = "orphans", the.crs = "+init=epsg:4326", 
+                          filename = NULL, plot=TRUE, createShp = TRUE){
   name=""
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   if (is.null(filename)) {
@@ -96,10 +96,10 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     }
     plotLines = sp::SpatialLines(plotLines)
     sp::proj4string(plotLines) <- sp::CRS(the.crs)
-
+    
     plotLinesID = data.frame(SEGMID = sapply(plotLines@lines, function(x) x@ID))
-  
-   # dets = df[!is.na(df[shp.field]),]
+    
+    # dets = df[!is.na(df[shp.field]),]
     dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
     names(dets)[1]<-"SEGMID"
     
@@ -117,14 +117,14 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     
     plotLines<-sp::SpatialLinesDataFrame(plotLines,data = plotLinesID, match.ID = FALSE)
     res[["segments"]]=plotLines
-      if (createShp) {
-        rgdal::writeOGR(obj = plotLines, layer =paste0(name,"_line"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
-        shapes = c(shapes,paste0(name,"_line.shp"))
-      }
+    if (createShp) {
+      rgdal::writeOGR(obj = plotLines, layer =paste0(name,"_line"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+      shapes = c(shapes,paste0(name,"_line.shp"))
+    }
   }else{
     cat("No segments could be made\n")
-    }
-    
+  }
+  
   if (plot == TRUE){
     addIt = FALSE
     if (exists("plotLines")){

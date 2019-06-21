@@ -19,8 +19,10 @@
 #' to the nearest 5 minutes.  If a field called "UPDATE_DATE" exists, it will be 
 #' used to grab only the most recent record in cases where multiple records have
 #' the same values for both objField and timeField (e.g. vessel, and time of position)
+#' @importFrom data.table :=
+#' @importFrom data.table .SD
 #' @importFrom data.table setDT
-#' @importFrom data.table special-symbol
+#' @importFrom utils tail
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -31,7 +33,7 @@ VMS_clean_recs <-function(vmsdf=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE"
   vmsdf[,lat.field]<-round( vmsdf[,lat.field],4)
   vmsdf[,lon.field]<-round( vmsdf[,lon.field],4)
   #round time to nearest 5 minutes
-  vmsdf[,timeField] <- as.POSIXct(round(as.numeric(vmsRecs$POSITION_UTC_DATE)/(300))*(300),origin='1970-01-01')
+  vmsdf[,timeField] <- as.POSIXct(round(as.numeric(vmsdf$POSITION_UTC_DATE)/(300))*(300),origin='1970-01-01')
   vmsdf= unique(vmsdf)
   
   if ("UPDATE_DATE" %in% names(vmsdf)){
