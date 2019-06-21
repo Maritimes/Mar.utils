@@ -26,25 +26,28 @@
 #' with VMS data, no end date is entered.  If this is the case, this value will 
 #' limit how many VMS records are pulled on each function call.  It is in place l
 #' to prevent crashing your application.
+#' @param simpleQC default is \code{TRUE}. If True, this drops records where the 
+#' latitude is 0, 90 or -90 or the longitude is 0, 180 or -180. 
 #' @return a DataFrame with the column \code{agg.poly.field} added (if value for 
 #' \code{shp} is supplied)
-# @importFrom sp CRS
-# @importFrom sp spTransform
-# @importFrom sp coordinates
-# @importFrom sp proj4string
-# @importFrom rgdal readOGR
+#' @importFrom sp CRS
+#' @importFrom sp spTransform
+#' @importFrom sp coordinates
+#' @importFrom sp proj4string
+#' @importFrom rgdal readOGR
+#' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
-                       rowNum = 50000){
+                       rowNum = 50000, simpleQC = TRUE){
   if (!is.null(dateEnd)) {
-    whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD HH24:MI:SS')") 
+    whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
   }else{
     whereDateEnd = paste0("AND ROWNUM <= ",rowNum)
   }
   if (!is.null(vrnList)) {
-    whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = FALSE),")") 
+    whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
   }else{
     whereVRN = ""
   }
@@ -53,15 +56,13 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
   # go to VMS source, and retrieve records
   recSQL = paste0("select VR_NUMBER,LATITUDE,LONGITUDE,POSITION_UTC_DATE,SPEED_KNOTS,UPDATE_DATE
               from MFD_OBFMI.VMS_ALL 
-              WHERE POSITION_UTC_DATE> to_date('",dateStart,"','YYYY-MM-DD HH24:MI:SS') ",whereDateEnd, 
+              WHERE POSITION_UTC_DATE> to_date('",dateStart,"','YYYY-MM-DD') ",whereDateEnd, 
                   " ",whereVRN
   )
   oracle_cxn = make_oracle_cxn(usepkg)
-  
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
   #set up something to hold the ones we'll keep
   if (!is.null(shp)){
-    
     saveRecs = allRecs[FALSE,]
     saveRecs = cbind(saveRecs,data.frame(SEGMID=character(), shp.field=character()))
     names(saveRecs)[names(saveRecs) == "shp.field"] <- shp.field
@@ -72,6 +73,7 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
     #maybe this is where we detect old segmid that we need to append to?
     allVess<-unique(areaRecs$VR_NUMBER)
     for (i in 1:length(allVess)){
+      cat("working on",allVess[i],"\n")
       # if (i==1)browser()
       thisVessRecs = areaRecs[areaRecs$VR_NUMBER == allVess[i],]
       thisVessRecs = thisVessRecs[order(thisVessRecs$POSITION_UTC_DATE),]
@@ -111,11 +113,19 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
           saveRecs = rbind(saveRecs,allContextthisTrip)
         }
       }
-      
+      cat("finished ",allVess[i],"\n")
     }
-    saveRecs= saveRecs[order(c(saveRecs$VR_NUMBER, saveRecs$POSITION_UTC_DATE)),]
+    saveRecs = saveRecs[with(saveRecs,order(VR_NUMBER, POSITION_UTC_DATE)),]
   }else{
-    saveRecs = allRecs[order(c(allRecs$VR_NUMBER, allRecs$POSITION_UTC_DATE)),]
+    saveRecs = allRecs[with(allRecs,order(VR_NUMBER, POSITION_UTC_DATE)),]
   }
+
+  if (simpleQC){
+  saveRecs = saveRecs[which(abs(round(saveRecs$LATITUDE,0))!=0 & 
+                            abs(round(saveRecs$LONGITUDE,0)) !=0 & 
+                            abs(round(saveRecs$LATITUDE,0))!=90 & 
+                            abs(round(saveRecs$LONGITUDE,0))!=180),]
+  }
+  
   return(saveRecs)
 }

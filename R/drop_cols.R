@@ -7,15 +7,13 @@
 #' will drop/retain iother fields depending on the following parameters. 
 #' @param uniformFields default is \code{'retain'}.  This determines how the script
 #' will handle uniform fields.  It can either retain them or drop them.  Valid
-#' values are \code{'retain'} or \code{'drop'} .   
-#' \describe{ 
-#' \item{\code{'drop'}} specifies that any field that has a single value for all 
+#' values are \code{'retain'} or \code{'drop'}.   
+#' \code{'drop'} specifies that any field that has a single value for all 
 #' entries will be dropped.  This is useful for identifying the fields that can 
-#' be used to differentiate records. 
-#' \item{\code{'retain'}} specifies that only those fields which have a single 
+#' be used to differentiate records.
+#' \code{'retain'} specifies that only those fields which have a single 
 #' value for all entries will be retained.  This is useful for identifying the 
-#' fields with values that are shared by all records in a dataframe. 
-#' }
+#' fields with values that are shared by all records in a dataframe.
 #' @param keepFields default is \code{NULL}.This is a vector of column names you 
 #' definitely want to retain, regardless of the values.
 #' @return dataframe

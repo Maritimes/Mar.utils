@@ -6,7 +6,7 @@
 \usage{
 VMS_get_recs(usepkg = "roracle", dateStart = NULL, dateEnd = NULL,
   vrnList = NULL, hrBuffer = 4, shp = NULL, shp.field = NULL,
-  rowNum = 50000)
+  rowNum = 50000, simpleQC = TRUE)
 }
 \arguments{
 \item{usepkg}{default is \code{'roracle'}. This indicates whether the 
@@ -40,6 +40,9 @@ that identifies the area(s).}
 with VMS data, no end date is entered.  If this is the case, this value will 
 limit how many VMS records are pulled on each function call.  It is in place l
 to prevent crashing your application.}
+
+\item{simpleQC}{default is \code{TRUE}. If True, this drops records where the 
+latitude is 0, 90 or -90 or the longitude is 0, 180 or -180.}
 }
 \value{
 a DataFrame with the column \code{agg.poly.field} added (if value for 
@@ -50,6 +53,10 @@ This function extracts VMS data for a given timespan and area.
 A time buffer can be added returns other points that are not within the area
 of interest, but give context to the path.
 }
+\seealso{
+Other vms: \code{\link{VMS_clean_recs}}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{vms}
