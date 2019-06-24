@@ -37,7 +37,7 @@ identify_area <- function(df = NULL,
   df_sp = df_to_sp(df = df, lat.field = lat.field, lon.field = lon.field, the.crs = "+init=epsg:4326")
   #default to determining the NAFO_BEST column of the NAFO areas if no polygon and/or field is chosen
   if (is.null(agg.poly.shp)){
-    agg.poly= NAFOSubunits
+    agg.poly= Mar.data::NAFOSubunits
     agg.poly = sp::spTransform(agg.poly,sp::CRS("+init=epsg:4326"))
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO_BEST'

@@ -4,11 +4,16 @@
 \alias{VMS_clean_recs}
 \title{VMS_clean_recs}
 \usage{
-VMS_clean_recs(vmsdf = NULL, lat.field = "LATITUDE",
+VMS_clean_recs(df = NULL, lat.field = "LATITUDE",
   lon.field = "LONGITUDE", objField = "VR_NUMBER",
   timeField = "POSITION_UTC_DATE")
 }
 \arguments{
+\item{df}{default is \code{NULL}.  This is the dataframe to be processed.  It 
+should have coordinates in decimal degrees and they should be in fields 
+called "LATITUDE" and "LONGITUDE".  It also needs a field with the time 
+associated with each position, i.e. the  \code{timeField}.}
+
 \item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values 
 (in decimal degrees)}
 
@@ -20,11 +25,6 @@ points are associated withe eachother.}
 
 \item{timeField}{default is \code{POSITION_UTC_DATE}. This is the field which 
 will be used to calculate the time differences between records.}
-
-\item{df}{default is \code{NULL}.  This is the dataframe to be processed.  It 
-should have coordinates in decimal degrees and they should be in fields 
-called "LATITUDE" and "LONGITUDE".  It also needs a field with the time 
-associated with each position, i.e. the  \code{timeField}.}
 }
 \description{
 This function takes raw VMS data (i.e. a dataframe having 

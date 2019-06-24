@@ -2,6 +2,9 @@ Mar.utils
 ==============
 
 Changes:
+2019.06.24
+* Moves data files to external repos (Mar.data)
+* Adds VMS_clea_recs
 2019.06.07
 * Replaced drop_NA_cols with much more flexible drop_cols
 2019.03.28

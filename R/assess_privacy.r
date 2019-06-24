@@ -99,7 +99,7 @@ assess_privacy <- function(
   sp::proj4string(df) = sp::CRS("+proj=longlat +datum=WGS84")
 
   if (is.null(agg.poly.shp)){
-    agg.poly= NAFOSubunits
+    agg.poly= Mar.data::NAFOSubunits
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO_BEST'
     }
@@ -159,9 +159,9 @@ assess_privacy <- function(
   df$ORD_df = seq.int(nrow(df))
   
   if (grid.shape =="hex"){
-    grid2Min<-hex
+    grid2Min<-Mar.data::hex
   } else{
-    
+    grid2Min<-Mar.data::grid2Min
   }
   sp::proj4string(grid2Min) = sp::CRS("+proj=longlat +datum=WGS84")
   # > hex@proj4string

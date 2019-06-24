@@ -26,9 +26,10 @@
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-VMS_clean_recs <-function(vmsdf=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
+VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE"){
   #round dd coords to 4 decimals (~10m resolution)
+  vmsdf=df
   n1 = nrow(vmsdf)
   vmsdf[,lat.field]<-round( vmsdf[,lat.field],4)
   vmsdf[,lon.field]<-round( vmsdf[,lon.field],4)
