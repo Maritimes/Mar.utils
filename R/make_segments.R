@@ -57,7 +57,6 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
   names(check)[names(check)==objField]<-"objID"
   dataLines = df[df[,objField] %in% check[check$freq>1,"objID"],]
   dataPoints = df[df[,objField] %in% check[check$freq==1,"objID"],]
-  
   res=list()
   shapes = NA
   
@@ -87,7 +86,14 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
       }
     }
   } 
+  
   if (nrow(dataLines)){
+    dataLines=as.data.table(dataLines)
+    dataLines[ , trekMin := min(get(seqField)), by = objField]
+    dataLines[ , trekMax := max(get(seqField)), by = objField]
+    dataLines[ , cnt := length(get(objField)), by = objField]
+    dataLines = as.data.frame(dataLines)
+    
     plotLines<-list()
     segs = unique(dataLines[,objField])
     for (i in 1:length(segs)){
@@ -96,28 +102,12 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     }
     plotLines = sp::SpatialLines(plotLines)
     sp::proj4string(plotLines) <- sp::CRS(the.crs)
-    
-    plotLinesID = data.frame(SEGMID = sapply(plotLines@lines, function(x) x@ID))
-    
-    # dets = df[!is.na(df[shp.field]),]
-    dets = as.data.frame(df[!duplicated(df[c(objField)]),objField]) 
-    names(dets)[1]<-"SEGMID"
-    
-    if(objField=="SEGMID"){
-      vrn <- strsplit(dets$SEGMID, split = "_")
-      vrn <- lapply(vrn, "[", 2)
-      vrn <- unlist(vrn)
-      vrn = as.numeric(gsub(pattern = "[[:alpha:]]", replacement = "", x = vrn, perl = TRUE))
-      dets$VR_NUMBER = vrn
-    }
-    #remove LAT, LON
-    #dets = dets[,c(shp.field,objField)]
-    
-    plotLinesID = merge(plotLinesID, dets, all.x = T)
-    
-    plotLines<-sp::SpatialLinesDataFrame(plotLines,data = plotLinesID, match.ID = FALSE)
+    dets = as.data.frame(dataLines[!duplicated(dataLines[c(objField)]),]) 
+    rownames(dets) <- dets[,objField]
+    plotLines<-sp::SpatialLinesDataFrame(plotLines,data = dets, match.ID = TRUE)
     res[["segments"]]=plotLines
     if (createShp) {
+      plotLines = prepare_shape_fields(plotLines)
       rgdal::writeOGR(obj = plotLines, layer =paste0(name,"_line"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
       shapes = c(shapes,paste0(name,"_line.shp"))
     }
@@ -140,5 +130,4 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     print(shapes)
   }
   return(invisible(res))
-  #return(invisible(plotLines))
 }

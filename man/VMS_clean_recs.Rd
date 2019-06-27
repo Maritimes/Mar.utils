@@ -6,7 +6,8 @@
 \usage{
 VMS_clean_recs(df = NULL, lat.field = "LATITUDE",
   lon.field = "LONGITUDE", objField = "VR_NUMBER",
-  timeField = "POSITION_UTC_DATE")
+  timeField = "POSITION_UTC_DATE", minDist_m = 50,
+  maxBreak_mins = 1440)
 }
 \arguments{
 \item{df}{default is \code{NULL}.  This is the dataframe to be processed.  It 
@@ -25,18 +26,33 @@ points are associated withe eachother.}
 
 \item{timeField}{default is \code{POSITION_UTC_DATE}. This is the field which 
 will be used to calculate the time differences between records.}
+
+\item{minDist_m}{the default is \code{50}. This is the minimum distance (m) a vessel
+must move from it's last position in order for the record to be kept.  This 
+should be greater than zero to avoid records for vessels sitting in port.}
+
+\item{maxBreak_mins}{the default is \code{1440}.  This is the maximum time (in mins)
+that is allowed between positions before a new "trek" is created.}
+}
+\value{
+a dataframe with an additional "trek" column identifying a number of
+discrete paths for each unique value of \code{objField}.
 }
 \description{
 This function takes raw VMS data (i.e. a dataframe having 
-sequential coordinates and times), and removes duplicate positions.
+sequential coordinates and times) and cleans it.
 }
 \note{
-Your resultant df will likely have less records than your source df.
-During the cleaning process, values for Latitude and Longitude will be 
-rounded to 4 decimals (~11m resolution), and values in your timeFields will be rounded 
-to the nearest 5 minutes.  If a field called "UPDATE_DATE" exists, it will be 
-used to grab only the most recent record in cases where multiple records have
-the same values for both objField and timeField (e.g. vessel, and time of position)
+The resultant df will likely have less records than the source.
+During the cleaning process, values for Latitude and Longitude are rounded 
+from 5 decimal places to 4 (~1m --> 11m resolution), and times are rounded
+to the nearest 5 minutes.  If a field called  "UPDATE_DATE" exists, it will
+be used to "break ties" in the case of duplicate records (i.e. the more recent 
+record will is retained.
+Additionally,  data is grouped into "treks" which can be thought of as discrete
+forays by a vessel.  A new trek occurs when the time between subsequent points 
+for a vessel exceeds \code{maxBreak_mins}.  If no value is provided, 24 hours
+(i.e. 1440 minutes) will be used.
 }
 \seealso{
 Other vms: \code{\link{VMS_get_recs}}

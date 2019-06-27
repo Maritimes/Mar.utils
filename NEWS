@@ -2,9 +2,12 @@ Mar.utils
 ==============
 
 Changes:
+2019.06.27
+* Vast improvement to VMS_clean_recs
+* Improves make_segments
 2019.06.24
 * Moves data files to external repos (Mar.data)
-* Adds VMS_clea_recs
+* Adds VMS_clean_recs
 2019.06.07
 * Replaced drop_NA_cols with much more flexible drop_cols
 2019.03.28
