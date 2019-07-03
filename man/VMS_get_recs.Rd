@@ -6,7 +6,7 @@
 \usage{
 VMS_get_recs(usepkg = "roracle", dateStart = NULL, dateEnd = NULL,
   vrnList = NULL, hrBuffer = 4, shp = NULL, shp.field = NULL,
-  rowNum = 50000, simpleQC = TRUE)
+  simpleQC = TRUE, rowNum = 50000)
 }
 \arguments{
 \item{usepkg}{default is \code{'roracle'}. This indicates whether the 
@@ -18,7 +18,8 @@ connect.  rodbc is slightly easier to setup, but roracle will extract data
 for your VMS data search}
 
 \item{dateEnd}{default is \code{NULL}. This is the end date ('YYYY-MM-DD') 
-for your VMS data search}
+for your VMS data search. If this is left NULL, one year of data will be
+returned}
 
 \item{vrnList}{default is \code{NULL}.  A vector or VRNs can be added so 
 that the only positions returned match particular vessel(s).}
@@ -36,13 +37,12 @@ polygons that should be checked for existence of VMS data.}
 that should attached to the reurned data.  This will typically be a field 
 that identifies the area(s).}
 
-\item{rowNum}{default is \code{50000}.  In the event of populating a table 
-with VMS data, no end date is entered.  If this is the case, this value will 
-limit how many VMS records are pulled on each function call.  It is in place l
-to prevent crashing your application.}
-
 \item{simpleQC}{default is \code{TRUE}. If True, this drops records where the 
 latitude is 0, 90 or -90 or the longitude is 0, 180 or -180.}
+
+\item{rowNum}{default is \code{50000}.  This is the maximimum number of VMS 
+records that can be extracted. It is in place to prevent crashing your 
+application.}
 }
 \value{
 a DataFrame with the column \code{agg.poly.field} added (if value for 

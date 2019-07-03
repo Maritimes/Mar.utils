@@ -19,15 +19,15 @@
 #' @param dateStart default is \code{NULL}. This is the start date ('YYYY-MM-DD') 
 #' for your VMS data search
 #' @param dateEnd default is \code{NULL}. This is the end date ('YYYY-MM-DD') 
-#' for your VMS data search
+#' for your VMS data search. If this is left NULL, one year of data will be
+#' returned 
 #' @param vrnList default is \code{NULL}.  A vector or VRNs can be added so 
 #' that the only positions returned match particular vessel(s).
-#' @param rowNum default is \code{50000}.  In the event of populating a table 
-#' with VMS data, no end date is entered.  If this is the case, this value will 
-#' limit how many VMS records are pulled on each function call.  It is in place l
-#' to prevent crashing your application.
 #' @param simpleQC default is \code{TRUE}. If True, this drops records where the 
 #' latitude is 0, 90 or -90 or the longitude is 0, 180 or -180. 
+#' @param rowNum default is \code{50000}.  This is the maximimum number of VMS 
+#' records that can be extracted. It is in place to prevent crashing your 
+#' application.
 #' @return a DataFrame with the column \code{agg.poly.field} added (if value for 
 #' \code{shp} is supplied)
 #' @importFrom sp CRS
@@ -35,29 +35,29 @@
 #' @importFrom sp coordinates
 #' @importFrom sp proj4string
 #' @importFrom rgdal readOGR
+#' @importFrom lubridate years
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
-                       rowNum = 50000, simpleQC = TRUE){
-  if (!is.null(dateEnd)) {
-    whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
-  }else{
-    whereDateEnd = paste0("AND ROWNUM <= ",rowNum)
-  }
+                       simpleQC = TRUE, rowNum = 50000){
+  if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + years(1)
+  whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
+  
   if (!is.null(vrnList)) {
     whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
   }else{
     whereVRN = ""
   }
+  sqlLimit = paste0(" AND ROWNUM <= ",rowNum)
   
   run_ts = as.integer(Sys.time())
   # go to VMS source, and retrieve records
   recSQL = paste0("select VR_NUMBER,LATITUDE,LONGITUDE,POSITION_UTC_DATE,SPEED_KNOTS,UPDATE_DATE
               from MFD_OBFMI.VMS_ALL 
               WHERE POSITION_UTC_DATE> to_date('",dateStart,"','YYYY-MM-DD') ",whereDateEnd, 
-                  " ",whereVRN
+                  " ",whereVRN, sqlLimit
   )
   oracle_cxn = make_oracle_cxn(usepkg)
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
