@@ -63,10 +63,8 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
   dataPoints = df[df[,objField] %in% check[check$freq==1,"objID"],]
   res=list()
   shapes = NA
-  
   res[["points"]]=NA
   res[["segments"]]=NA
-  
   if (points == "all") {
     plotPoints = df_to_sp(df,the.crs = the.crs)
     res[[1]]=plotPoints
@@ -79,7 +77,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     # plotPoints = NA
   } else {
     if (nrow(dataPoints)==0){
-      cat("No points are orphaned\n")
+      # cat("\nNo points are orphaned")
     }else{
       plotPoints = df_to_sp(dataPoints,the.crs = the.crs)
       res[["points"]]=plotPoints
@@ -116,7 +114,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
       shapes = c(shapes,paste0(name,"_line.shp"))
     }
   }else{
-    cat("No segments could be made\n")
+    cat("\nNo segments could be made")
   }
   
   if (plot == TRUE){
@@ -129,7 +127,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
   }
   
   if (any(!is.na(shapes))) {
-    cat(paste0("The following shapefiles were written to ",getwd(),": \n"))
+    cat(paste0("\nThe following shapefiles were written to ",getwd(),": "))
     shapes=shapes[!is.na(shapes)]
     print(shapes)
   }
