@@ -2,18 +2,20 @@ Mar.utils
 ==============
 
 Changes:
+2019.07.04
+* Adds total_fishng_picture() and
 2019.06.27
-* Vast improvement to VMS_clean_recs
-* Improves make_segments
+* Vast improvement to VMS_clean_recs()
+* Improves make_segments()
 2019.06.24
 * Moves data files to external repos (Mar.data)
 * Adds VMS_clean_recs
 2019.06.07
-* Replaced drop_NA_cols with much more flexible drop_cols
+* Replaced drop_NA_cols() with much more flexible drop_cols()
 2019.03.28
 * Added hex data
 2019.03.12
-* Added updateCheck function
+* Added updateCheck() function
 2018.04.06 
 * Added method for extracting VMS data by area
 * Added function for plotting line segments

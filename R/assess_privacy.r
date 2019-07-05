@@ -99,7 +99,7 @@ assess_privacy <- function(
   sp::proj4string(df) = sp::CRS("+proj=longlat +datum=WGS84")
 
   if (is.null(agg.poly.shp)){
-    agg.poly= Mar.data::NAFOSubunits
+    agg.poly=  Mar.data::NAFOSubunits
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO_BEST'
     }

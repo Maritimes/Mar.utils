@@ -23,6 +23,8 @@
 #' @importFrom data.table :=
 #' @importFrom data.table .SD
 #' @importFrom data.table setDT
+#' @importFrom data.table shift
+#' @importFrom utils head
 #' @importFrom utils tail
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
@@ -40,6 +42,9 @@
 VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE",
                           minDist_m = 50, maxBreak_mins = 1440){
+  #following are vars that will be created by data.table, and build errors
+  #appear if we don't define them
+  distCalc <- time_min <- elapsedDist_m <- elapsedTime_min<-  NA
   vmsdf=df
   n1 = nrow(vmsdf)
   # cat("initial no:",n1,"\n")
@@ -55,18 +60,18 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     #For cases where a vessel has multiple positions at a single time, I use 
     #UPDATE_DATE to get only the most recently updated position
     vmsdf = vmsdf[order(vmsdf[objField],vmsdf[timeField],vmsdf$UPDATE_DATE),] 
-    vmsdf = setDT(vmsdf)
-    vmsdf = vmsdf[,tail(.SD,1),by=list("newObjField" = get(objField),"newTimeField" = get(timeField))]
+    vmsdf = data.table::setDT(vmsdf)
+    vmsdf = vmsdf[,utils::tail(.SD,1),by=list("newObjField" = get(objField),"newTimeField" = get(timeField))]
     vmsdf = as.data.frame(vmsdf)
     vmsdf[objField]<-NULL
     vmsdf[timeField]<-NULL
     colnames(vmsdf)[colnames(vmsdf)=="newObjField"] <- objField
     colnames(vmsdf)[colnames(vmsdf)=="newTimeField"] <- timeField
   }
-  # cat("post-rounding:",nrow(vmsdf),"\n")
+  
   vmsdf = setDT(vmsdf)
   vmsdf[,distCalc:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
-  vmsdf[,time_min:=difftime(get(timeField), shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
+  vmsdf[,time_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
   vmsdf <- as.data.frame(vmsdf)
   vmsdf$time_min<-as.numeric(vmsdf$time_min)
   # pingRate = median(vmsdf$time_min) 
@@ -75,7 +80,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   #distCalc above associates distance with the record *before* the movement 
   #occurred.  The following bumps all of the distance calculations down to the 
   #next record.
-  vmsdf['distCalc'] <- c(-1, head(vmsdf['distCalc'], dim(vmsdf)[1] - 1)[[1]])
+  vmsdf['distCalc'] <- c(-1, utils::head(vmsdf['distCalc'], dim(vmsdf)[1] - 1)[[1]])
   #if the position has not changed since the last one, then it's probably 
   #non-informative.  However, if enough time has passed (i.e. 10*pingRate), maybe
   #it's the start of a new trip? 
@@ -84,12 +89,12 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   vmsdf <- vmsdf[which(vmsdf$KEEP==TRUE),]
   # cat("post-redundants:",nrow(vmsdf),"\n")
   vmsdf$KEEP<-NULL
-  vmsdf = setDT(vmsdf)
+  vmsdf = data.table::setDT(vmsdf)
   vmsdf[,elapsedDist_m:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
   vmsdf[,elapsedTime_min:=difftime(get(timeField), shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
   vmsdf <- as.data.frame(vmsdf)
   vmsdf$elapsedTime_min<-as.numeric(vmsdf$elapsedTime_min)
-  vmsdf['elapsedDist_m'] <- c(NA, head(vmsdf['elapsedDist_m'], dim(vmsdf)[1] - 1)[[1]])
+  vmsdf['elapsedDist_m'] <- c(NA, utils::head(vmsdf['elapsedDist_m'], dim(vmsdf)[1] - 1)[[1]])
   vmsdf$time_min<-NULL
   vmsdf$distCalc <- NULL
   

@@ -31,6 +31,7 @@
 #' tracks will be plotted.
 #' @param createShp default is \code{TRUE}. This determines whether or not 
 #' shapefiles will be generated in your working directory.
+#' @importFrom data.table setDT
 #' @return a list with 2 items - a SpatialPointsDataFrame, and a 
 #' SpatialLinesDataFrame.  Additionally, shapefiles can also be generated.
 #' @importFrom plyr count
@@ -40,6 +41,9 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
                           lat.field= "LATITUDE",lon.field="LONGITUDE",
                           points = "orphans", the.crs = "+init=epsg:4326", 
                           filename = NULL, plot=TRUE, createShp = TRUE){
+  #following are vars that will be created by data.table, and build errors
+  #appear if we don't define them
+  trekMax <- trekMin <- cnt <- NULL
   name=""
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   if (is.null(filename)) {
@@ -88,7 +92,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
   } 
   
   if (nrow(dataLines)){
-    dataLines=as.data.table(dataLines)
+    dataLines=data.table::setDT(dataLines)
     dataLines[ , trekMin := min(get(seqField)), by = objField]
     dataLines[ , trekMax := max(get(seqField)), by = objField]
     dataLines[ , cnt := length(get(objField)), by = objField]
