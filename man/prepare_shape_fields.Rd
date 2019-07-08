@@ -19,9 +19,10 @@ attempts to ensure that the shortened names that result from calls to writeOGR()
 understood and are not simply truncated.
 }
 \seealso{
-Other general_use: \code{\link{df_qc_spatial}},
-  \code{\link{df_to_sp}}, \code{\link{drop_cols}},
-  \code{\link{pbs2sp_poly}}, \code{\link{updateCheck}}
+Other general_use: \code{\link{clip_by_poly_generic}},
+  \code{\link{df_qc_spatial}}, \code{\link{df_to_sp}},
+  \code{\link{drop_cols}}, \code{\link{pbs2sp_poly}},
+  \code{\link{updateCheck}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

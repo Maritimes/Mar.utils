@@ -27,8 +27,9 @@ hemisphere (i.e. LAT between 0 and 90) and aren't in the western hemisphere
 the "return.bad" flag allows it to return only the "bad" points.
 }
 \seealso{
-Other general_use: \code{\link{df_to_sp}},
-  \code{\link{drop_cols}}, \code{\link{pbs2sp_poly}},
+Other general_use: \code{\link{clip_by_poly_generic}},
+  \code{\link{df_to_sp}}, \code{\link{drop_cols}},
+  \code{\link{pbs2sp_poly}},
   \code{\link{prepare_shape_fields}},
   \code{\link{updateCheck}}
 }
