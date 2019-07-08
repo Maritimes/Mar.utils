@@ -8,13 +8,18 @@
 #' @param the.crs the default is \code{+init=epsg:4326}.  This is the projection 
 #' of the incoming data.  This is NOT what you want the projection to be.  
 #' Assigning a projection, and reprojecting are different.
+#' @param autoQC the default is \code{TRUE}.  This runs df_qc_spatial() 
+#' automatically, ensuring that all coordinates are in the Northern hemsisphere
+#' (i.e. Latitude between 0 and 90N) and the western hemisphere (i.e. Longitude
+#' between -180 and 0W) 
 #' @return spatialpointsdataframe
 #' @family general_use
 #' @importFrom sp SpatialPointsDataFrame
 #' @importFrom sp CRS
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-df_to_sp <- function(df = NULL, lat.field="LATITUDE", lon.field="LONGITUDE", the.crs = "+init=epsg:4326"){
+df_to_sp <- function(df = NULL, lat.field="LATITUDE", lon.field="LONGITUDE", the.crs = "+init=epsg:4326", autoQC = TRUE){
+  df = df_qc_spatial(df = df, lat.field = lat.field, lon.field = lon.field, return.bad = FALSE)
   df.sp = sp::SpatialPointsDataFrame(
     coords = df[, c(lon.field, lat.field)],
     data = df,

@@ -5,7 +5,7 @@
 \title{df_to_sp}
 \usage{
 df_to_sp(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE",
-  the.crs = "+init=epsg:4326")
+  the.crs = "+init=epsg:4326", autoQC = TRUE)
 }
 \arguments{
 \item{df}{default is \code{NULL}. This is the dataframe you want to spatialize.}
@@ -19,6 +19,11 @@ values (in decimal degrees)}
 \item{the.crs}{the default is \code{+init=epsg:4326}.  This is the projection 
 of the incoming data.  This is NOT what you want the projection to be.  
 Assigning a projection, and reprojecting are different.}
+
+\item{autoQC}{the default is \code{TRUE}.  This runs df_qc_spatial() 
+automatically, ensuring that all coordinates are in the Northern hemsisphere
+(i.e. Latitude between 0 and 90N) and the western hemisphere (i.e. Longitude
+between -180 and 0W)}
 }
 \value{
 spatialpointsdataframe
