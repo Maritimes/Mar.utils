@@ -56,7 +56,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   
   if (dup>0){
     isdb.df <- isdb.df[!duplicated(isdb.df), ]
-    cat(paste(dup," duplicate rows were removed from your data\n"))
+    cat(paste("\n",dup," duplicate rows were removed from your data"))
   }
   rownames(isdb.df) <- isdb.df$FISHSET_ID
 
@@ -120,7 +120,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
       posHem = length(isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"LONG"] )
       if (posHem>0){
         isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"QC"] <- 'pos:HEMISPHERE'
-        cat(paste0(posHem," coords seem to be in the wrong hemisphere, but will be plotted as-is\n"))
+        cat(paste0("\n",posHem," coords seem to be in the wrong hemisphere, but will be plotted as-is"))
       }
     }
     #Flag posBad for drop (except wrong hemisphere)
@@ -207,7 +207,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   all.sets.lines = SpatialLines(all.sets.lines)
   proj4string(all.sets.lines) <- crs.geo
   }
-  cat(paste0(length(all.sets.lines), " of ", nrow(isdb.df), " sets could be made into lines having at least 2 points.\n"))
+  cat(paste0("\n",length(all.sets.lines), " of ", nrow(isdb.df), " sets could be made into lines having at least 2 points."))
   
   if (do.qc){
     #Sort the qc field prior to merging into line df
@@ -228,20 +228,20 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
     }
     if (any(!is.na(fishsetsBadPt))){
       fishsetsBadPt <- fishsetsBadPt[!is.na(fishsetsBadPt)]
-      cat(paste0("The following ",length(fishsetsBadPt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:\n"))
+      cat(paste0("\n","The following ",length(fishsetsBadPt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:"))
       for (j in 1:length(fishsetsBadPt)){
-        cat(paste0("\t ",fishsetsBadPt[j],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadPt[j]),"QCPOS"],"\n"))
+        cat(paste0("\n\t ",fishsetsBadPt[j],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadPt[j]),"QCPOS"]))
       }
     }
     if  (any(!is.na(fishsetsBadTime))){
       fishsetsBadTime <- fishsetsBadTime[!is.na(fishsetsBadTime)]
-      cat(paste0("The following ",length(fishsetsBadTime)," sets reported invalid dates/times, due to identical values across positions, or time-order mismatch:\n"))
+      cat(paste0("\n","The following ",length(fishsetsBadTime)," sets reported invalid dates/times, due to identical values across positions, or time-order mismatch:"))
       for (l in 1:length(fishsetsBadTime)){
-        cat(paste0("\t ",fishsetsBadTime[l],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadTime[l]),"QCTIME"],"\n"))
+        cat(paste0("\n\t ",fishsetsBadTime[l],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadTime[l]),"QCTIME"]))
       }
     }
   }else{
-    cat("For more info on the lines that failed or other issues, run this with function with 'do.qc=TRUE'")
+    cat("\n","For more info on the lines that failed or other issues, run this with function with 'do.qc=TRUE'")
     if(length(all.sets.lines)>0){
       all.sets.lines<-SpatialLinesDataFrame(all.sets.lines, isdb.df[1], match.ID = "FISHSET_ID")
     }

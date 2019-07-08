@@ -26,7 +26,7 @@ updateCheck<-function(gitPkg = NULL){
   })
   
   if (is.null(remote)){
-    cat("Can't reach url to check version")
+    cat("\n","Can't reach url to check version")
     return(NULL)
   }  
 
@@ -35,13 +35,13 @@ updateCheck<-function(gitPkg = NULL){
   remoteVer = verCleaner(remote)
   
   if (localVer == remoteVer){
-    cat(paste0(gitPkg,": Latest and greatest version confirmed.","\n"))
+    cat(paste0("\n", gitPkg,": Latest and greatest version confirmed."))
   }else if (localVer > remoteVer){
-    cat("Push to Github!","\n")
+    cat("\n","Push to Github!")
   }else if (localVer < remoteVer){
-    cat(paste0(gitPkg, ": Old version detected -- v.",gsub('^([0-9]{4})([0-9]{2})([0-9]{2})$','\\1\\.\\2\\.\\3',remoteVer)," is now available","\n"))
-    cat("It is highly recommended that you run the following code to update this package","\n\n")
-    cat(paste("devtools::install_github('",gitPkg,"')", sep=""))
+    cat(paste0("\n", gitPkg, ": Old version detected -- v.",gsub('^([0-9]{4})([0-9]{2})([0-9]{2})$','\\1\\.\\2\\.\\3',remoteVer)," is now available"))
+    cat("\n","You can run the following code to update this package:")
+    cat(paste("\n","devtools::install_github('",gitPkg,"')", sep=""))
   }
   
 }

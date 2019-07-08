@@ -73,7 +73,7 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
     #maybe this is where we detect old segmid that we need to append to?
     allVess<-unique(areaRecs$VR_NUMBER)
     for (i in 1:length(allVess)){
-      cat("working on",allVess[i],"\n")
+      cat("\n","working on",allVess[i])
       # if (i==1)browser()
       thisVessRecs = areaRecs[areaRecs$VR_NUMBER == allVess[i],]
       thisVessRecs = thisVessRecs[order(thisVessRecs$POSITION_UTC_DATE),]
@@ -113,7 +113,7 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
           saveRecs = rbind(saveRecs,allContextthisTrip)
         }
       }
-      cat("finished ",allVess[i],"\n")
+      cat("\n","finished ",allVess[i])
     }
     saveRecs = saveRecs[with(saveRecs,order(VR_NUMBER, POSITION_UTC_DATE)),]
   }else{

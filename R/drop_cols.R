@@ -22,7 +22,7 @@
 #' @export
 drop_cols<-function(df = NULL, justDropNAs = TRUE, uniformFields = 'retain', keepFields = NULL){
   if (justDropNAs) {
-    cat("Just dropping NA columns","\n")
+    cat("\n","Just dropping NA columns")
     return(df[!sapply(df, function(x) all(is.na(x)))])
   }
 
