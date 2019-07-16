@@ -2,6 +2,21 @@
 #' @description This function extracts VMS data for a given timespan and area.  
 #' A time buffer can be added returns other points that are not within the area
 #' of interest, but give context to the path.
+#' @param fn.oracle.username default is \code{'_none_'} This is your username for
+#' accessing oracle objects. If you have a value for \code{oracle.username} 
+#' stored in your environment (e.g. from an rprofile file), this can be left out
+#' and that value will be used.  If a value for this is provided, it will take 
+#' priority over your existing value.
+#' @param fn.oracle.password default is \code{'_none_'} This is your password for
+#' accessing oracle objects. If you have a value for \code{oracle.password}  
+#' stored in your environment (e.g. from an rprofile file), this can be left out
+#' and that value will be used.  If a value for this is provided, it will take 
+#' priority over your existing value.
+#' @param fn.oracle.dsn default is \code{'_none_'} This is your dsn/ODBC
+#' identifier for accessing oracle objects. If you have a value for 
+#' \code{oracle.dsn} stored in your environment (e.g. from an rprofile file), 
+#' this can be left and that value will be used.  If a value for this is 
+#' provided, it will take priority over your existing value.
 #' @param usepkg default is \code{'roracle'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data 
@@ -39,13 +54,20 @@
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
+VMS_get_recs <- function(fn.oracle.username = "_none_", 
+                         fn.oracle.password = "_none_", 
+                         fn.oracle.dsn = "_none_",
+                         usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
                        simpleQC = TRUE, rowNum = 50000){
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
   
   if (!is.null(vrnList)) {
+    if (length(vrnList)>1000){
+      cat("\nToo many vessels to extract VMS data (max of 1000)")
+      return(NA)
+    }
     whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
   }else{
     whereVRN = ""
@@ -59,7 +81,10 @@ VMS_get_recs <- function(usepkg = 'roracle', dateStart = NULL, dateEnd = NULL,
               WHERE POSITION_UTC_DATE> to_date('",dateStart,"','YYYY-MM-DD') ",whereDateEnd, 
                   " ",whereVRN, sqlLimit
   )
-  oracle_cxn = make_oracle_cxn(usepkg)
+  oracle_cxn = make_oracle_cxn(fn.oracle.username =fn.oracle.username, 
+                               fn.oracle.password = fn.oracle.password, 
+                               fn.oracle.dsn = fn.oracle.dsn,
+                               usepkg = usepkg)
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
   #set up something to hold the ones we'll keep
   if (!is.null(shp)){
