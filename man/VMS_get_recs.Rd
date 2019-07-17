@@ -4,12 +4,32 @@
 \alias{VMS_get_recs}
 \title{VMS_get_recs}
 \usage{
-VMS_get_recs(usepkg = "roracle", dateStart = NULL, dateEnd = NULL,
+VMS_get_recs(fn.oracle.username = "_none_",
+  fn.oracle.password = "_none_", fn.oracle.dsn = "_none_",
+  usepkg = "rodbc", dateStart = NULL, dateEnd = NULL,
   vrnList = NULL, hrBuffer = 4, shp = NULL, shp.field = NULL,
   simpleQC = TRUE, rowNum = 50000)
 }
 \arguments{
-\item{usepkg}{default is \code{'roracle'}. This indicates whether the 
+\item{fn.oracle.username}{default is \code{'_none_'} This is your username for
+accessing oracle objects. If you have a value for \code{oracle.username} 
+stored in your environment (e.g. from an rprofile file), this can be left out
+and that value will be used.  If a value for this is provided, it will take 
+priority over your existing value.}
+
+\item{fn.oracle.password}{default is \code{'_none_'} This is your password for
+accessing oracle objects. If you have a value for \code{oracle.password}  
+stored in your environment (e.g. from an rprofile file), this can be left out
+and that value will be used.  If a value for this is provided, it will take 
+priority over your existing value.}
+
+\item{fn.oracle.dsn}{default is \code{'_none_'} This is your dsn/ODBC
+identifier for accessing oracle objects. If you have a value for 
+\code{oracle.dsn} stored in your environment (e.g. from an rprofile file), 
+this can be left and that value will be used.  If a value for this is 
+provided, it will take priority over your existing value.}
+
+\item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
 connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 connect.  rodbc is slightly easier to setup, but roracle will extract data 
 ~ 5x faster.}

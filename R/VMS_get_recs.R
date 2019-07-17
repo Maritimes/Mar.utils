@@ -17,7 +17,7 @@
 #' \code{oracle.dsn} stored in your environment (e.g. from an rprofile file), 
 #' this can be left and that value will be used.  If a value for this is 
 #' provided, it will take priority over your existing value.
-#' @param usepkg default is \code{'roracle'}. This indicates whether the 
+#' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data 
 #' ~ 5x faster.
@@ -57,7 +57,7 @@
 VMS_get_recs <- function(fn.oracle.username = "_none_", 
                          fn.oracle.password = "_none_", 
                          fn.oracle.dsn = "_none_",
-                         usepkg = 'roracle', dateStart = NULL, dateEnd = NULL, 
+                         usepkg = 'rodbc', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
                        simpleQC = TRUE, rowNum = 50000){
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + years(1)
