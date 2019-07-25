@@ -5,7 +5,7 @@
 \title{df_qc_spatial}
 \usage{
 df_qc_spatial(df, lat.field = "LATITUDE", lon.field = "LONGITUDE",
-  return.bad = FALSE)
+  return.bad = FALSE, autoQC = T)
 }
 \arguments{
 \item{df}{the dataframe to be cleaned}
@@ -16,6 +16,11 @@ df_qc_spatial(df, lat.field = "LATITUDE", lon.field = "LONGITUDE",
 
 \item{return.bad}{the default is \code{FALSE}.  Normally, only the plottable points are returned.
 If TRUE, only the rejected points are returned.}
+
+\item{autoQC}{the default is \code{TRUE}.  This runs df_qc_spatial() 
+automatically, ensuring that all coordinates are in the Northern hemsisphere
+(i.e. Latitude between 0 and 90N) and the western hemisphere (i.e. Longitude
+between -180 and 0W)}
 }
 \value{
 data.frame contents depend of the return.bad parameter

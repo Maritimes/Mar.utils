@@ -19,7 +19,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 df_to_sp <- function(df = NULL, lat.field="LATITUDE", lon.field="LONGITUDE", the.crs = "+init=epsg:4326", autoQC = TRUE){
-  df = df_qc_spatial(df = df, lat.field = lat.field, lon.field = lon.field, return.bad = FALSE)
+  df = df_qc_spatial(df = df, lat.field = lat.field, lon.field = lon.field, return.bad = FALSE, autoQC=autoQC)
   df.sp = sp::SpatialPointsDataFrame(
     coords = df[, c(lon.field, lat.field)],
     data = df,

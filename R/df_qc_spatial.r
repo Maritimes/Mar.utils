@@ -8,14 +8,20 @@
 #' @param lon.field default is \code{LONGITUDE}.  The field in the dataframe holding the longitudes
 #' @param return.bad the default is \code{FALSE}.  Normally, only the plottable points are returned.
 #' If TRUE, only the rejected points are returned.
+#' @param autoQC the default is \code{TRUE}.  This runs df_qc_spatial() 
+#' automatically, ensuring that all coordinates are in the Northern hemsisphere
+#' (i.e. Latitude between 0 and 90N) and the western hemisphere (i.e. Longitude
+#' between -180 and 0W) 
 #' @return data.frame contents depend of the return.bad parameter
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-df_qc_spatial <-function(df, lat.field = "LATITUDE", lon.field = "LONGITUDE", return.bad=FALSE){
+df_qc_spatial <-function(df, lat.field = "LATITUDE", lon.field = "LONGITUDE", return.bad=FALSE, autoQC=T){
   pass = df[!is.na(df[lat.field]) & !is.na(df[lon.field]),]
+  if (autoQC){
   pass = pass[pass[lat.field] > 0 & pass[lat.field] < 90,] #northern hemisphere only
   pass = pass[pass[lon.field] > -180 & pass[lon.field] < 0,] #western hemisphere only
+  }
   if (return.bad){
     fail = rbind(df, pass)
     fail = fail[!duplicated(fail,fromLast = FALSE)&!duplicated(fail,fromLast = TRUE),]
