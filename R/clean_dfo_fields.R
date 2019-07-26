@@ -1,4 +1,4 @@
-#' @title clean_marf_fields
+#' @title clean_dfo_fields
 #' @description This function facilitates the dropping of fields from a dataframe.
 #' It was built for specific fields in MARFIS that I never wanted (i.e. CUSER, 
 #' CDATE, UUSER, UDATE), but can also drop other fields easily.
@@ -10,7 +10,7 @@
 #' or any of the ones specified in customCrap.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-clean_marf_fields<- function(df = NULL, customCrap = NULL){
+clean_dfo_fields<- function(df = NULL, customCrap = NULL){
   knownCrap = c('CUSER','CDATE','UUSER','UDATE','LAST_UPDATE','LAST_UPDATE_BY',
                 'LAST_UPDATE_DATE','CREATED_BY','CREATED_DATE','OWNER_GROUP')
   df = df[,!names(df) %in% knownCrap]
