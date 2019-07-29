@@ -69,9 +69,6 @@ clip_by_poly_generic <- function(df=NULL,
   }
   df.sp_subset <- df.sp[clip.poly_this, ] 
   
-  if (!is.null(db)){
-    assign(ds_all[[.GlobalEnv$db]]$table_pos, df.sp_subset@data, envir = env)
-  } 
   if (!return.spatial){
     df.sp_subset = df.sp_subset@data
   }

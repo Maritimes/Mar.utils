@@ -8,6 +8,7 @@ Depends:
     R (>= 2.10)
 Imports:
     RODBC,
+    rgeos,
     sp,
     RColorBrewer,
     classInt,
