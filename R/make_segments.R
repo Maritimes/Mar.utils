@@ -31,10 +31,8 @@
 #' tracks will be plotted.
 #' @param createShp default is \code{TRUE}. This determines whether or not 
 #' shapefiles will be generated in your working directory.
-#' @importFrom data.table setDT
 #' @return a list with 2 items - a SpatialPointsDataFrame, and a 
 #' SpatialLinesDataFrame.  Additionally, shapefiles can also be generated.
-#' @importFrom plyr count
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
@@ -43,7 +41,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
                           filename = NULL, plot=TRUE, createShp = TRUE){
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
-  trekMax <- trekMin <- cnt <- NULL
+  trekMax <- trekMin <- cnt <- `:=` <- NULL
   name=""
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   if (is.null(filename)) {

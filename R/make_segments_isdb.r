@@ -37,16 +37,6 @@
 ##' otherwise data.  Additionally, if the line has a length of zero, that is 
 ##' noted as well.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
-#' @importFrom sp CRS
-#' @importFrom sp Line
-#' @importFrom sp Lines
-#' @importFrom sp LinesLength
-#' @importFrom sp SpatialLines
-#' @importFrom sp SpatialLinesDataFrame
-#' @importFrom sp proj4string<-
-#' @importFrom stats aggregate
-#' @importFrom stats complete.cases
-#' @importFrom lubridate year
 #' @export
 make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
  
@@ -82,13 +72,13 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
     fishsetsBadTime <- NA
     #datechecks
     #year 9999 is a default date - change to NA
-    isdbPos[which(year(isdbPos$DATETIME) == 9999),"DATETIME"]<-NA
+    isdbPos[which(lubridate::year(isdbPos$DATETIME) == 9999),"DATETIME"]<-NA
     #earliest date is 1977
-    validYear<-c(1977:year(Sys.Date()))
+    validYear<-c(1977:lubridate::year(Sys.Date()))
 
-    if (length(unique(isdbPos[!(year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"FISHSET_ID"]))>0){
-      isdbPos[!(year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"QCTIME"]<- 'Invalid year'
-      fishsetsBadTime = c(fishsetsBadTime, unique(isdbPos[!(year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"FISHSET_ID"]))
+    if (length(unique(isdbPos[!(lubridate::year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"FISHSET_ID"]))>0){
+      isdbPos[!(lubridate::year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"QCTIME"]<- 'Invalid year'
+      fishsetsBadTime = c(fishsetsBadTime, unique(isdbPos[!(lubridate::year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"FISHSET_ID"]))
     }
     #more date analysis after bad pos recs have been dropped 
   }
@@ -130,7 +120,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   }
 
   # Do the removal (drop all records which contain an NA -----------------------
-  isdbPos <- isdbPos[complete.cases(isdbPos),] 
+  isdbPos <- isdbPos[stats::complete.cases(isdbPos),] 
  
   if (do.qc){
     isdbTim <- isdbPos[,c("FISHSET_ID","DATETIME", "P","QCTIME")] 
@@ -161,7 +151,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   
   if (do.qc){
     # Roll up all the comments for each set into one col ----------------------
-    isdb.qc <- aggregate(QC ~ FISHSET_ID, isdbPos, function(x) paste0(unique(x), collapse = ", "))
+    isdb.qc <- stats::aggregate(QC ~ FISHSET_ID, isdbPos, function(x) paste0(unique(x), collapse = ", "))
     rownames(isdb.qc) <-isdb.qc$FISHET_ID
     isdb.qc$LEN_KM<-NA
     isdb.qc$N_VALID_VERT<-NA
@@ -177,10 +167,10 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
         all.sets.lines[[i]]<-NULL
         next
       }else{
-        li = Line(isdbPos[isdbPos$FISHSET_ID==this.a,][3:2])
-        all.sets.lines[[i]]<-Lines(li,ID=this.a)
+        li = sp::Line(isdbPos[isdbPos$FISHSET_ID==this.a,][3:2])
+        all.sets.lines[[i]]<-sp::Lines(li,ID=this.a)
       }
-      this.len = LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
+      this.len = sp::LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
       isdb.qc[isdb.qc$FISHSET_ID==this.a,"N_VALID_VERT"]<-length(all.sets.lines[[i]]@Lines[[1]]@coords)/2
       isdb.qc[isdb.qc$FISHSET_ID==this.a,"LEN_KM"]<-this.len
     }
@@ -195,17 +185,17 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
         all.sets.lines[[i]]<-NULL
         next
       }else{
-        li = Line(isdbPos[isdbPos$FISHSET_ID==this.a,][3:2])
-        all.sets.lines[[i]]<-Lines(li,ID=this.a)
+        li = sp::Line(isdbPos[isdbPos$FISHSET_ID==this.a,][3:2])
+        all.sets.lines[[i]]<-sp::Lines(li,ID=this.a)
       }
-      this.len = LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
+      this.len = sp::LinesLength(Ls = all.sets.lines[[i]], longlat = TRUE)
     }
   }
   if(length(all.sets.lines)>0){
   #drop any lines that have zero length
   all.sets.lines = all.sets.lines[!sapply(all.sets.lines, is.null)]
-  all.sets.lines = SpatialLines(all.sets.lines)
-  proj4string(all.sets.lines) <- crs.geo
+  all.sets.lines = sp::SpatialLines(all.sets.lines)
+  sp::proj4string(all.sets.lines) <- crs.geo
   }
   cat(paste0("\n",length(all.sets.lines), " of ", nrow(isdb.df), " sets could be made into lines having at least 2 points."))
   
@@ -223,7 +213,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
     isdb.qc$QCPOS<-sub(",$","",trimws(isdb.qc$QCPOS))
 
     if(length(all.sets.lines)>0){
-    all.sets.lines<-SpatialLinesDataFrame(all.sets.lines, isdb.qc, match.ID = "FISHSET_ID")
+    all.sets.lines<-sp::SpatialLinesDataFrame(all.sets.lines, isdb.qc, match.ID = "FISHSET_ID")
     fishsetsBadPt = setdiff(fishsetsBadPt, all.sets.lines@data$FISHSET_ID)
     }
     if (any(!is.na(fishsetsBadPt))){
@@ -243,7 +233,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   }else{
     cat("\n","For more info on the lines that failed or other issues, run this with function with 'do.qc=TRUE'")
     if(length(all.sets.lines)>0){
-      all.sets.lines<-SpatialLinesDataFrame(all.sets.lines, isdb.df[1], match.ID = "FISHSET_ID")
+      all.sets.lines<-sp::SpatialLinesDataFrame(all.sets.lines, isdb.df[1], match.ID = "FISHSET_ID")
     }
   }
   #add original attribs to line

@@ -17,11 +17,6 @@
 #' the shapefile provided to agg.poly.shp that should be used to check for 
 #' sufficient unique values of the sens.fields.
 #' @return a DataFrame with the column \code{agg.poly.field} added
-#' @importFrom sp CRS
-#' @importFrom sp spTransform
-#' @importFrom sp coordinates
-#' @importFrom sp proj4string
-#' @importFrom rgdal readOGR
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 identify_area <- function(df = NULL,

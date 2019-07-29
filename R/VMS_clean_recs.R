@@ -20,12 +20,6 @@
 #' that is allowed between positions before a new "trek" is created. 
 #' @return a dataframe with an additional "trek" column identifying a number of
 #' discrete paths for each unique value of \code{objField}.
-#' @importFrom data.table :=
-#' @importFrom data.table .SD
-#' @importFrom data.table setDT
-#' @importFrom data.table shift
-#' @importFrom utils head
-#' @importFrom utils tail
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -44,7 +38,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           minDist_m = 50, maxBreak_mins = 1440){
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
-  distCalc <- time_min <- elapsedDist_m <- elapsedTime_min<-  NA
+  distCalc <- time_min <- elapsedDist_m <- elapsedTime_min <- .SD <- `:=` <-  NULL
   vmsdf=df
   n1 = nrow(vmsdf)
   # cat("initial no:",n1,"\n")
@@ -69,7 +63,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     colnames(vmsdf)[colnames(vmsdf)=="newTimeField"] <- timeField
   }
   
-  vmsdf = setDT(vmsdf)
+  vmsdf = data.table::setDT(vmsdf)
   vmsdf[,distCalc:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
   vmsdf[,time_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
   vmsdf <- as.data.frame(vmsdf)
@@ -91,7 +85,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   vmsdf$KEEP<-NULL
   vmsdf = data.table::setDT(vmsdf)
   vmsdf[,elapsedDist_m:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
-  vmsdf[,elapsedTime_min:=difftime(get(timeField), shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
+  vmsdf[,elapsedTime_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
   vmsdf <- as.data.frame(vmsdf)
   vmsdf$elapsedTime_min<-as.numeric(vmsdf$elapsedTime_min)
   vmsdf['elapsedDist_m'] <- c(NA, utils::head(vmsdf['elapsedDist_m'], dim(vmsdf)[1] - 1)[[1]])
@@ -111,7 +105,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     c(NA, x[v])[cumsum(v)+1]
   }
   vmsdf$trek <- na.locf(vmsdf$trek)
-  trekpts <- aggregate(
+  trekpts <- stats::aggregate(
     x = list(cnt = vmsdf[,objField]),
     by = list(grp = vmsdf$trek
     ),

@@ -53,19 +53,6 @@
 #' want to use to categorize data on the output plot.
 #' @return a SpatialPolygonsDataFrame, and generates a shapefile
 #' @family aggregation
-#' @importFrom stats aggregate
-#' @importFrom rgdal readOGR
-#' @importFrom rgdal writeOGR
-#' @importFrom sp CRS
-#' @importFrom sp coordinates
-#' @importFrom sp proj4string
-#' @importFrom sp over
-#' @importFrom sp merge
-#' @importFrom classInt classIntervals
-#' @importFrom RColorBrewer brewer.pal
-#' @importFrom grDevices dev.off
-#' @importFrom grDevices png
-#' @importFrom graphics plot.new
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @note If sensitive fields have names that are 
 #' different than what is provided in the \code{sen.fields}, they will not be detected, or 
@@ -105,7 +92,7 @@ assess_privacy <- function(
     }
   }else{
     agg.poly <- rgdal::readOGR(dsn = agg.poly.shp, verbose = FALSE)
-    if (is.na(proj4string(agg.poly))) {
+    if (is.na(sp::proj4string(agg.poly))) {
       cat('\nNo projection found for input shapefile - assuming geographic.')
       sp::proj4string(agg.poly) = sp::CRS("+proj=longlat +datum=WGS84")
     }
@@ -121,7 +108,7 @@ assess_privacy <- function(
   df@data[agg.fields] <- lapply(df@data[agg.fields], as.numeric)
   #aggregate - calculate statistics by polygon area ####
   #this df will be merged to the original poly
-  POLY.agg = as.data.frame(as.list(aggregate(
+  POLY.agg = as.data.frame(as.list(stats::aggregate(
     df@data[agg.fields],
     by = df@data[c(agg.poly.field)],
     FUN = function(x)
@@ -134,7 +121,7 @@ assess_privacy <- function(
   
   POLY.agg[,2:ncol(POLY.agg)] <- sapply(POLY.agg[,2:ncol(POLY.agg)], as.numeric)
   if (!is.null(sens.fields)){
-    POLY.agg.sens = as.data.frame(as.list(aggregate(
+    POLY.agg.sens = as.data.frame(as.list(stats::aggregate(
       df@data[intersect(sens.fields, colnames(df@data))],
       by = df@data[c(agg.poly.field)],
       FUN = function(x)
@@ -184,7 +171,7 @@ assess_privacy <- function(
     test <- sp::merge(df.allowed,join)    
     
     #step 2 -- aggregate the points by the grids
-    grid.agg = as.data.frame(as.list(aggregate(
+    grid.agg = as.data.frame(as.list(stats::aggregate(
           test@data[agg.fields],
               by = test@data[c('ORD_gr')],
               FUN = function(x)

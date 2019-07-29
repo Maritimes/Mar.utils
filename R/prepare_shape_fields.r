@@ -7,7 +7,6 @@
 #' @return a datafraame - spatial or otherwise
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
-#' @importFrom stats ave
 #' @export
 prepare_shape_fields <- function(shape){
   names(shape) = gsub('\\.','_', names(shape))
@@ -56,7 +55,7 @@ prepare_shape_fields <- function(shape){
   }
   #still have duplicates? remove last character, and replace with integer
   if (!field.names.ok(names(shape))){
-    names(shape) = ave(as.character(names(shape)), names(shape), 
+    names(shape) = stats::ave(as.character(names(shape)), names(shape), 
        FUN=function(x) if (length(x)>1) paste0(substr(x[1],1,nchar(x[1])-1), seq_along(x)) else x[1])
   }
 

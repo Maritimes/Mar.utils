@@ -7,9 +7,6 @@
 #' a shapefile should be created.
 #' @return a SpatialPolygonsDataFrame, and potentially a shapefile
 #' @family general_use
-#' @importFrom maptools PolySet2SpatialPolygons
-#' @importFrom sp SpatialPolygonsDataFrame
-#' @importFrom rgdal writeOGR
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 pbs2sp_poly <- function(pbs=NULL, create.shp=FALSE){

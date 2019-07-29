@@ -45,12 +45,6 @@
 #' application.
 #' @return a DataFrame with the column \code{agg.poly.field} added (if value for 
 #' \code{shp} is supplied)
-#' @importFrom sp CRS
-#' @importFrom sp spTransform
-#' @importFrom sp coordinates
-#' @importFrom sp proj4string
-#' @importFrom rgdal readOGR
-#' @importFrom lubridate years
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -60,7 +54,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                          usepkg = 'rodbc', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
                        simpleQC = TRUE, rowNum = 50000){
-  if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + years(1)
+  if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
   
   if (!is.null(vrnList)) {
