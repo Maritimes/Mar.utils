@@ -41,7 +41,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
                           filename = NULL, plot=TRUE, createShp = TRUE){
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
-  trekMax <- trekMin <- cnt <- `:=` <- NULL
+  trekMax <- trekMin <- cnt <- NULL
   name=""
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   if (is.null(filename)) {
