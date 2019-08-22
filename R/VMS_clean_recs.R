@@ -38,7 +38,8 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           minDist_m = 50, maxBreak_mins = 1440){
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
-  distCalc <- time_min <- elapsedDist_m <- elapsedTime_min <- .SD <- `:=` <-  NULL
+  distCalc <- time_min <- elapsedDist_m <- elapsedTime_min <- .SD <- NULL
+  `:=` <- NA
   vmsdf=df
   n1 = nrow(vmsdf)
   # cat("initial no:",n1,"\n")
