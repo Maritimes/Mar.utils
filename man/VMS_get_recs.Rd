@@ -73,9 +73,6 @@ This function extracts VMS data for a given timespan and area.
 A time buffer can be added returns other points that are not within the area
 of interest, but give context to the path.
 }
-\seealso{
-Other vms: \code{\link{VMS_clean_recs}}
-}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
