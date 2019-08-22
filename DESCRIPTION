@@ -5,7 +5,8 @@ Authors@R: c( person("Mike", "McMahon", email="Mike.McMahon@dfo-mpo.gc.ca", role
 Maintainer: Mike McMahon <Mike.McMahon@dfo-mpo.gc.ca>
 Description: This package contains a number of utility function used by several of the Maritimes R packages.
 Depends:
-    R (>= 2.10)
+    R (>= 2.10),
+    data.table
 Imports:
     RODBC,
     rgeos,
@@ -17,7 +18,6 @@ Imports:
     plyr,
     curl,
     maptools,
-    data.table,
     geosphere,
     Mar.data
 Enhances: 
