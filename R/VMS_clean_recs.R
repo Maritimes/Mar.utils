@@ -84,7 +84,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   # cat("post-redundants:",nrow(vmsdf),"\n")
   vmsdf$KEEP<-NULL
   vmsdf = data.table::setDT(vmsdf)
-  vmsdf[,elapsedDist_m:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
+  vmsdf[,elapsedDist_m:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)][]
   vmsdf[,elapsedTime_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
   vmsdf <- as.data.frame(vmsdf)
   vmsdf$elapsedTime_min<-as.numeric(vmsdf$elapsedTime_min)
