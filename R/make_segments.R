@@ -42,7 +42,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
   trekMax <- trekMin <- cnt <- NULL
-  `:=` <- NA
+  `:=` <- function (x, value) value
   name=""
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   if (is.null(filename)) {
