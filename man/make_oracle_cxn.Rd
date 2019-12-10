@@ -5,7 +5,8 @@
 \title{make_oracle_cxn}
 \usage{
 make_oracle_cxn(usepkg = "rodbc", fn.oracle.username = "_none_",
-  fn.oracle.password = "_none_", fn.oracle.dsn = "_none_")
+  fn.oracle.password = "_none_", fn.oracle.dsn = "_none_",
+  quiet = FALSE)
 }
 \arguments{
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the connection to Oracle should
@@ -29,6 +30,9 @@ identifier for accessing oracle objects. If you have a value for
 \code{oracle.dsn} stored in your environment (e.g. from an rprofile file), 
 this can be left and that value will be used.  If a value for this is 
 provided, it will take priority over your existing value.}
+
+\item{quiet}{default is \code{FALSE}  This indicates whether or not status messages should be 
+shown.}
 }
 \description{
 This function facilitates creating a connection to Oracle, and

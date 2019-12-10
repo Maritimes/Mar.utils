@@ -19,13 +19,16 @@
 #' \code{oracle.dsn} stored in your environment (e.g. from an rprofile file), 
 #' this can be left and that value will be used.  If a value for this is 
 #' provided, it will take priority over your existing value.
+#' @param quiet default is \code{FALSE}  This indicates whether or not status messages should be 
+#' shown.
 #' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 make_oracle_cxn <- function(usepkg = 'rodbc', 
                             fn.oracle.username ="_none_",
                             fn.oracle.password="_none_",
-                            fn.oracle.dsn="_none_") {
+                            fn.oracle.dsn="_none_",
+                            quiet = FALSE) {
   oracle_cxn = NULL
   use.roracle <-function(oracle.dsn, oracle.username, oracle.password){
     oracle_cxn <-tryCatch(
@@ -37,11 +40,11 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       }
     )
     if (class(oracle_cxn)[1]=="OraConnection") {
-      cat("\nSuccessfully connected to Oracle via ROracle\n")
+      if (!quiet) cat("\nSuccessfully connected to Oracle via ROracle\n")
       results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
       return(results)
     } else {
-      cat("\nROracle attempt failed\n")
+      if (!quiet) cat("\nROracle attempt failed\n")
       return(-1)
     }
   }
@@ -55,11 +58,11 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       }
     )
     if (class(oracle_cxn)[1]=="RODBC") {
-      cat("\nSuccessfully connected to Oracle via RODBC\n")
+      if (!quiet) cat("\nSuccessfully connected to Oracle via RODBC\n")
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       return(results)
     } else {
-      cat("\nRODBC attempt failed\n")
+      if (!quiet) cat("\nRODBC attempt failed\n")
       return(-1)
     }
   }
@@ -78,7 +81,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       oracle.username= fn.oracle.username
     } else if (exists('oracle.username')){
       oracle.username <- oracle.username
-      cat("\nUsing stored 'oracle.username'")
+      if (!quiet) cat("\nUsing stored 'oracle.username'")
     }else{
       oracle.username <- readline(prompt = "Oracle Username: ")
       print(oracle.username)
@@ -87,7 +90,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
          oracle.password= fn.oracle.password
     }else if (exists('oracle.password')){
       oracle.password <- oracle.password
-      cat("\nUsing stored 'oracle.password'")
+      if (!quiet) cat("\nUsing stored 'oracle.password'")
     } else {
       oracle.password <- readline(prompt = "Oracle Password: ")
       print(oracle.password)
@@ -96,7 +99,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
          oracle.dsn= fn.oracle.dsn
     }else if (exists('oracle.dsn')){
       oracle.dsn <- oracle.dsn
-      cat("\nUsing stored 'oracle.dsn'")
+      if (!quiet) cat("\nUsing stored 'oracle.dsn'")
     }else{
       oracle.dsn <- readline(prompt = "Oracle DSN (e.g. PTRAN): ")
       print(oracle.dsn)
