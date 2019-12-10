@@ -30,7 +30,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
                             fn.oracle.dsn="_none_",
                             quiet = FALSE) {
   oracle_cxn = NULL
-  use.roracle <-function(oracle.dsn, oracle.username, oracle.password){
+  use.roracle <-function(oracle.dsn, oracle.username, oracle.password, quiet){
     oracle_cxn <-tryCatch(
       {
         assign('oracle_cxn', ROracle::dbConnect( DBI::dbDriver("Oracle"), oracle.username,oracle.password,oracle.dsn))
@@ -48,7 +48,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       return(-1)
     }
   }
-  use.rodbc <-function(oracle.dsn, oracle.username, oracle.password){
+  use.rodbc <-function(oracle.dsn, oracle.username, oracle.password, quiet){
     oracle_cxn <-tryCatch(
       {
         assign('oracle_cxn', RODBC::odbcConnect(oracle.dsn, uid = oracle.username, pwd = oracle.password, believeNRows = F))
@@ -106,9 +106,9 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
     }
     
     if (usepkg=='roracle'){
-      use.roracle(oracle.dsn, oracle.username, oracle.password)
+      use.roracle(oracle.dsn, oracle.username, oracle.password, quiet)
     }else{
-      use.rodbc(oracle.dsn, oracle.username, oracle.password)
+      use.rodbc(oracle.dsn, oracle.username, oracle.password, quiet)
     }
   }
 }
