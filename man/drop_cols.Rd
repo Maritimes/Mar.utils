@@ -4,8 +4,12 @@
 \alias{drop_cols}
 \title{drop_cols}
 \usage{
-drop_cols(df = NULL, justDropNAs = TRUE, uniformFields = "retain",
-  keepFields = NULL)
+drop_cols(
+  df = NULL,
+  justDropNAs = TRUE,
+  uniformFields = "retain",
+  keepFields = NULL
+)
 }
 \arguments{
 \item{df}{default is \code{NULL}. This is the dataframe you want to handle.}
@@ -35,11 +39,13 @@ This function takes a dataframe and drops or retains fields
 based on the uniformity of their values.
 }
 \seealso{
-Other general_use: \code{\link{clip_by_poly_generic}},
-  \code{\link{df_qc_spatial}}, \code{\link{df_to_sp}},
-  \code{\link{pbs2sp_poly}},
-  \code{\link{prepare_shape_fields}},
-  \code{\link{updateCheck}}
+Other general_use: 
+\code{\link{clip_by_poly_generic}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{df_to_sp}()},
+\code{\link{pbs2sp_poly}()},
+\code{\link{prepare_shape_fields}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

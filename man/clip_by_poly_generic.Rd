@@ -4,9 +4,15 @@
 \alias{clip_by_poly_generic}
 \title{clip_by_poly_generic}
 \usage{
-clip_by_poly_generic(df = NULL, lat.field = "LATITUDE",
-  lon.field = "LONGITUDE", clip.poly = NULL, buffer.m = NULL,
-  return.spatial = FALSE, env = .GlobalEnv)
+clip_by_poly_generic(
+  df = NULL,
+  lat.field = "LATITUDE",
+  lon.field = "LONGITUDE",
+  clip.poly = NULL,
+  buffer.m = NULL,
+  return.spatial = FALSE,
+  env = .GlobalEnv
+)
 }
 \arguments{
 \item{df}{default is \code{NULL}.  This is the dataframe to be clipped.}
@@ -43,11 +49,13 @@ WGS84. FYI, during buffering, the polygon is briefly converted to UTMZone20, and
 since the use of distances requires projecting the data.
 }
 \seealso{
-Other general_use: \code{\link{df_qc_spatial}},
-  \code{\link{df_to_sp}}, \code{\link{drop_cols}},
-  \code{\link{pbs2sp_poly}},
-  \code{\link{prepare_shape_fields}},
-  \code{\link{updateCheck}}
+Other general_use: 
+\code{\link{df_qc_spatial}()},
+\code{\link{df_to_sp}()},
+\code{\link{drop_cols}()},
+\code{\link{pbs2sp_poly}()},
+\code{\link{prepare_shape_fields}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

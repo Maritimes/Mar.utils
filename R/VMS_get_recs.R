@@ -43,6 +43,8 @@
 #' @param rowNum default is \code{50000}.  This is the maximimum number of VMS 
 #' records that can be extracted. It is in place to prevent crashing your 
 #' application.
+#' @param quietly default is \code{FALSE}.  This indicates whether or not
+#' information about the process should be shown.
 #' @return a DataFrame with the column \code{agg.poly.field} added (if value for 
 #' \code{shp} is supplied)
 #' @family vms
@@ -53,7 +55,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                          fn.oracle.dsn = "_none_",
                          usepkg = 'rodbc', dateStart = NULL, dateEnd = NULL, 
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
-                       simpleQC = TRUE, rowNum = 50000){
+                       simpleQC = TRUE, rowNum = 50000, quietly = F){
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
   
@@ -78,7 +80,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
   oracle_cxn = make_oracle_cxn(fn.oracle.username =fn.oracle.username, 
                                fn.oracle.password = fn.oracle.password, 
                                fn.oracle.dsn = fn.oracle.dsn,
-                               usepkg = usepkg)
+                               usepkg = usepkg, quietly = quietly)
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
   #set up something to hold the ones we'll keep
   if (!is.null(shp)){

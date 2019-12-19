@@ -4,9 +4,13 @@
 \alias{make_oracle_cxn}
 \title{make_oracle_cxn}
 \usage{
-make_oracle_cxn(usepkg = "rodbc", fn.oracle.username = "_none_",
-  fn.oracle.password = "_none_", fn.oracle.dsn = "_none_",
-  quiet = FALSE)
+make_oracle_cxn(
+  usepkg = "rodbc",
+  fn.oracle.username = "_none_",
+  fn.oracle.password = "_none_",
+  fn.oracle.dsn = "_none_",
+  quietly = FALSE
+)
 }
 \arguments{
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the connection to Oracle should
@@ -31,7 +35,7 @@ identifier for accessing oracle objects. If you have a value for
 this can be left and that value will be used.  If a value for this is 
 provided, it will take priority over your existing value.}
 
-\item{quiet}{default is \code{FALSE}  This indicates whether or not status messages should be 
+\item{quietly}{default is \code{FALSE}  This indicates whether or not status messages should be 
 shown.}
 }
 \description{

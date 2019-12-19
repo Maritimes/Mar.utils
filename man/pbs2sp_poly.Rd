@@ -21,11 +21,13 @@ SpatialPolygonsDataFrame, and can generate a shapefile at teh same time, if
 requested.
 }
 \seealso{
-Other general_use: \code{\link{clip_by_poly_generic}},
-  \code{\link{df_qc_spatial}}, \code{\link{df_to_sp}},
-  \code{\link{drop_cols}},
-  \code{\link{prepare_shape_fields}},
-  \code{\link{updateCheck}}
+Other general_use: 
+\code{\link{clip_by_poly_generic}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{df_to_sp}()},
+\code{\link{drop_cols}()},
+\code{\link{prepare_shape_fields}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

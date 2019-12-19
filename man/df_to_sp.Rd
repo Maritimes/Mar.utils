@@ -4,8 +4,13 @@
 \alias{df_to_sp}
 \title{df_to_sp}
 \usage{
-df_to_sp(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE",
-  the.crs = "+init=epsg:4326", autoQC = TRUE)
+df_to_sp(
+  df = NULL,
+  lat.field = "LATITUDE",
+  lon.field = "LONGITUDE",
+  the.crs = "+init=epsg:4326",
+  autoQC = TRUE
+)
 }
 \arguments{
 \item{df}{default is \code{NULL}. This is the dataframe you want to spatialize.}
@@ -32,11 +37,13 @@ spatialpointsdataframe
 This function takes a dataframe and converts in to a spatialpointsdataframe
 }
 \seealso{
-Other general_use: \code{\link{clip_by_poly_generic}},
-  \code{\link{df_qc_spatial}}, \code{\link{drop_cols}},
-  \code{\link{pbs2sp_poly}},
-  \code{\link{prepare_shape_fields}},
-  \code{\link{updateCheck}}
+Other general_use: 
+\code{\link{clip_by_poly_generic}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{drop_cols}()},
+\code{\link{pbs2sp_poly}()},
+\code{\link{prepare_shape_fields}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

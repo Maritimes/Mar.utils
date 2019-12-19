@@ -4,11 +4,21 @@
 \alias{VMS_get_recs}
 \title{VMS_get_recs}
 \usage{
-VMS_get_recs(fn.oracle.username = "_none_",
-  fn.oracle.password = "_none_", fn.oracle.dsn = "_none_",
-  usepkg = "rodbc", dateStart = NULL, dateEnd = NULL,
-  vrnList = NULL, hrBuffer = 4, shp = NULL, shp.field = NULL,
-  simpleQC = TRUE, rowNum = 50000)
+VMS_get_recs(
+  fn.oracle.username = "_none_",
+  fn.oracle.password = "_none_",
+  fn.oracle.dsn = "_none_",
+  usepkg = "rodbc",
+  dateStart = NULL,
+  dateEnd = NULL,
+  vrnList = NULL,
+  hrBuffer = 4,
+  shp = NULL,
+  shp.field = NULL,
+  simpleQC = TRUE,
+  rowNum = 50000,
+  quietly = F
+)
 }
 \arguments{
 \item{fn.oracle.username}{default is \code{'_none_'} This is your username for
@@ -63,6 +73,9 @@ latitude is 0, 90 or -90 or the longitude is 0, 180 or -180.}
 \item{rowNum}{default is \code{50000}.  This is the maximimum number of VMS 
 records that can be extracted. It is in place to prevent crashing your 
 application.}
+
+\item{quietly}{default is \code{FALSE}.  This indicates whether or not
+information about the process should be shown.}
 }
 \value{
 a DataFrame with the column \code{agg.poly.field} added (if value for 
@@ -74,7 +87,8 @@ A time buffer can be added returns other points that are not within the area
 of interest, but give context to the path.
 }
 \seealso{
-Other vms: \code{\link{VMS_clean_recs}}
+Other vms: 
+\code{\link{VMS_clean_recs}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

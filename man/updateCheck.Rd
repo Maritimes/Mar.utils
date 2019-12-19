@@ -15,10 +15,13 @@ This function compares the package with the available version on
 github, and prompts the user to update.
 }
 \seealso{
-Other general_use: \code{\link{clip_by_poly_generic}},
-  \code{\link{df_qc_spatial}}, \code{\link{df_to_sp}},
-  \code{\link{drop_cols}}, \code{\link{pbs2sp_poly}},
-  \code{\link{prepare_shape_fields}}
+Other general_use: 
+\code{\link{clip_by_poly_generic}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{df_to_sp}()},
+\code{\link{drop_cols}()},
+\code{\link{pbs2sp_poly}()},
+\code{\link{prepare_shape_fields}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

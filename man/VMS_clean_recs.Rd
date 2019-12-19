@@ -4,10 +4,15 @@
 \alias{VMS_clean_recs}
 \title{VMS_clean_recs}
 \usage{
-VMS_clean_recs(df = NULL, lat.field = "LATITUDE",
-  lon.field = "LONGITUDE", objField = "VR_NUMBER",
-  timeField = "POSITION_UTC_DATE", minDist_m = 50,
-  maxBreak_mins = 1440)
+VMS_clean_recs(
+  df = NULL,
+  lat.field = "LATITUDE",
+  lon.field = "LONGITUDE",
+  objField = "VR_NUMBER",
+  timeField = "POSITION_UTC_DATE",
+  minDist_m = 50,
+  maxBreak_mins = 1440
+)
 }
 \arguments{
 \item{df}{default is \code{NULL}.  This is the dataframe to be processed.  It 
@@ -55,7 +60,8 @@ for a vessel exceeds \code{maxBreak_mins}.  If no value is provided, 24 hours
 (i.e. 1440 minutes) will be used.
 }
 \seealso{
-Other vms: \code{\link{VMS_get_recs}}
+Other vms: 
+\code{\link{VMS_get_recs}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -4,8 +4,13 @@
 \alias{df_qc_spatial}
 \title{df_qc_spatial}
 \usage{
-df_qc_spatial(df, lat.field = "LATITUDE", lon.field = "LONGITUDE",
-  return.bad = FALSE, autoQC = T)
+df_qc_spatial(
+  df,
+  lat.field = "LATITUDE",
+  lon.field = "LONGITUDE",
+  return.bad = FALSE,
+  autoQC = T
+)
 }
 \arguments{
 \item{df}{the dataframe to be cleaned}
@@ -32,11 +37,13 @@ hemisphere (i.e. LAT between 0 and 90) and aren't in the western hemisphere
 the "return.bad" flag allows it to return only the "bad" points.
 }
 \seealso{
-Other general_use: \code{\link{clip_by_poly_generic}},
-  \code{\link{df_to_sp}}, \code{\link{drop_cols}},
-  \code{\link{pbs2sp_poly}},
-  \code{\link{prepare_shape_fields}},
-  \code{\link{updateCheck}}
+Other general_use: 
+\code{\link{clip_by_poly_generic}()},
+\code{\link{df_to_sp}()},
+\code{\link{drop_cols}()},
+\code{\link{pbs2sp_poly}()},
+\code{\link{prepare_shape_fields}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
