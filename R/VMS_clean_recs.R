@@ -62,7 +62,6 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     colnames(vmsdf)[colnames(vmsdf)=="newObjField"] <- objField
     colnames(vmsdf)[colnames(vmsdf)=="newTimeField"] <- timeField
   }
-  
   vmsdf = data.table::setDT(vmsdf)
   vmsdf[,distCalc:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
   vmsdf[,time_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]

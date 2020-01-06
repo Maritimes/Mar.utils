@@ -82,15 +82,22 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                                fn.oracle.dsn = fn.oracle.dsn,
                                usepkg = usepkg, quietly = quietly)
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
+  if (nrow(allRecs)<1){
+    if (!quietly) cat(paste0("\n","No records returned"))
+    return(NULL)
+  }
   #set up something to hold the ones we'll keep
   if (!is.null(shp)){
     saveRecs = allRecs[FALSE,]
     saveRecs = cbind(saveRecs,data.frame(SEGMID=character(), shp.field=character()))
     names(saveRecs)[names(saveRecs) == "shp.field"] <- shp.field
-    if (nrow(allRecs)==0) stop("No records returned")
+
     areaRecs = identify_area(allRecs, agg.poly.shp = shp, agg.poly.field = shp.field)
     areaRecs = areaRecs[which(!is.na(areaRecs[shp.field]) & areaRecs[shp.field] != "Bad coordinate"),] 
-    if (nrow(areaRecs)==0) stop("No records in area detected")
+    if (nrow(areaRecs)<1){
+      if (!quietly) cat(paste0("\n","No records in area detected"))
+      return(NULL)
+    }
     #maybe this is where we detect old segmid that we need to append to?
     allVess<-unique(areaRecs$VR_NUMBER)
     for (i in 1:length(allVess)){
