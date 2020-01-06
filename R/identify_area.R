@@ -37,7 +37,7 @@ identify_area <- function(df = NULL,
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO_BEST'
     }
-  }else{
+  }else if (is.character(agg.poly.shp)){
     agg.poly <- rgdal::readOGR(dsn = agg.poly.shp, verbose = FALSE)
     if (is.na(sp::proj4string(agg.poly))) {
       cat('\nNo projection found for input shapefile - assuming geographic.')
