@@ -45,6 +45,8 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       return(results)
     } else {
       if (!quietly) cat("\nROracle attempt failed\n")
+      # results = list(usepkg='roracle', channel = -1, thecmd=NA)
+      # return(results)
       return(-1)
     }
   }
@@ -63,6 +65,8 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       return(results)
     } else {
       if (!quietly) cat("\nRODBC attempt failed\n")
+      # results = list(usepkg='rodbc', channel = -1, thecmd=NA)
+      # return(results)
       return(-1)
     }
   }

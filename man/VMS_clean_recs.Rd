@@ -61,7 +61,8 @@ for a vessel exceeds \code{maxBreak_mins}.  If no value is provided, 24 hours
 }
 \seealso{
 Other vms: 
-\code{\link{VMS_get_recs}()}
+\code{\link{VMS_get_recs}()},
+\code{\link{assess_privacy}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

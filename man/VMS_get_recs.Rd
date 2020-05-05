@@ -88,7 +88,8 @@ of interest, but give context to the path.
 }
 \seealso{
 Other vms: 
-\code{\link{VMS_clean_recs}()}
+\code{\link{VMS_clean_recs}()},
+\code{\link{assess_privacy}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
