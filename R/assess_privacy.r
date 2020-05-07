@@ -151,13 +151,14 @@ assess_privacy <- function(
   df@data <- merge(df@data, dfWide, by=key.fields)
   df@data[agg.fields][is.na(df@data[agg.fields])] <- 0
   df@data[agg.fields] <- lapply(df@data[agg.fields], as.numeric)
+
   POLY.agg <- as.data.frame(as.list(stats::aggregate(
     df@data[agg.fields],
     by = df@data[c(agg.poly.field)],
     FUN = function(x)
       c(
         MEAN = round(mean(x), 4),
-        CNT = round(length(x), 4),
+        CNT = round(length(x[x!=0]), 0),
         SUM = round(sum(x), 4)
       )
   )))
@@ -168,7 +169,7 @@ assess_privacy <- function(
       by = df@data[c(agg.poly.field)],
       FUN = function(x)
         c(
-          CNT = round(length(unique(x)), 4)
+          CNT = round(length(unique(x)), 0)
         )
     )))
     POLY.agg.sens$TOTUNIQUE = apply(as.data.frame(POLY.agg.sens[,2:ncol(POLY.agg.sens)]), 1, min)
@@ -210,13 +211,14 @@ assess_privacy <- function(
     join$ORD_df <- seq.int(nrow(join)) 
     test <- sp::merge(df.allowed,join)    
     #step 2 -- aggregate the points by the grids
+    
     grid.agg = as.data.frame(as.list(stats::aggregate(
       test@data[agg.fields],
       by = test@data[c('ORD_gr')],
       FUN = function(x)
         c(
           MEAN = round(mean(x), 4),
-          CNT = round(length(x), 4),
+          CNT = round(length(x[x!=0]), 0),
           SUM = round(sum(x), 4)
         )
     )))
