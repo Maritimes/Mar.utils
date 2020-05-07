@@ -9,55 +9,55 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 prepare_shape_fields <- function(shape){
-  names(shape) = gsub('\\.','_', names(shape))
-  #do something about names that are more than 10 characters long (not allowed by shapefile)
   
-  #check if there's a problem - are all names 10 chars or less, and unique?
-  field.names.ok <-function(fields){
-    if (length(fields[nchar(fields)>10])>0 | length(fields) != length(unique(fields))){
-      return(FALSE)
-    }else{
-      return(TRUE)
-    }
-
+  updateCnt<-function(df){
+    df$CNT<- nchar(df$NEW)
+    return(df)
   }
-  names(shape) = gsub('COMBINED','COMB', names(shape))
-  names(shape) = gsub('CAUGHT','CGHT', names(shape))
-  names(shape) = gsub('LICENSE','LIC', names(shape))
-  names(shape) = gsub('VESSEL','VES', names(shape))
-  names(shape) = gsub('MARFIS','MARF', names(shape))
-  names(shape) = gsub('TEMPERATURE','TEMP', names(shape))
-  names(shape) = gsub('BOTTOM','BOTT', names(shape))
-  names(shape) = gsub('SURFACE','SURF', names(shape))
-  names(shape) = gsub('SALINITY','SAL', names(shape))
-  names(shape) = gsub('WEIGHT','WT', names(shape))
-  names(shape) = gsub('DEPTH','DEP', names(shape))
   
-  #see if removing the underscores from fields with > 10 chars fixes it
-  if (field.names.ok(gsub('_','', names(shape)[nchar(names(shape))>10]))){
-    names(shape)[nchar(names(shape))>10]= gsub('_','', names(shape)[nchar(names(shape))>10])
+  
+  #big ol' df of stuff that we should always replace
+  univRepl <- data.frame("VERBOSE" = character(), "SUCCINCT" = character())
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('COMBINED','CMB')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('CAUGHT','CGHT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('LICENSE','LIC')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('VESSEL','VES')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('TEMPERATURE','TMP')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('BOTTOM','BOTT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('SURFACE','SURF')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('SALINITY','SAL')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('WEIGHT','WT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('DEPTH','DEP')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('KEPT_WT','KP')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('DISCARD_WT','DS')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('MEAN','MN')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('COUNT','CT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('CNT','CT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('SUM','SU')))
+  
+  #grab all of the original names, capture their order, length, and prepare a place for their replacements
+  allNames = data.frame(ID = seq(length(names(shape))), ORIG = names(shape), CNT = nchar(names(shape)), NEW = names(shape))
+  
+  #replace periods with underscores
+  allNames$NEW = gsub('\\.','_', allNames$NEW)
+  
+  #do the universal replacements
+  for (r in 1:nrow(univRepl)){
+    allNames[grepl(x=allNames$NEW, ignore.case = T, pattern=univRepl[r,"VERBOSE"]),"NEW"]<-gsub(x = allNames[grepl(x = allNames$NEW,ignore.case = T,pattern = univRepl[r,"VERBOSE"]),"NEW"], pattern = univRepl[r,"VERBOSE"],replacement = univRepl[r,"SUCCINCT"])
   }
-  #see if trimming fields with > 10 chars fixes it
-  if (field.names.ok(substr(names(shape)[nchar(names(shape))>10],1,10))){
-    names(shape)[nchar(names(shape))>10]= substr(names(shape)[nchar(names(shape))>10],1,10)
+  
+  allNames <-updateCnt(allNames)
+  #do succesively more harsh actions to get char down to 10
+  if (max(range(allNames$CNT))>10){
+    allNames[allNames$CNT>10,"NEW"]<-gsub("_","", allNames[allNames$CNT>10,"NEW"])
+    allNames <-updateCnt(allNames)
   }
-
-  if (!field.names.ok(names(shape))){
-    cutpo = regexpr("_[^_]*$",  names(shape)[nchar(names(shape))>10])
-    nch = nchar(names(shape)[nchar(names(shape))>10])
-    #get everything after last underscore
-    ext=substr(names(shape)[nchar(names(shape))>10],cutpo+1, nchar(names(shape)[nchar(names(shape))>10]))
-    #get everything before underscore, remove all underscores, and trim it enough so that when the ext
-    #is added, its only 10 chars
-    start =  substr(gsub('_','', substr(names(shape)[nchar(names(shape))>10], 1, cutpo-1)),1,10-nchar(ext))
-    names(shape)[nchar(names(shape))>10] = paste0(start,ext)
-    #if not sufficient writeOGR will make modifications, but we've saved the critical parts
+  #maybe more actions prior to the substr?
+  if (max(range(allNames$CNT))>10){
+    allNames[allNames$CNT>10,"NEW"]<-substr(allNames[allNames$CNT>10,"NEW"], 1, 10) 
+    cat("!!Warning -- Aggressive measures were taken to reduce the field names to the 10 chars allowed by ArcGIS","\n")
+    allNames <-updateCnt(allNames)
   }
-  #still have duplicates? remove last character, and replace with integer
-  if (!field.names.ok(names(shape))){
-    names(shape) = stats::ave(as.character(names(shape)), names(shape), 
-       FUN=function(x) if (length(x)>1) paste0(substr(x[1],1,nchar(x[1])-1), seq_along(x)) else x[1])
-  }
-
+  names(shape) = allNames[with(allNames,order(ID)),"NEW"]
   return(shape)
 }

@@ -7,6 +7,7 @@
 assess_privacy(
   df = NULL,
   grid.shape = "hex",
+  whole.grid = TRUE,
   lat.field = "LATITUDE",
   lon.field = "LONGITUDE",
   rule.of = 5,
@@ -14,8 +15,9 @@ assess_privacy(
   sens.fields = NULL,
   facet.field = "SPECCD_ID",
   key.fields = c("TRIP", "SET_NO"),
+  for.public = TRUE,
   create.shps = TRUE,
-  file_id = NULL,
+  file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL
 )
@@ -25,6 +27,9 @@ assess_privacy(
 
 \item{grid.shape}{default is \code{"hex"}.  This identifies the shape of the 
 you want to aggregate your data into.  The options are "hex" or "square"}
+
+\item{whole.grid}{default is \code{TRUE}.  This ensures that all grid cells are output.  If FALSE, 
+only those with some non-NA data will be output, generating a significantly smaller file.}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values 
 (in decimal degrees)}
@@ -59,13 +64,19 @@ to uniquely identify each fishing set.  If a \code{facet.field} is provided, the
 onto it. The key.fields are instrumental in ensuring that the data is able to get rejoined back to the 
 original sets.}
 
+\item{for.public}{default is \code{TRUE}. While calculating the aggregated values within each 
+2min cell, this script first establishes whether or not cells within an area have enough unique 
+values of sensitive fields to be allowed to show any data at all.  If this parameter is \code{TRUE},
+the calculated valued value for areas that cannot be shown will be wiped prior to generating the 
+output files.}
+
 \item{create.shps}{default is \code{TRUE}.  This indicates whether or not 
 shapefiles should be created for 1) the polygon file (with aggregated values 
 for each polygon and an indication of whether or not each polygon meets the 
 privacy constraints), and 2) the 2 min gridded data (only for within those 
 polygons that meet the privacy constraints).}
 
-\item{file_id}{default is \code{NULL} Whatever is entered here will be used 
+\item{file.id}{default is \code{NULL} Whatever is entered here will be used 
 to name the output shapefiles and/or plots.  If nothing is enetered, the 
 output files will just be named using timestamps.}
 
@@ -86,21 +97,13 @@ At this time, data with privacy considerations must be aggregated such that each
 polygon has a minimum of 5 unique values for sensitive fields like Licenses, License Holders, and 
 Vessels.  This function takes a dataframe and shapefile and for each polygon in the 
 shapefile calculates 1) aggregate values for a number of (user-specified) fields , and 2) 
-how many unique values exist in each polygon for each of a number of sensitive fields. A 
-shapefile is generated with all of the data, as well as a field indicating whether or not the 
-data can be displayed.
+how many unique values exist in each polygon for each of a number of sensitive fields.
 }
 \note{
 If sensitive fields have names that are different than what is provided in the \code{sen.fields}, 
 they will not be detected, or included in the checks.  Please make very sure you correctly 
 identify such fields.
 }
-\seealso{
-Other vms: 
-\code{\link{VMS_clean_recs}()},
-\code{\link{VMS_get_recs}()}
-}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{vms}
