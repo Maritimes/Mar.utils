@@ -9,9 +9,6 @@
 #' @param grid.shape default is \code{"hex"}.  This identifies the shape of the 
 #' you want to aggregate your data into.  The options are "hex" or "square"
 
-#' @param whole.grid default is \code{TRUE}.  This ensures that all grid cells are output.  If FALSE, 
-#' only those with some non-NA data will be output, generating a significantly smaller file.
-
 #' @param lat.field the default is \code{"LATITUDE"}. the name of the field holding latitude values 
 #' (in decimal degrees)
 
@@ -80,7 +77,6 @@
 assess_privacy <- function(
   df= NULL, 
   grid.shape = 'hex',
-  whole.grid = TRUE,
   lat.field = 'LATITUDE',
   lon.field = 'LONGITUDE',
   rule.of = 5,
@@ -120,8 +116,8 @@ assess_privacy <- function(
                "key.fields must identify enough fields required to identify unique fishing sets - e.g. trip & set","\n"))
     }else{
       dfWide <- foo(dfLong, id=key.fields, measure = facet.field,val = agg.fields)
-      dfWide$ALL_TOT<-NA
-      dfWide$ALL_TOT <- rowSums(dfWide[,!names(dfWide) %in% key.fields],na.rm = T)
+      # dfWide$ALL_TOT<-NA
+      # dfWide$ALL_TOT <- rowSums(dfWide[,!names(dfWide) %in% key.fields],na.rm = T)
       agg.fields <- names(dfWide[,!names(dfWide) %in% key.fields])
       # cat("Updated agg.fields to reflect new, faceted data structure","\n")
       df<-dfRestU
@@ -148,7 +144,8 @@ assess_privacy <- function(
     agg.poly <- sp::spTransform(agg.poly,sp::CRS("+proj=longlat +datum=WGS84"))
   }
   df@data = cbind(df@data,sp::over( df, agg.poly , fn = NULL))
-  df@data <- merge(df@data, dfWide, by=key.fields)
+ 
+  if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) df <- sp::merge(df, dfWide, by=key.fields, all.x=T)
   df@data[agg.fields][is.na(df@data[agg.fields])] <- 0
   df@data[agg.fields] <- lapply(df@data[agg.fields], as.numeric)
 
@@ -204,17 +201,16 @@ assess_privacy <- function(
   grid2Min$ORD_gr <-  seq.int(nrow(grid2Min)) 
   if (length(allowed.areas)>0){
     #clip the data to those overlaying acceptable NAFO
-    df.allowed <- df[allowed.areas.sp, ]
-    grid2Min.allowed <- grid2Min[allowed.areas.sp,]
+    df <- df[allowed.areas.sp, ]
+    grid2Min <- grid2Min[allowed.areas.sp,]
     #step 1 -- figure out which grid each point is in.
-    join <- sp::over(df.allowed, grid2Min.allowed)
+    join <- sp::over(df, grid2Min)  
     join$ORD_df <- seq.int(nrow(join)) 
-    test <- sp::merge(df.allowed,join)    
-    #step 2 -- aggregate the points by the grids
+    df@data = cbind(df@data,join)
     
     grid.agg = as.data.frame(as.list(stats::aggregate(
-      test@data[agg.fields],
-      by = test@data[c('ORD_gr')],
+      df@data[agg.fields],
+      by = df@data[c('ORD_gr')],
       FUN = function(x)
         c(
           MEAN = round(mean(x), 4),
@@ -223,10 +219,9 @@ assess_privacy <- function(
         )
     )))
     #step 3 -- append the aggregated data back onto the grid 
-    grid2Min.allowed@data <- data.frame(grid2Min.allowed@data, grid.agg[match(grid2Min.allowed@data[,"ORD_gr"], grid.agg[,"ORD_gr"]),])
-    grid2Min.allowed@data$ORD_gr.1 <- NULL
+    grid2Min=sp::merge(grid2Min, grid.agg)
     #populate all empty cells with 0
-    grid2Min.allowed@data[!names(grid2Min.allowed@data) %in% c("HEXID", "ORD_gr")][is.na(grid2Min.allowed@data[!names(grid2Min.allowed@data) %in% c("HEXID", "ORD_gr")])] <- 0 
+    grid2Min@data[!names(grid2Min@data) %in% c("HEXID", "ORD_gr")][is.na(grid2Min@data[!names(grid2Min@data) %in% c("HEXID", "ORD_gr")])] <- 0 
     file.id = ifelse(!is.null(file.id),paste0(file.id,"_"),"")
     POLY.agg.name = paste0(file.id,'POLY_AGG_', ts)
     this.df.name = paste0(file.id,'Grid2Min_', ts)
@@ -235,11 +230,11 @@ assess_privacy <- function(
       rgdal::writeOGR(POLY.agg, ".", POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
       cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp\n"))
       
-      this.df = prepare_shape_fields(grid2Min.allowed)
-      rgdal::writeOGR(this.df, ".", this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
+      grid2Min = prepare_shape_fields(grid2Min)
+      rgdal::writeOGR(grid2Min, ".", this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
       cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp\n"))
     }
-    results= list("Grid2Min" = grid2Min.allowed, "POLY_AGG" = POLY.agg)
+    results= list("Grid2Min" = grid2Min, "POLY_AGG" = POLY.agg)
   }else{
     print("No polygon has enough unique values to allow aggregated data to be shown")
     results= list("Grid2Min" = NULL, "POLY_AGG" = NULL)

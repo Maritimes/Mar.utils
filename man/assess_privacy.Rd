@@ -7,7 +7,6 @@
 assess_privacy(
   df = NULL,
   grid.shape = "hex",
-  whole.grid = TRUE,
   lat.field = "LATITUDE",
   lon.field = "LONGITUDE",
   rule.of = 5,
@@ -27,9 +26,6 @@ assess_privacy(
 
 \item{grid.shape}{default is \code{"hex"}.  This identifies the shape of the 
 you want to aggregate your data into.  The options are "hex" or "square"}
-
-\item{whole.grid}{default is \code{TRUE}.  This ensures that all grid cells are output.  If FALSE, 
-only those with some non-NA data will be output, generating a significantly smaller file.}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values 
 (in decimal degrees)}
