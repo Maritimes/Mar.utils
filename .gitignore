@@ -9,3 +9,5 @@
 *.dbf
 *.prj
 *.lock
+doc
+Meta

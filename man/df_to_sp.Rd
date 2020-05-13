@@ -40,6 +40,7 @@ This function takes a dataframe and converts in to a spatialpointsdataframe
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{df_qc_spatial}()},
+\code{\link{df_to_shp}()},
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
 \code{\link{prepare_shape_fields}()},

@@ -18,6 +18,7 @@ github, and prompts the user to update.
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{df_qc_spatial}()},
+\code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},

@@ -1,6 +1,6 @@
 Package: Mar.utils
 Title: A suite of functions used by a variety of Maritimes packages
-Version: 2020.05.11
+Version: 2020.05.13
 Authors@R: c( person("Mike", "McMahon", email="Mike.McMahon@dfo-mpo.gc.ca", role=c("aut", "cre")) )
 Maintainer: Mike McMahon <Mike.McMahon@dfo-mpo.gc.ca>
 Description: This package contains a number of utility function used by several of the Maritimes R packages.
@@ -21,6 +21,11 @@ Imports:
 Enhances: 
     ROracle,
     DBI
+Suggests: 
+    knitr, 
+    rmarkdown
+VignetteBuilder: 
+    knitr
 Remotes:
    Maritimes/Mar.data
 Encoding: UTF-8
@@ -28,3 +33,4 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/Maritimes/Mar.utils/
 RoxygenNote: 7.0.2
+

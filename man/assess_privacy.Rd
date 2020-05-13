@@ -12,8 +12,8 @@ assess_privacy(
   rule.of = 5,
   agg.fields = "KEPT_WT",
   sens.fields = NULL,
-  facet.field = "SPECCD_ID",
-  key.fields = c("TRIP", "SET_NO"),
+  facet.field = NULL,
+  key.fields = NULL,
   for.public = TRUE,
   create.shps = TRUE,
   file.id = NULL,
@@ -49,12 +49,12 @@ unique values exist for each.  It will then populate a field 'TOTUNIQUE' with th
 of unique values of all the assessed fields. If this is 5 or more, a field called 'CAN_SHOW' will 
 be marked as 'YES' (otherwise it will be 'NO').}
 
-\item{facet.field}{default is \code{"SPECCD_ID"}.  In cases like bycatch data, you may have a dataframe
+\item{facet.field}{default is \code{NULL}.  In cases like bycatch data, you may have a dataframe
 where each row might represent different species.  You probably want a breakdown of each individual
 species, rather than summing them all up to get some generic weight of all species combined. This is 
 the field that will be used to aggregate data by common values (like Species_Code) .}
 
-\item{key.fields}{default is \code{c("TRIP","SET_NO")}.  This is a vector of fields that are required
+\item{key.fields}{default is \code{NULL}.  This is a vector of fields that are required
 to uniquely identify each fishing set.  If a \code{facet.field} is provided, the \code{facet.field}, 
 \code{key.fields} and \code{agg.fields} are all pulled off of the original data and then merged back 
 onto it. The key.fields are instrumental in ensuring that the data is able to get rejoined back to the 

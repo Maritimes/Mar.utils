@@ -10,7 +10,7 @@ prepare_shape_fields(shape)
 \item{shape}{a dataframe or spatial object whose fieldnames are to be processed}
 }
 \value{
-a datafraame - spatial or otherwise
+a dataframe - spatial or otherwise
 }
 \description{
 Shapefiles are limited in the naming conventions of the fields - they can only
@@ -22,6 +22,7 @@ understood and are not simply truncated.
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{df_qc_spatial}()},
+\code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
