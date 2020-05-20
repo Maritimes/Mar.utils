@@ -66,10 +66,10 @@ prepare_shape_fields <- function(shape){
   }
   #maybe more actions prior to the substr?
   if (max(range(allNames$CNT))>10){
-    allNames[allNames$CNT>10,"NEW"]<-substr(allNames[allNames$CNT>10,"NEW"], 1, 10) 
-    cat("!!Warning -- Aggressive measures were taken to reduce the field names to the 10 chars allowed by ArcGIS","\n")
-    cat(allNames$NEW)
-    allNames <-updateCnt(allNames)
+    # allNames[allNames$CNT>10,"NEW"]<-substr(allNames[allNames$CNT>10,"NEW"], 1, 10) 
+    cat("\n!!Despite efforts to shorten them, rgdal will impose some aggressive measures to reduce the field names to the 10 chars allowed by ArcGIS","\n")
+    #cat(allNames$NEW)
+    #allNames <-updateCnt(allNames)
   }
   names(shape) = allNames[with(allNames,order(ID)),"NEW"]
   return(shape)
