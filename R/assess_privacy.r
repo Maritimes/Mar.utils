@@ -241,7 +241,7 @@ assess_privacy <- function(
       rgdal::writeOGR(POLY.agg, ".", POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
       cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp\n"))
       
-      grid2Min = prepare_shape_fields(grid2Min)
+      grid2Min = Mar.utils::prepare_shape_fields(grid2Min)
       rgdal::writeOGR(grid2Min, ".", this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
       cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp\n"))
     }

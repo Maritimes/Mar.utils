@@ -19,17 +19,17 @@ prepare_shape_fields <- function(shape){
   #big ol' df of stuff that we should always replace
   univRepl <- data.frame("VERBOSE" = character(), "SUCCINCT" = character())
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('COMBINED','CMB')))
-  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('CAUGHT','CGHT')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('LICENSE','LIC')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('VESSEL','VES')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('TEMPERATURE','TMP')))
-  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('BOTTOM','BOTT')))
-  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('SURFACE','SURF')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('BOTTOM','BOT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('SURFACE','SUR')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('SALINITY','SAL')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('WEIGHT','WT')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('DEPTH','DEP')))
-  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('KEPT_WT','KPT')))
-  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('DISCARD_WT','DSC')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('EST_KEPT_WT','KPT')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('EST_DISCARD_WT','DSC')))
+  univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('EST_NUM_CAUGHT','NUM')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('MEAN','MN')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('COUNT','CT')))
   univRepl <- as.data.frame(rbind(as.matrix(univRepl), c('CNT','CT')))
@@ -49,7 +49,7 @@ prepare_shape_fields <- function(shape){
   
   #grab all of the original names, capture their order, length, and prepare a place for their replacements
   allNames = data.frame(ID = seq(length(names(shape))), ORIG = names(shape), CNT = nchar(names(shape)), NEW = names(shape))
-  
+
   #replace periods with underscores
   allNames$NEW = gsub('\\.','_', allNames$NEW)
   
@@ -57,7 +57,6 @@ prepare_shape_fields <- function(shape){
   for (r in 1:nrow(univRepl)){
     allNames[grepl(x=allNames$NEW, ignore.case = T, pattern=univRepl[r,"VERBOSE"]),"NEW"]<-gsub(x = allNames[grepl(x = allNames$NEW,ignore.case = T,pattern = univRepl[r,"VERBOSE"]),"NEW"], pattern = univRepl[r,"VERBOSE"],replacement = univRepl[r,"SUCCINCT"])
   }
-  
   allNames <-updateCnt(allNames)
   #do succesively more harsh actions to get char down to 10
   if (max(range(allNames$CNT))>10){
