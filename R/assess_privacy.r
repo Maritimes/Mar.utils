@@ -123,12 +123,18 @@ assess_privacy <- function(
       df<-dfRestU
     }
   }
-  df = Mar.utils::df_qc_spatial(df, lat.field, lon.field, FALSE)
-  sp::coordinates(df) = c(lon.field, lat.field)
-  sp::proj4string(df) = sp::CRS("+proj=longlat +datum=WGS84")
+  df = df_to_sp(df, lat.field, lon.field)
+  # df = Mar.utils::df_qc_spatial(df, lat.field, lon.field, FALSE)
+  # sp::coordinates(df) = c(lon.field, lat.field)
+  # sp::proj4string(df) = sp::CRS("+init=epsg:4326")
   if (is.null(agg.poly.shp)){
     agg.poly=  Mar.data::NAFOSubunits
     defFields <- c("NAFO_1", "NAFO_2", "NAFO_3","NAFO_BEST")
+    # know that the CRS of agg.poly obj is WGS84, but perhaps saved with 
+    #slight variations in the text
+      sp::proj4string(agg.poly) <- sp::CRS(as.character(NA))
+      sp::proj4string(agg.poly) = sp::CRS("+init=epsg:4326")
+    
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO_BEST'
     }
@@ -138,12 +144,13 @@ assess_privacy <- function(
     agg.poly <- rgdal::readOGR(dsn = agg.poly.shp, verbose = FALSE)
     if (is.na(sp::proj4string(agg.poly))) {
       cat('\nNo projection found for input shapefile - assuming geographic.')
-      sp::proj4string(agg.poly) = sp::CRS("+proj=longlat +datum=WGS84")
+      sp::proj4string(agg.poly) = sp::CRS("+init=epsg:4326")
     }
     #convert the shape to geographic
-    agg.poly <- sp::spTransform(agg.poly,sp::CRS("+proj=longlat +datum=WGS84"))
+    agg.poly <- sp::spTransform(agg.poly,sp::CRS("+init=epsg:4326"))
   }
-  df@data = cbind(df@data,sp::over( df, agg.poly , fn = NULL))
+  pip <- sp::over( df, agg.poly , fn = NULL)
+  df@data = cbind(df@data, pip)
  
   if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) df <- sp::merge(df, dfWide, by=key.fields, all.x=T)
   df@data[agg.fields][is.na(df@data[agg.fields])] <- 0
@@ -197,7 +204,11 @@ assess_privacy <- function(
   } else{
     grid2Min<-Mar.data::grid2Min
   }
-  sp::proj4string(grid2Min) = sp::CRS("+proj=longlat +datum=WGS84")
+  # know that the CRS of both grid2Min obj is WGS84, but perhaps saved with 
+  #slight variations in the text
+  sp::proj4string(grid2Min) <- sp::CRS(as.character(NA))
+  sp::proj4string(grid2Min) = sp::CRS("+init=epsg:4326")
+
   grid2Min$ORD_gr <-  seq.int(nrow(grid2Min)) 
   if (length(allowed.areas)>0){
     #clip the data to those overlaying acceptable NAFO
