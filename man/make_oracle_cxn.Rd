@@ -42,6 +42,10 @@ shown.}
 This function facilitates creating a connection to Oracle, and
 allows connection via RODBC or ROracle, depending on the value of usepkg.
 }
+\seealso{
+Other dfo_extractions: 
+\code{\link{get_data_tables}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
