@@ -41,6 +41,9 @@ get_data_tables<-function(schema=NULL,
     loadit <- function(x, data.dir) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
+      if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T))) thisP = gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T)
+      if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T))) thisP = gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T)
+      if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
       
       load(file = thisP,envir = env)
       if (!quiet) cat(paste0("\nLoaded ", x, "... "))
