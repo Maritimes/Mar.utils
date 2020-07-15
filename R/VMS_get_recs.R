@@ -57,7 +57,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                        vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
                        simpleQC = TRUE, rowNum = 50000, quietly = F){
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
-  whereDateEnd = paste0("AND POSITION_UTC_DATE < to_date('",dateEnd,"','YYYY-MM-DD')") 
+  whereDateEnd = paste0("AND POSITION_UTC_DATE <= to_date('",dateEnd,"','YYYY-MM-DD')") 
   
   if (!is.null(vrnList)) {
     if (length(vrnList)>1000){
@@ -74,18 +74,18 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
   # go to VMS source, and retrieve records
   recSQL = paste0("select VR_NUMBER,LATITUDE,LONGITUDE,POSITION_UTC_DATE,SPEED_KNOTS,UPDATE_DATE
               from MFD_OBFMI.VMS_ALL 
-              WHERE POSITION_UTC_DATE> to_date('",dateStart,"','YYYY-MM-DD') ",whereDateEnd, 
+              WHERE POSITION_UTC_DATE>= to_date('",dateStart,"','YYYY-MM-DD') ",whereDateEnd, 
                   " ",whereVRN, sqlLimit
   )
   oracle_cxn = make_oracle_cxn(fn.oracle.username =fn.oracle.username, 
                                fn.oracle.password = fn.oracle.password, 
                                fn.oracle.dsn = fn.oracle.dsn,
                                usepkg = usepkg, quietly = quietly)
-
-  if (oracle_cxn ==-1){
+  if (!is.list(oracle_cxn)) {
     cat("\nCan't do this without a DB connection.  Aborting.\n")
     return(NULL)
   }
+
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
   if (nrow(allRecs)<1){
     if (!quietly) cat(paste0("\n","No records returned"))
