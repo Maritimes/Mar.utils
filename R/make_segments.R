@@ -31,6 +31,7 @@
 #' tracks will be plotted.
 #' @param createShp default is \code{TRUE}. This determines whether or not 
 #' shapefiles will be generated in your working directory.
+#' @import data.table
 #' @return a list with 2 items - a SpatialPointsDataFrame, and a 
 #' SpatialLinesDataFrame.  Additionally, shapefiles can also be generated.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}

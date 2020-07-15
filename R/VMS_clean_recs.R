@@ -20,6 +20,7 @@
 #' that is allowed between positions before a new "trek" is created. 
 #' @return a dataframe with an additional "trek" column identifying a number of
 #' discrete paths for each unique value of \code{objField}.
+#' @import data.table
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export

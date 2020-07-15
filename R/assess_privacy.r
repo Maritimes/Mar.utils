@@ -67,6 +67,8 @@
 #' the shapefile provided to agg.poly.shp that should be used to check for 
 #' sufficient unique values of the sens.fields.
 
+#' @import data.table
+
 #' @return a SpatialPolygonsDataFrame, and generates a shapefile
 
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
