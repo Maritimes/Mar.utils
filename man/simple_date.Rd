@@ -23,6 +23,11 @@ This function converts specified datetime fields into date fields.
 The number of items in oldFields and newFields must be identical, and 
 the order matters in that newFields[3] will replace oldFields[3].
 }
+\seealso{
+Other datesAndTimes: 
+\code{\link{vali_dates}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{datesAndTimes}
