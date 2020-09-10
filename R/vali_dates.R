@@ -9,7 +9,7 @@
 #' @param year default is \code{'NULL'}.
 #' @family datesAndTimes
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
-#'
+#' @export
 vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL){
 
   if(!is.null(year)){
