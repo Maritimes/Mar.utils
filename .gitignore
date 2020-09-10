@@ -11,3 +11,4 @@
 *.lock
 doc
 Meta
+inst/doc
