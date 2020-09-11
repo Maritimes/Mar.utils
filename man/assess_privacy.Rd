@@ -11,6 +11,7 @@ assess_privacy(
   lon.field = "LONGITUDE",
   rule.of = 5,
   agg.fields = "KEPT_WT",
+  calculate = c("MEAN", "COUNT", "SUM"),
   sens.fields = NULL,
   facet.field = NULL,
   key.fields = NULL,
@@ -27,11 +28,11 @@ assess_privacy(
 \item{grid.shape}{default is \code{"hex"}.  This identifies the shape of the 
 you want to aggregate your data into.  The options are "hex" or "square"}
 
-\item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values 
-(in decimal degrees)}
+\item{lat.field}{the default is \code{"LATITUDE"}. This is the name of the 
+field holding latitude values (in decimal degrees)}
 
-\item{lon.field}{the default is \code{"LONGITUDE"}.  the name of the field holding longitude 
-values (in decimal degrees)}
+\item{lon.field}{the default is \code{"LONGITUDE"}.  This is the name of the 
+field holding longitudevalues (in decimal degrees)}
 
 \item{rule.of}{default is \code{5} Whether or not data can be shown (even 
 aggregated) depends on the presence of a threshold number of unique values 
@@ -40,6 +41,12 @@ for certain sensitive fields.  This parameter sets that threshold.}
 \item{agg.fields}{the default is \code{"KEPT_WT"}.  These are the fields in the data that contain 
 the values you want to aggregate (e.g. calulate the mean, sum or count of.  This field needs to be
 numeric.}
+
+\item{calculate}{the default is \code{c("MEAN", "COUNT", "SUM")}. These are the 
+analytics which should be performed for every field identified in \code{agg.field}.
+For example, if KEPT_WT and DISCAD_WT are both identified in \code{agg.field},
+then for every resultant aggregated polygon (e.g. hexagon), the mean, count 
+and sum of both of these fields is calculated for every polygon.}
 
 \item{sens.fields}{the defaults are \code{NULL}  These are fields
 to which the "rule of 5" should be applied. The Treasury Secretariat states that when data is 
@@ -99,6 +106,14 @@ how many unique values exist in each polygon for each of a number of sensitive f
 If sensitive fields have names that are different than what is provided in the \code{sen.fields}, 
 they will not be detected, or included in the checks.  Please make very sure you correctly 
 identify such fields.
+
+It should be also noted that shapefiles can only have 255 columns, which can 
+be exceeded by this function relatively easily when a \code{facet.field} is 
+provided (e.g. for bycatch species).  For example, if all 3 default \code{calculate} 
+fields are requested on 3 different \code{agg.fields}, and there are 30 
+unique values in the \code{facet.field}, this will result in (3*3*30 =) 270 
+fields plus 3 or 4 additional housekeeping fields. In this event, a warning 
+will be provided, but no shapefiles will be output.
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

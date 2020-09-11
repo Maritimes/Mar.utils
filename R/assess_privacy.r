@@ -9,11 +9,17 @@
 #' @param grid.shape default is \code{"hex"}.  This identifies the shape of the 
 #' you want to aggregate your data into.  The options are "hex" or "square"
 
-#' @param lat.field the default is \code{"LATITUDE"}. the name of the field holding latitude values 
-#' (in decimal degrees)
+#' @param lat.field the default is \code{"LATITUDE"}. This is the name of the 
+#' field holding latitude values (in decimal degrees)
 
-#' @param lon.field the default is \code{"LONGITUDE"}.  the name of the field holding longitude 
-#' values (in decimal degrees)
+#' @param lon.field the default is \code{"LONGITUDE"}.  This is the name of the 
+#' field holding longitudevalues (in decimal degrees)
+
+#' @param calculate the default is \code{c("MEAN", "COUNT", "SUM")}. These are the 
+#' analytics which should be performed for every field identified in \code{agg.field}.
+#' For example, if KEPT_WT and DISCAD_WT are both identified in \code{agg.field},
+#' then for every resultant aggregated polygon (e.g. hexagon), the mean, count 
+#' and sum of both of these fields is calculated for every polygon.
 
 #' @param rule.of default is \code{5} Whether or not data can be shown (even 
 #' aggregated) depends on the presence of a threshold number of unique values 
@@ -76,6 +82,14 @@
 #' @note If sensitive fields have names that are different than what is provided in the \code{sen.fields}, 
 #' they will not be detected, or included in the checks.  Please make very sure you correctly 
 #' identify such fields.
+#' 
+#' It should be also noted that shapefiles can only have 255 columns, which can 
+#' be exceeded by this function relatively easily when a \code{facet.field} is 
+#' provided (e.g. for bycatch species).  For example, if all 3 default \code{calculate} 
+#' fields are requested on 3 different \code{agg.fields}, and there are 30 
+#' unique values in the \code{facet.field}, this will result in (3*3*30 =) 270 
+#' fields plus 3 or 4 additional housekeeping fields. In this event, a warning 
+#' will be provided, but no shapefiles will be output. 
 assess_privacy <- function(
   df= NULL, 
   grid.shape = 'hex',
@@ -83,6 +97,7 @@ assess_privacy <- function(
   lon.field = 'LONGITUDE',
   rule.of = 5,
   agg.fields = "KEPT_WT",
+  calculate = c("MEAN", "COUNT", "SUM"),
   sens.fields = NULL,
   facet.field = NULL,
   key.fields = NULL,
@@ -95,6 +110,18 @@ assess_privacy <- function(
   #set up
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   `:=` <- function (x, value) value
+  
+  
+  analyticChooser <- function(x, calculate){
+    #this function is called by the aggregate functions to allow use to select which analytics are calculated for all agg.fields
+    res <- NA
+    if ("CNT" %in% calculate)  res= c(res, round(length(x[x!=0]), 0))
+    if ("SUM" %in% calculate)  res= c(res, round(sum(x), 4))
+    if ("MEAN" %in% calculate)  res= c(res, round(mean(x), 4))
+    res = res[!is.na(res)]
+    return(res)
+  }
+  
   #deal with cases where differing rows may refer to different species in the same sets
   #in short:
   #1)pull key.fields, facet.field and agg.fields into dfLong
@@ -157,17 +184,33 @@ assess_privacy <- function(
   if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) df <- sp::merge(df, dfWide, by=key.fields, all.x=T)
   df@data[agg.fields][is.na(df@data[agg.fields])] <- 0
   df@data[agg.fields] <- lapply(df@data[agg.fields], as.numeric)
+  
+  calc= NA
+  if ("MEAN" %in% calculate) calc = c(calc, "MEAN = round(mean(x), 4)")
+  if ("CNT" %in% calculate) calc =  c(calc, "CNT = round(length(x[x!=0]), 0)")
+  if ("SUM" %in% calculate) calc = c(calc, "SUM = round(sum(x), 4)")
+  calc = calc[!is.na(calc)]
+  # 
+  # 
+  # POLY.agg <- as.data.frame(as.list(stats::aggregate(
+  #   df@data[agg.fields],
+  #   by = df@data[c(agg.poly.field)],
+  #   FUN = function(x)
+  #     c(
+  #       MEAN = round(mean(x), 4),
+  #       CNT = round(length(x[x!=0]), 0),
+  #       SUM = round(sum(x), 4)
+  #     )
+  # )))
+
 
   POLY.agg <- as.data.frame(as.list(stats::aggregate(
     df@data[agg.fields],
     by = df@data[c(agg.poly.field)],
-    FUN = function(x)
-      c(
-        MEAN = round(mean(x), 4),
-        CNT = round(length(x[x!=0]), 0),
-        SUM = round(sum(x), 4)
-      )
+    FUN = function(x) analyticChooser(x, calculate)
   )))
+  
+
   POLY.agg[,2:ncol(POLY.agg)] <- sapply(POLY.agg[,2:ncol(POLY.agg)], as.numeric)
   if (!is.null(sens.fields)){
     POLY.agg.sens = as.data.frame(as.list(stats::aggregate(
@@ -178,6 +221,8 @@ assess_privacy <- function(
           CNT = round(length(unique(x)), 0)
         )
     )))
+
+   
     POLY.agg.sens$TOTUNIQUE = apply(as.data.frame(POLY.agg.sens[,2:ncol(POLY.agg.sens)]), 1, min)
     POLY.agg.sens$CAN_SHOW <- 'NA'
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,]$CAN_SHOW <- 'YES'
@@ -224,12 +269,13 @@ assess_privacy <- function(
     grid.agg = as.data.frame(as.list(stats::aggregate(
       df@data[agg.fields],
       by = df@data[c('ORD_gr')],
-      FUN = function(x)
-        c(
-          MEAN = round(mean(x), 4),
-          CNT = round(length(x[x!=0]), 0),
-          SUM = round(sum(x), 4)
-        )
+      # FUN = function(x)
+      #   c(
+      #     MEAN = round(mean(x), 4),
+      #     CNT = round(length(x[x!=0]), 0),
+      #     SUM = round(sum(x), 4)
+      #   )
+      FUN = function(x) analyticChooser(x, calculate)
     )))
     #step 3 -- append the aggregated data back onto the grid 
     grid2Min=sp::merge(grid2Min, grid.agg)
@@ -238,14 +284,38 @@ assess_privacy <- function(
     file.id = ifelse(!is.null(file.id),paste0(file.id,"_"),"")
     POLY.agg.name = paste0(file.id,'POLY_AGG_', ts)
     this.df.name = paste0(file.id,'Grid2Min_', ts)
+    
+    # there are 3 analytics possible within the agg function via (analyticChooser) - CNT, SUM and MEAN
+    # the resultant column get added to the data with the original names with "*.1", "*.2", or "*.3"
+    # appended, depending on which analytic the values correspond with
+    # the next bit will help establish which appended number corresponds with which analytic
+    # possible analytics
+    usedAnal <- intersect(c("CNT", "SUM", "MEAN"), calculate) # this returns the ones that were run
+    nums <- match(calculate,usedAnal)   
+    for (i in 1:length(nums)){
+      thisSearch = nums[i]
+      thisrep = usedAnal[thisSearch]
+      colnames(POLY.agg@data) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(POLY.agg@data))
+      colnames(grid2Min@data) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(grid2Min@data))
+    }
+
+    
     if (create.shps){
+      if (max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
+        warning("\nCan not create shapefiles.  Shapefiles are limited to 255 fields, and your data will have more than that.
+The number of fields is determined by:
+1) the number of unique values found in your facet.field (if present, e.g. bycatch species);
+2) the number of specified agg.fields (e.g. kept_weight, discarded weight); 
+3) for each combination above, a sum, count and mean is calculated;
+4) several housekeeping fields are also created")
+      }else{
       POLY.agg = prepare_shape_fields(POLY.agg) 
-      rgdal::writeOGR(POLY.agg, ".", POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
+      rgdal::writeOGR(obj = POLY.agg, dsn= getwd(), layer = POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
       cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp\n"))
-      
       grid2Min = prepare_shape_fields(grid2Min)
-      rgdal::writeOGR(grid2Min, ".", this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
+      rgdal::writeOGR(obj = grid2Min, dsn=getwd(), layer = this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
       cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp\n"))
+      }
     }
     results= list("Grid2Min" = grid2Min, "POLY_AGG" = POLY.agg)
   }else{
