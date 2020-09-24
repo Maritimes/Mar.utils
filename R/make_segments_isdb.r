@@ -36,9 +36,11 @@
 ##' The QC data checks the positions of each FISHSET for NAs, Zeroes, or 
 ##' otherwise data.  Additionally, if the line has a length of zero, that is 
 ##' noted as well.
+#' @param createShp default is \code{TRUE}. This determines whether or not 
+#' shapefiles will be generated in your working directory.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
+make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", createShp=TRUE){
  
   # Pull out coordinates, stack em, create and populate QC status field ----
   crs.geo <- sp::CRS("+init=epsg:4326") 
@@ -240,6 +242,14 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines"){
   if(length(all.sets.lines)>0){
     all.sets.lines@data= merge(all.sets.lines@data, isdb.df)
   }
+  
+  if (createShp) {
+    all.sets.lines = Mar.utils::prepare_shape_fields( all.sets.lines)
+    rgdal::writeOGR(obj =  all.sets.lines, layer =paste0("isdb_lines"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+    cat(paste0("\nA shapefile ('isdb_lines') was written to  ",getwd(),": "))
+  }
+  
+  
   if (return.choice != "lines" & do.qc){
     return(isdb.qc)
   }else{

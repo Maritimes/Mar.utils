@@ -4,7 +4,12 @@
 \alias{make_segments_isdb}
 \title{make_segments_isdb}
 \usage{
-make_segments_isdb(isdb.df, do.qc = FALSE, return.choice = "lines")
+make_segments_isdb(
+  isdb.df,
+  do.qc = FALSE,
+  return.choice = "lines",
+  createShp = TRUE
+)
 }
 \arguments{
 \item{isdb.df}{This is the dataframe you want to plot.  isdb dataframes are
@@ -28,6 +33,9 @@ km), and the number of valid vertices.
 The QC data checks the positions of each FISHSET for NAs, Zeroes, or 
 otherwise data.  Additionally, if the line has a length of zero, that is 
 noted as well.}
+
+\item{createShp}{default is \code{TRUE}. This determines whether or not 
+shapefiles will be generated in your working directory.}
 }
 \description{
 This function takes a df of the isdb data (including fields
