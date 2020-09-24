@@ -9,6 +9,7 @@
 #' values will be retained (i.e. those from the primary list)
 #' @return list of all of the arguments
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
+#' @export
 combine_lists <- function(ancilliary = NULL, primary = NULL, quiet= T){
   sent <- ancilliary[intersect(names(ancilliary),names(primary))]
   used <- primary[intersect(names(ancilliary),names(primary))]
