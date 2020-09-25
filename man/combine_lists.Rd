@@ -4,12 +4,12 @@
 \alias{combine_lists}
 \title{combine_lists}
 \usage{
-combine_lists(ancilliary = NULL, primary = NULL, quiet = T)
+combine_lists(primary = NULL, ancilliary = NULL, quiet = T)
 }
 \arguments{
-\item{ancilliary}{default is \code{NULL}}
-
 \item{primary}{default is \code{NULL}}
+
+\item{ancilliary}{default is \code{NULL}}
 
 \item{quiet}{default is \code{TRUE}.  If FALSE, this function will notify the
 user that the lists have similarly named elements, and will indicate which
