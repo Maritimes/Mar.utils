@@ -21,7 +21,7 @@
 #' identifier for accessing oracle objects. 
 #' @param env This the the environment you want this function to work in.  The 
 #' default value is \code{.GlobalEnv}.
-#' @param quiet default is \code{FALSE}.  If TRUE, no output messages will be shown.
+#' @param quietly default is \code{FALSE}.  If TRUE, no output messages will be shown.
 #' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -33,7 +33,7 @@ get_data_tables<-function(schema=NULL,
                           fn.oracle.password="_none_",
                           fn.oracle.dsn="_none_",
                           env=.GlobalEnv,
-                          quiet=F){
+                          quietly=F){
   schema=toupper(schema)
   tables = toupper(tables)
   
@@ -46,18 +46,18 @@ get_data_tables<-function(schema=NULL,
       if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
       
       load(file = thisP,envir = env)
-      if (!quiet) cat(paste0("\nLoaded ", x, "... "))
+      if (!quietly) cat(paste0("\nLoaded ", x, "... "))
       fileAge = file.info(thisP)$mtime
       fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
-      if (!quiet) cat(paste0(" (Data modified ", fileAge, " days ago.)"))
-      if ((!quiet)  & fileAge > 90) 
+      if (!quietly) cat(paste0(" (Data modified ", fileAge, " days ago.)"))
+      if ((!quietly)  & fileAge > 90) 
         cat(paste("\n!!! This data was extracted more than 90 days ago - consider re-extracting it"))
     }
-    if (!quiet) cat("\nLoading data...")
+    if (!quietly) cat("\nLoading data...")
     timer.start = proc.time()
     sapply(tables, simplify = TRUE, loadit, data.dir)
     elapsed = timer.start - proc.time()
-    if (!quiet) cat(paste0("\n\n", round(elapsed[3], 0) * -1, " seconds to load..."))
+    if (!quietly) cat(paste0("\n\n", round(elapsed[3], 0) * -1, " seconds to load..."))
   }
   
   reqd = toupper(paste0(schema, ".", tables))
@@ -82,7 +82,7 @@ get_data_tables<-function(schema=NULL,
     }
     
     for (i in 1:length(tables)){
-      if (!quiet) cat(paste0("\n","Verifying access to ",tables[i]," ..."))
+      if (!quietly) cat(paste0("\n","Verifying access to ",tables[i]," ..."))
       qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",tables[i])," WHERE ROWNUM<=1")
       
       
@@ -105,9 +105,9 @@ get_data_tables<-function(schema=NULL,
       res= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
       assign(table_naked, res)
       save(list = table_naked, file = file.path(data.dir, paste0(schema,".",tables[i],".RData")))
-      if (!quiet) cat(paste("\n","Got", tables[i]))
+      if (!quietly) cat(paste("\n","Got", tables[i]))
       assign(x = tables[i],value = get(table_naked), envir = env)
-      if (!quiet) cat(paste0("\n","Loaded ",tables[i]))
+      if (!quietly) cat(paste0("\n","Loaded ",tables[i]))
     }
   }
 }

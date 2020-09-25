@@ -13,7 +13,7 @@ get_data_tables(
   fn.oracle.password = "_none_",
   fn.oracle.dsn = "_none_",
   env = .GlobalEnv,
-  quiet = F
+  quietly = F
 )
 }
 \arguments{
@@ -45,7 +45,7 @@ identifier for accessing oracle objects.}
 \item{env}{This the the environment you want this function to work in.  The 
 default value is \code{.GlobalEnv}.}
 
-\item{quiet}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
+\item{quietly}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
 }
 \description{
 This function allows users to extract tables for which they have select permissions

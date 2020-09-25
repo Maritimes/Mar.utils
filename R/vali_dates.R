@@ -14,7 +14,7 @@
 vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = FALSE){
   if (!is.null(dateStart) & !is.null(year)){
     year <- NULL
-    if (!quiet) cat('Both "dateStart" and "year" were supplied as parameters.  dateStart will be used.','\n')      
+    if (!quietly) cat('Both "dateStart" and "year" were supplied as parameters.  dateStart will be used.','\n')      
   }
   if(!is.null(year)){
     dateStart<-year
@@ -52,7 +52,7 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
     dateEnd <- as.POSIXlt(dateStart)
     dateEnd$year <- dateEnd$year + 1
     dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
-    if (!quiet) cat("No endDate was supplied, so endDate was set to be 1 yr after startDate","\n")
+    if (!quietly) cat("No endDate was supplied, so endDate was set to be 1 yr after startDate","\n")
   }
 
   if (dateStart>dateEnd){

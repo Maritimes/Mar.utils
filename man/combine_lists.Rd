@@ -4,14 +4,14 @@
 \alias{combine_lists}
 \title{combine_lists}
 \usage{
-combine_lists(primary = NULL, ancilliary = NULL, quiet = T)
+combine_lists(primary = NULL, ancilliary = NULL, quietly = T)
 }
 \arguments{
 \item{primary}{default is \code{NULL}}
 
 \item{ancilliary}{default is \code{NULL}}
 
-\item{quiet}{default is \code{TRUE}.  If FALSE, this function will notify the
+\item{quietly}{default is \code{TRUE}.  If FALSE, this function will notify the
 user that the lists have similarly named elements, and will indicate which
 values will be retained (i.e. those from the primary list)}
 }

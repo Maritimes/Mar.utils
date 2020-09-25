@@ -4,17 +4,17 @@
 #' will be retained.
 #' @param primary default is \code{NULL}
 #' @param ancilliary default is \code{NULL}
-#' @param quiet default is \code{TRUE}.  If FALSE, this function will notify the
+#' @param quietly default is \code{TRUE}.  If FALSE, this function will notify the
 #' user that the lists have similarly named elements, and will indicate which
 #' values will be retained (i.e. those from the primary list)
 #' @return list of all of the arguments
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-combine_lists <- function(primary = NULL, ancilliary = NULL, quiet= T){
+combine_lists <- function(primary = NULL, ancilliary = NULL, quietly= T){
   dups <- ancilliary[intersect(names(ancilliary),names(primary))]  #
   kept <- primary[intersect(names(ancilliary),names(primary))]
   ignored <- dups[!(dups %in% kept)]
-    if (!quiet & length(setdiff(dups, kept))>0){
+    if (!quietly & length(setdiff(dups, kept))>0){
     cat("Ambiguous parameter(s) detected","\n")
     for(c in 1:length(kept)){
       this = names(ignored)[c]
