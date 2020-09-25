@@ -6,16 +6,20 @@
 #' 'YYYY' (which will then become Jan 1st).
 #' @param dateEnd default is \code{'NULL'}.  This can be a date in the format of 'YYYY-MM-DD' or
 #' 'YYYY' (which will then become Dec 31st).
+#' @param quietly default is \code{FALSE}. When TRUE, no output will be shown.
 #' @param year default is \code{'NULL'}.
 #' @family datesAndTimes
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL){
-
+vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = FALSE){
+  if (!is.null(dateStart) & !is.null(year)){
+    year <- NULL
+    if (!quiet) cat('Both "dateStart" and "year" were supplied as parameters.  dateStart will be used.','\n')      
+  }
   if(!is.null(year)){
     dateStart<-year
     dateEnd <- NULL
-    year<-NULL
+    year<-NULL  
   }
 
   if(!is.null(dateStart)){
@@ -45,7 +49,10 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL){
       dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
     }
   }else{
-    dateEnd <- as.POSIXct(format(as.Date(dateStart) + 365, "%Y-%m-%d"), origin = "1970-01-01")
+    dateEnd <- as.POSIXlt(dateStart)
+    dateEnd$year <- dateEnd$year + 1
+    dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
+    if (!quiet) cat("No endDate was supplied, so endDate was set to be 1 yr after startDate","\n")
   }
 
   if (dateStart>dateEnd){
