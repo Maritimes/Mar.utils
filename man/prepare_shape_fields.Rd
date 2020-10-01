@@ -21,12 +21,14 @@ understood and are not simply truncated.
 \seealso{
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
+\code{\link{combine_lists}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
-\code{\link{updateCheck}()}
+\code{\link{updateCheck}()},
+\code{\link{where_now}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -23,6 +23,19 @@ This function assembles 2 lists into a single list.  When
 elements from both lists have the same name, the values from the primary list
 will be retained.
 }
+\seealso{
+Other general_use: 
+\code{\link{clip_by_poly_generic}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{df_to_shp}()},
+\code{\link{df_to_sp}()},
+\code{\link{drop_cols}()},
+\code{\link{pbs2sp_poly}()},
+\code{\link{prepare_shape_fields}()},
+\code{\link{updateCheck}()},
+\code{\link{where_now}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{general_use}

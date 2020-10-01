@@ -8,6 +8,7 @@
 #' user that the lists have similarly named elements, and will indicate which
 #' values will be retained (i.e. those from the primary list)
 #' @return list of all of the arguments
+#' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 combine_lists <- function(primary = NULL, ancilliary = NULL, quietly= T){
