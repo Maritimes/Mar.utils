@@ -4,10 +4,10 @@
 \alias{where_now}
 \title{where_now}
 \usage{
-where_now(inf = as.character(sys.calls()[[sys.nframe() - 1]]), lvl = 1)
+where_now(inf = NULL, lvl = 1)
 }
 \arguments{
-\item{inf}{the default is \code{as.character(sys.calls()[[sys.nframe() - 1]])}. 
+\item{inf}{the default is \code{NULL}.  WOrks with \code{as.character(sys.calls()[[sys.nframe() - 1]])}. 
 This is a method for extracting the function information.}
 
 \item{lvl}{the default is \code{0}. This controls how many tabs are used to 
