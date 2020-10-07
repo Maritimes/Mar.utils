@@ -1,7 +1,7 @@
 #' @title vali_dates
-#' @description This function ensures that functions have valid start and end dates. If only\code{startDate}
-#' is provided, \code{endDate}  will be for 1 year later. If \code{year} is provided, \code{startDate}  and
-#' \code{endDate} will be Jan 1 and Dec 31 of that year, respectively.
+#' @description This function ensures that functions have valid start and end dates. If only\code{dateStart}
+#' is provided, \code{endDate}  will be for 1 year later. If \code{year} is provided, \code{dateStart}  and
+#' \code{dateEnd} will be Jan 1 and Dec 31 of that year, respectively.
 #' @param dateStart default is \code{'NULL'}.  This can be a date in the format of 'YYYY-MM-DD' or
 #' 'YYYY' (which will then become Jan 1st).
 #' @param dateEnd default is \code{'NULL'}.  This can be a date in the format of 'YYYY-MM-DD' or
@@ -52,7 +52,7 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
     dateEnd <- as.POSIXlt(dateStart)
     dateEnd$year <- dateEnd$year + 1
     dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
-    if (!quietly) cat("No endDate was supplied, so endDate was set to be 1 yr after startDate","\n")
+    if (!quietly) cat("No dateEnd was supplied, so dateEnd was set to be 1 yr after dateStart","\n")
   }
 
   if (dateStart>dateEnd){

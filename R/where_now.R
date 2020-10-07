@@ -3,7 +3,7 @@
 #' parameters it is using
 #' @param inf the default is \code{NULL}.  WOrks with \code{as.character(sys.calls()[[sys.nframe() - 1]])}. 
 #' This is a method for extracting the function information.
-#' @param lvl the default is \code{0}. This controls how many tabs are used to 
+#' @param lvl the default is \code{1}. This controls how many tabs are used to 
 #' display the results.  It can be useful when functions call subfunctions
 #' @return NULL - it just prints to the screen
 #' @family general_use
