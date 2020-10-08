@@ -18,9 +18,9 @@ vali_dates(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = FALSE)
 \item{quietly}{default is \code{FALSE}. When TRUE, no output will be shown.}
 }
 \description{
-This function ensures that functions have valid start and end dates. If only\code{startDate}
-is provided, \code{endDate}  will be for 1 year later. If \code{year} is provided, \code{startDate}  and
-\code{endDate} will be Jan 1 and Dec 31 of that year, respectively.
+This function ensures that functions have valid start and end dates. If only\code{dateStart}
+is provided, \code{endDate}  will be for 1 year later. If \code{year} is provided, \code{dateStart}  and
+\code{dateEnd} will be Jan 1 and Dec 31 of that year, respectively.
 }
 \seealso{
 Other datesAndTimes: 

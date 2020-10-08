@@ -10,7 +10,7 @@ where_now(inf = NULL, lvl = 1)
 \item{inf}{the default is \code{NULL}.  WOrks with \code{as.character(sys.calls()[[sys.nframe() - 1]])}. 
 This is a method for extracting the function information.}
 
-\item{lvl}{the default is \code{0}. This controls how many tabs are used to 
+\item{lvl}{the default is \code{1}. This controls how many tabs are used to 
 display the results.  It can be useful when functions call subfunctions}
 }
 \value{

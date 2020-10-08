@@ -20,6 +20,7 @@ Converts a vector of characters into something that an "IN" statement can use
 }
 \seealso{
 Other util: 
+\code{\link{Mode}()},
 \code{\link{st_err}()}
 }
 \author{

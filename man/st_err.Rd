@@ -14,6 +14,7 @@ Calculates the standard error
 }
 \seealso{
 Other util: 
+\code{\link{Mode}()},
 \code{\link{SQL_in}()}
 }
 \author{
