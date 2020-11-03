@@ -176,7 +176,7 @@ assess_privacy <- function(
       sp::proj4string(agg.poly) = sp::CRS("+init=epsg:4326")
     }
     #convert the shape to geographic
-    agg.poly <- sp::spTransform(agg.poly,sp::CRS("+init=epsg:4326"))
+    agg.poly <- suppressWarnings(sp::spTransform(agg.poly,sp::CRS("+init=epsg:4326")))
   }
   pip <- sp::over( df, agg.poly , fn = NULL)
   df@data = cbind(df@data, pip)

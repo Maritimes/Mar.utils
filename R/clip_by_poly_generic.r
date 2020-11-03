@@ -48,14 +48,14 @@ clip_by_poly_generic <- function(df=NULL,
     cat('\nNo projection found for input shapefile - assuming geographic.')
     sp::proj4string(clip.poly_this) = sp::CRS("+init=epsg:4326")
   } else if (sp::proj4string(clip.poly_this)!="+init=epsg:4326") {
-    clip.poly_this = sp::spTransform(clip.poly_this, sp::CRS('+init=epsg:4326'))
+    clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS('+init=epsg:4326')))
   }
   
   if (!is.null(buffer.m)){
     #if a buffer is specified, convert poly to UTM20N, apply buffer, and convert back
-    clip.poly_this = sp::spTransform(clip.poly_this, sp::CRS("+init=epsg:2220"))
+    clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS("+init=epsg:2220")))
     clip.poly_this = rgeos::gBuffer(clip.poly_this, width=buffer.m)
-    clip.poly_this = sp::spTransform(clip.poly_this, sp::CRS('+init=epsg:4326'))
+    clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS('+init=epsg:4326')))
   }
   if (NROW(df.sp[clip.poly_this, ]) ==0) {
     stop("\nNo data lies inside this polygon, aborting clip.")
