@@ -36,7 +36,8 @@ get_data_tables<-function(schema=NULL,
                           quietly=F){
   schema=toupper(schema)
   tables = toupper(tables)
-  
+  if (!quietly) cat("\nLoading data...")
+  timer.start = proc.time()
   try_load <- function(tables, data.dir, thisenv = env) {
     loadit <- function(x, data.dir) {
       this = paste0(x, ".RData")
@@ -53,37 +54,45 @@ get_data_tables<-function(schema=NULL,
       if ((!quietly)  & fileAge > 90) 
         cat(paste("\n!!! This data was extracted more than 90 days ago - consider re-extracting it"))
     }
-    if (!quietly) cat("\nLoading data...")
-    timer.start = proc.time()
-    sapply(tables, simplify = TRUE, loadit, data.dir)
+    sapply(tables, simplify = TRUE, loadit, data.dir)  
     elapsed = timer.start - proc.time()
     if (!quietly) cat(paste0("\n\n", round(elapsed[3], 0) * -1, " seconds to load..."))
+    return(TRUE)
   }
   
   reqd = toupper(paste0(schema, ".", tables))
-  loadsuccess = tryCatch(
-    {
-      try_load(reqd, data.dir)
-    }, 
-    warning = function(w) {
-      print()
-    },
-    error=function(cond){
-      return(-1)
-    }
-  )
-  if (is.null(loadsuccess)){
+  
+  res <- NA
+  
+  for (r in 1:length(reqd)){
+    loadsuccess = tryCatch(
+      {
+        try_load(reqd[r], data.dir)
+      }, 
+      warning = function(w) {
+        print()
+      },
+      error=function(cond){
+        return(-1)
+      }
+    )
+    res <- c(res, loadsuccess)
+  }
+  res<- res[!is.na(res)]
+  
+  if (all(res %in% 1)){
     return(invisible(NULL))
-  } else if (loadsuccess==-1){
+  } else {
     oracle_cxn_custom = Mar.utils::make_oracle_cxn(usepkg, fn.oracle.username, fn.oracle.password, fn.oracle.dsn)  
     if (!class(oracle_cxn_custom) =="list"){
       cat("\nCan't get the data without a DB connection.  Aborting.\n")
       return(NULL)
     }
     
-    for (i in 1:length(tables)){
-      if (!quietly) cat(paste0("\n","Verifying access to ",tables[i]," ..."))
-      qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",tables[i])," WHERE ROWNUM<=1")
+    missingtables = tables[which(res==-1)]
+    for (i in 1:length(missingtables)){
+      if (!quietly) cat(paste0("\n","Verifying access to ",missingtables[i]," ..."))
+      qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
       
       
       m = tryCatch(
@@ -99,15 +108,17 @@ get_data_tables<-function(schema=NULL,
         cat("\nCan't find or access the specified table")
         break
       }
-      cat(paste0("\n","Extracting ",tables[i],"..."))
-      table_naked = gsub(paste0(schema,"."),"",tables[i])
+      cat(paste0("\n","Extracting ",missingtables[i],"..."))
+      table_naked = gsub(paste0(schema,"."),"",missingtables[i])
       qry = paste0("SELECT * from ", schema, ".",table_naked)
       res= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
       assign(table_naked, res)
-      save(list = table_naked, file = file.path(data.dir, paste0(schema,".",tables[i],".RData")))
-      if (!quietly) cat(paste("\n","Got", tables[i]))
-      assign(x = tables[i],value = get(table_naked), envir = env)
-      if (!quietly) cat(paste0("\n","Loaded ",tables[i]))
-    }
+      save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
+      if (!quietly) cat(paste("\n","Got", missingtables[i]))
+      assign(x = missingtables[i],value = get(table_naked), envir = env)
+      if (!quietly) cat(paste0("\n","Loaded ",missingtables[i]))
+    }  
   }
+  
+
 }
