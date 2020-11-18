@@ -13,8 +13,7 @@ identify_area(
 )
 }
 \arguments{
-\item{df}{a dataframe to be analyzed. If left \code{NULL}, a value for 
-\code{db} should be provided}
+\item{df}{a dataframe to be analyzed.}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values 
 (in decimal degrees)}
@@ -22,22 +21,25 @@ identify_area(
 \item{lon.field}{the default is \code{"LONGITUDE"}.  the name of the field holding longitude 
 values (in decimal degrees)}
 
-\item{agg.poly.shp}{default is \code{NULL}.  This is the shapefile that has 
-polygons that should be checked for sufficient unique values of the 
-sens.fields.  If NULL, NAFO zones will be used.  Otherwise, a path to any 
-polygon shapefile can be provided.}
+\item{agg.poly.shp}{default is \code{NULL}.  This is either the path to the 
+*.shp file of a shapefile, an sf spatial object; or an sp spatialpolygonsdataframe.
+ If NULL, NAFO zones will be used.}
 
 \item{agg.poly.field}{default is \code{NULL}.  This identifies the field within 
-the shapefile provided to agg.poly.shp that should be used to check for 
-sufficient unique values of the sens.fields.}
+\code{agg.poly.shp} that contains the values that should be appended to the 
+input dataframe. If NULL, "NAFO_BEST", will be used, which is the finest
+resolution NAFO subdivision.}
 }
 \value{
 a DataFrame with the column \code{agg.poly.field} added
 }
 \description{
-This function takes a df with coordinate fields in decimal
-degrees, and overlays it a shapefile (agg.poly.shp).  It adds a column to the 
-df indicating which polygon within the shapefile each point falls within.
+This function takes a dataframe (with coordinate fields in decimal
+degrees), (optionally) a spatial object (either a shapefile, an
+sp::SpatialPolygonsDataframe, or an sf::polygon), and a field name from the 
+polygon object.  It then overlays the df with the polygon, and determines which
+discrete polygon contains each point from the df, and appends a new field 
+containing this value.  
 If no polygon is provided, the df will be assessed against NAFO subdivisions.
 }
 \author{
