@@ -40,7 +40,7 @@ the "return.bad" flag allows it to return only the "bad" points.
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
-\code{\link{csv2other_poly}()},
+\code{\link{convert2poly}()},
 \code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},

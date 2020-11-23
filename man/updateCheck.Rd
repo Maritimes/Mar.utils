@@ -18,7 +18,7 @@ github, and prompts the user to update.
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
-\code{\link{csv2other_poly}()},
+\code{\link{convert2poly}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
