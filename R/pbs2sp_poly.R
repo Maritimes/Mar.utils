@@ -10,7 +10,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 pbs2sp_poly <- function(pbs=NULL, create.shp=FALSE){
-  
+.Deprecated("csv2other_poly", msg = "This functionality and more is possible in csv2other_poly")
   nm = deparse(substitute(pbs))
   nm = gsub(replacement = "_",x = nm, pattern = "\\.")
   this = maptools::PolySet2SpatialPolygons(pbs)

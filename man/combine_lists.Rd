@@ -26,6 +26,7 @@ will be retained.
 \seealso{
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
+\code{\link{csv2other_poly}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},

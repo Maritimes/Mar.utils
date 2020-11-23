@@ -37,6 +37,7 @@ This function is set to overwrite existing shapefiles with the same name.
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
+\code{\link{csv2other_poly}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
