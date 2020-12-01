@@ -67,10 +67,17 @@ get_data_tables<-function(schema=NULL,
         }
       }
       
-      if(!file.exists(thisP))stop()
+
       
       
-      if(!checkOnly) {
+      if(checkOnly) {
+        if(file.exists(thisP)){
+          if (!quietly) cat(paste0("\nVerified ", x, "... "))
+        }else{
+          if (!quietly) cat(paste0("\nMissing ", x, " (download will be attempted)... "))
+          stop()
+        }
+      }else{
         load(file = thisP,envir = env)
         if (!quietly) cat(paste0("\nLoaded ", x, "... "))
       }
@@ -81,15 +88,6 @@ get_data_tables<-function(schema=NULL,
       #   cat(paste("\n!!! This data was extracted more than 90 days ago - consider re-extracting it"))
     }
     sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)  
-    elapsed = timer.start - proc.time()
-    if (!quietly){
-      t = round(elapsed[3], 0) * -1
-      if(!checkOnly) {
-        cat(paste0("\n\n", t, " seconds to load..."))
-      }else{ 
-        cat(paste0("\n\n", t, " seconds to check..."))
-      }
-    } 
     if (!quietly) 
     return(TRUE)
   }
@@ -113,6 +111,15 @@ get_data_tables<-function(schema=NULL,
   }
   res<- res[!is.na(res)]
   if (all(res %in% 1)){
+    t = timer.start - proc.time()
+    if (!quietly){
+      t = round(t[3], 0) * -1
+      if(!checkOnly) {
+        cat(paste0("\n\n", t, " seconds to load..."))
+      }else{ 
+        cat(paste0("\n\n", t, " seconds to check..."))
+      }
+    } 
     return(invisible(NULL))
   } else {
     oracle_cxn_custom = Mar.utils::make_oracle_cxn(usepkg, fn.oracle.username, fn.oracle.password, fn.oracle.dsn)  
@@ -143,15 +150,28 @@ get_data_tables<-function(schema=NULL,
       cat(paste0("\n","Extracting ",missingtables[i],"..."))
       table_naked = gsub(paste0(schema,"."),"",missingtables[i])
       qry = paste0("SELECT * from ", schema, ".",table_naked)
-      res= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
-      assign(table_naked, res)
+      result= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
+      assign(table_naked, result)
       save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
       if (!quietly) cat(paste("\n","Got", missingtables[i]))
       if(!checkOnly) {
         assign(x = missingtables[i],value = get(table_naked), envir = env)
         if (!quietly) cat(paste0("\n","Loaded ",missingtables[i]))
       }
-    }  
+    } 
+    t = timer.start - proc.time()
+    if (!quietly){
+      t = round(t[3], 0) * -1
+      if(!checkOnly) {
+        cat(paste0("\n\n", t, " seconds to load..."))
+      }else{ 
+        if (all(res == 1)){
+          cat(paste0("\n\n", t, " seconds to check..."))
+        }else{
+          cat(paste0("\n\n", t, " seconds to check and download..."))
+        }
+      }
+    } 
   }
   
   
