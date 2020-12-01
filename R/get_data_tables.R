@@ -19,6 +19,8 @@
 #' accessing oracle objects. 
 #' @param fn.oracle.dsn default is \code{'_none_'} This is your dsn/ODBC
 #' identifier for accessing oracle objects. 
+#' @param checkOnly default is \code{FALSE}  This flag allows the function to be 
+#' run such that it checks for the existence of the files, but doesn't load them.
 #' @param env This the the environment you want this function to work in.  The 
 #' default value is \code{.GlobalEnv}.
 #' @param quietly default is \code{FALSE}.  If TRUE, no output messages will be shown.
@@ -32,29 +34,47 @@ get_data_tables<-function(schema=NULL,
                           fn.oracle.username ="_none_",
                           fn.oracle.password="_none_",
                           fn.oracle.dsn="_none_",
+                          checkOnly = FALSE,
                           env=.GlobalEnv,
                           quietly=F){
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly) cat("\nLoading data...")
   timer.start = proc.time()
-  try_load <- function(tables, data.dir, thisenv = env) {
-    loadit <- function(x, data.dir) {
+  try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
+    loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
-      if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T))) thisP = gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T)
-      if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T))) thisP = gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T)
-      if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
       
-      load(file = thisP,envir = env)
-      if (!quietly) cat(paste0("\nLoaded ", x, "... "))
+      
+      if (grepl(x= thisP,pattern = "MARFIS\\.|MARFISSCI\\.")){
+        if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T))) {
+          thisP = gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T)
+        }
+      } else  if (grepl(x= thisP,pattern = "RV\\.|GROUNDFISH.")){
+        if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T))) {
+          thisP = gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T)
+        }
+      } else if (grepl(x= thisP,pattern = "ISDB\\.|OBSERVER.")){
+        if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) {
+          thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
+        }
+      }
+      
+      if(!file.exists(thisP))stop()
+      
+      
+      if(!checkOnly) {
+        load(file = thisP,envir = env)
+        if (!quietly) cat(paste0("\nLoaded ", x, "... "))
+      }
       fileAge = file.info(thisP)$mtime
       fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
       if (!quietly) cat(paste0(" (Data modified ", fileAge, " days ago.)"))
-      if ((!quietly)  & fileAge > 90) 
-        cat(paste("\n!!! This data was extracted more than 90 days ago - consider re-extracting it"))
+      # if ((!quietly)  & fileAge > 90) 
+      #   cat(paste("\n!!! This data was extracted more than 90 days ago - consider re-extracting it"))
     }
-    sapply(tables, simplify = TRUE, loadit, data.dir)  
+    sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)  
     elapsed = timer.start - proc.time()
     if (!quietly) cat(paste0("\n\n", round(elapsed[3], 0) * -1, " seconds to load..."))
     return(TRUE)
@@ -63,11 +83,10 @@ get_data_tables<-function(schema=NULL,
   reqd = toupper(paste0(schema, ".", tables))
   
   res <- NA
-  
   for (r in 1:length(reqd)){
     loadsuccess = tryCatch(
       {
-        try_load(reqd[r], data.dir)
+        try_load(reqd[r], data.dir, checkOnly)
       }, 
       warning = function(w) {
         print()
@@ -79,7 +98,6 @@ get_data_tables<-function(schema=NULL,
     res <- c(res, loadsuccess)
   }
   res<- res[!is.na(res)]
-  
   if (all(res %in% 1)){
     return(invisible(NULL))
   } else {
@@ -115,10 +133,12 @@ get_data_tables<-function(schema=NULL,
       assign(table_naked, res)
       save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
       if (!quietly) cat(paste("\n","Got", missingtables[i]))
-      assign(x = missingtables[i],value = get(table_naked), envir = env)
-      if (!quietly) cat(paste0("\n","Loaded ",missingtables[i]))
+      if(!checkOnly) {
+        assign(x = missingtables[i],value = get(table_naked), envir = env)
+        if (!quietly) cat(paste0("\n","Loaded ",missingtables[i]))
+      }
     }  
   }
   
-
+  
 }
