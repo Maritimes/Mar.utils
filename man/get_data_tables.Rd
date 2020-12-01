@@ -12,6 +12,7 @@ get_data_tables(
   fn.oracle.username = "_none_",
   fn.oracle.password = "_none_",
   fn.oracle.dsn = "_none_",
+  checkOnly = FALSE,
   env = .GlobalEnv,
   quietly = F
 )
@@ -41,6 +42,9 @@ accessing oracle objects.}
 
 \item{fn.oracle.dsn}{default is \code{'_none_'} This is your dsn/ODBC
 identifier for accessing oracle objects.}
+
+\item{checkOnly}{default is \code{FALSE}  This flag allows the function to be 
+run such that it checks for the existence of the files, but doesn't load them.}
 
 \item{env}{This the the environment you want this function to work in.  The 
 default value is \code{.GlobalEnv}.}

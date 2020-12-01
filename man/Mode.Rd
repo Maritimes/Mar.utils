@@ -7,7 +7,7 @@
 Mode(x)
 }
 \arguments{
-\item{v}{Vector}
+\item{x}{Vector}
 }
 \description{
 This function returns the mode of a vector, preserving data type.

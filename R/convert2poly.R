@@ -33,9 +33,9 @@ convert2poly <- function(input=NULL,
   skip <- FALSE
   if (is.character(input)){
     nm <- gsub(".csv|.dat","", basename(input))
-    theInput <- read.csv(input, header = header)
+    theInput <- utils::read.csv(input, header = header)
     if(ncol(theInput)<2) {
-      theInput <- read.table(input, header = header)
+      theInput <- utils::read.table(input, header = header)
       
       if (!all(c(lat.field,lon.field) %in% names(theInput)) && all(c("V1","V2") %in% names(theInput))){
         if (mean(theInput$V1)<0){
@@ -88,7 +88,7 @@ convert2poly <- function(input=NULL,
     return(NULL)
   }else if ( tolower(out)=="sf"){
     #preventing weird orphaned hole issue
-    slot(polySpDf, "polygons") <- lapply(slot(polySpDf, "polygons"), maptools::checkPolygonsHoles)
+    methods::slot(polySpDf, "polygons") <- lapply(methods::slot(polySpDf, "polygons"), maptools::checkPolygonsHoles)
     polySf <- sf::st_as_sf(polySpDf) 
     return(polySf)
   }

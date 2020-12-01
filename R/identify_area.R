@@ -43,7 +43,7 @@ identify_area <- function(df = NULL,
   }else if (is.character(agg.poly.shp)){
     agg.poly <- sf::st_read(dsn = agg.poly.shp)
   }else if (class(agg.poly.shp)=="SpatialPolygons" || class(agg.poly.shp)=="SpatialPolygonsDataFrame"){
-    agg.poly = as(agg.poly.shp, "sf")
+    agg.poly = methods::as(agg.poly.shp, "sf")
   }else if (any(class(agg.poly.shp)=="sf")){
     agg.poly = agg.poly.shp
   }

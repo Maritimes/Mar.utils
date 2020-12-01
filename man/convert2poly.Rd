@@ -11,21 +11,34 @@ convert2poly(
   lat.field = "X",
   lon.field = "Y",
   PID = "PID",
+  SID = "SID",
   POS = "POS",
   shp.path = NULL
 )
 }
 \arguments{
-\item{input}{a PBSMapping PolySet to be converted.}
+\item{input}{a PBSMapping PolySet to be converted (csv or df).}
+
+\item{header}{indicates whether or not the input data has an initial row
+describing the data.}
 
 \item{out}{default is \code{'sf'}.  This indicates whether an \code{sf} object, 
 \code{'sp'} (SpatialPolygonsDataFrame) or \code{'shp'} (shapefile) should be created.}
 
-\item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values
+\item{lat.field}{the default is \code{"X"}. the name of the field holding latitude values
 (in decimal degrees)}
 
-\item{lon.field}{the default is \code{"LONGITUDE"}.  the name of the field holding longitude
+\item{lon.field}{the default is \code{"Y"}.  the name of the field holding longitude
 values (in decimal degrees)}
+
+\item{PID}{the default is \code{"PID"}.  the name of the field holding primary 
+identifiers for polygons}
+
+\item{SID}{the default is \code{"SID"}.  the name of the field holding secondary 
+identifiers for polygons}
+
+\item{POS}{the default is \code{"POS"}.  the name of the field holding the 
+order in which the provided coordinates should be joined}
 
 \item{shp.path}{if \code{out ='shp'}, this is the path to where the shapefile 
 should be saved.  sf and sp objects are just created in the environment}
@@ -34,8 +47,8 @@ should be saved.  sf and sp objects are just created in the environment}
 an sf object, a SpatialPolygonsDataFrame,or a shapefile
 }
 \description{
-This function will turn PBSMapping style csv into either an 
-sf object, an sp object or a shapefile.
+This function will accept a PBSMapping style csv, a df or a 
+spatialpolygondataframe and turn it into an  sf object, an sp object or a shapefile.
 }
 \note{
 if no  PID or POS is provided, it is assumed that the provided positions
