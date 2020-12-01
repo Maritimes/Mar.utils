@@ -39,7 +39,13 @@ get_data_tables<-function(schema=NULL,
                           quietly=F){
   schema=toupper(schema)
   tables = toupper(tables)
-  if (!quietly) cat("\nLoading data...")
+  if (!quietly){
+    if(!checkOnly) {
+      cat("\nLoading data...")
+    }else{
+      cat("\nVerifying existence of data...")
+    }
+  } 
   timer.start = proc.time()
   try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
     loadit <- function(x, data.dir, checkOnly) {
@@ -76,7 +82,15 @@ get_data_tables<-function(schema=NULL,
     }
     sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)  
     elapsed = timer.start - proc.time()
-    if (!quietly) cat(paste0("\n\n", round(elapsed[3], 0) * -1, " seconds to load..."))
+    if (!quietly){
+      t = round(elapsed[3], 0) * -1
+      if(!checkOnly) {
+        cat(paste0("\n\n", t, " seconds to load..."))
+      }else{ 
+        cat(paste0("\n\n", t, " seconds to check..."))
+      }
+    } 
+    if (!quietly) 
     return(TRUE)
   }
   
