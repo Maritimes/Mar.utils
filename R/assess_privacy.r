@@ -105,7 +105,8 @@ assess_privacy <- function(
   create.shps = TRUE,
   file.id = NULL,
   agg.poly.shp = NULL,
-  agg.poly.field = NULL
+  agg.poly.field = NULL, 
+  ignore.shp.limit = FALSE
 ){
   #set up
   ts = format(Sys.time(), "%Y%m%d_%H%M")
@@ -203,7 +204,6 @@ assess_privacy <- function(
   #     )
   # )))
 
-
   POLY.agg <- as.data.frame(as.list(stats::aggregate(
     df@data[agg.fields],
     by = df@data[c(agg.poly.field)],
@@ -265,7 +265,6 @@ assess_privacy <- function(
     join <- sp::over(df, grid2Min)  
     join$ORD_df <- seq.int(nrow(join)) 
     df@data = cbind(df@data,join)
-    
     grid.agg = as.data.frame(as.list(stats::aggregate(
       df@data[agg.fields],
       by = df@data[c('ORD_gr')],
@@ -301,7 +300,7 @@ assess_privacy <- function(
 
     
     if (create.shps){
-      if (max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
+      if (!ignore.shp.limit && max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
         warning("\nCan not create shapefiles.  Shapefiles are limited to 255 fields, and your data will have more than that.
 The number of fields is determined by:
 1) the number of unique values found in your facet.field (if present, e.g. bycatch species);

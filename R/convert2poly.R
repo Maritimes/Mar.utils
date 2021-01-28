@@ -60,8 +60,8 @@ convert2poly <- function(input=NULL,
     if(!SID %in% colnames(theInput)) theInput$SID <- 1
     if(!POS %in% colnames(theInput)) theInput$POS <- seq(1:nrow(theInput))
     
-    colnames(theInput)[colnames(theInput)==lat.field] <- "X"
-    colnames(theInput)[colnames(theInput)==lon.field] <- "Y"
+    colnames(theInput)[colnames(theInput)==lat.field] <- "Y"
+    colnames(theInput)[colnames(theInput)==lon.field] <- "X"
     colnames(theInput)[colnames(theInput)==PID] <- "PID"
     colnames(theInput)[colnames(theInput)==SID] <- "SID"
     colnames(theInput)[colnames(theInput)==POS] <- "POS"

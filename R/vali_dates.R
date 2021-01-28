@@ -17,9 +17,12 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
     if (!quietly) cat('Both "dateStart" and "year" were supplied as parameters.  dateStart will be used.','\n')      
   }
   if(!is.null(year)){
-    dateStart<-year
+    if (nchar(year)>4){
+      cat("You specified 'year' as a parameter, but appear to have provided a specific date. \ndateStart and dateEnd will be for the calendar year. \nTo get more fine-grained resolution, use dateStart and dateEnd.\n")
+    }
+    dateStart<-lubridate::year(as.Date(year))
     dateEnd <- NULL
-    year<-NULL  
+    # year<-NULL  
   }
 
   if(!is.null(dateStart)){
@@ -49,10 +52,19 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
       dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
     }
   }else{
+    last_day <- function(date) {
+      lubridate::ceiling_date(date, "month") - lubridate::days(1)
+    }
+    
     dateEnd <- as.POSIXlt(dateStart)
     dateEnd$year <- dateEnd$year + 1
+    if (!is.null(year)) {
+      dateEnd <- last_day(dateEnd)      
+    } else{
+      if (!quietly) cat("No dateEnd was supplied, so dateEnd was set to be 1 yr after dateStart","\n")
+    }
     dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
-    if (!quietly) cat("No dateEnd was supplied, so dateEnd was set to be 1 yr after dateStart","\n")
+    
   }
 
   if (dateStart>dateEnd){

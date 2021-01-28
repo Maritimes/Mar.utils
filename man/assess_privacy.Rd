@@ -19,7 +19,8 @@ assess_privacy(
   create.shps = TRUE,
   file.id = NULL,
   agg.poly.shp = NULL,
-  agg.poly.field = NULL
+  agg.poly.field = NULL,
+  ignore.shp.limit = FALSE
 )
 }
 \arguments{
