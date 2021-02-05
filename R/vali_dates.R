@@ -16,62 +16,45 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
     year <- NULL
     if (!quietly) cat('Both "dateStart" and "year" were supplied as parameters.  dateStart will be used.','\n')      
   }
-  if(!is.null(year)){
-    if (nchar(year)>4){
-      cat("You specified 'year' as a parameter, but appear to have provided a specific date. \ndateStart and dateEnd will be for the calendar year. \nTo get more fine-grained resolution, use dateStart and dateEnd.\n")
-    }
-    dateStart<-lubridate::year(as.Date(year))
-    dateEnd <- NULL
-    # year<-NULL  
+  
+  fourDigToDate <- function(xxxx = NULL){
+    if (is.null(xxxx)) xxxx <- format(Sys.Date(), "%Y")
+    dateStart<-as.Date(ISOdate(xxxx,1,1))
+    dateEnd <- as.Date(ISOdate(xxxx,12,31))
+    res= list()
+    res[["dateStart"]]<- dateStart
+    res[["dateEnd"]]<- dateEnd
+    return(res)
   }
-
-  if(!is.null(dateStart)){
-    if (nchar(dateStart)==4){
-      dateStart <- try( as.Date( paste0(as.character(dateStart),"-01-01"), format= "%Y-%m-%d", origin="1970-01-01" ) )
-    }else{
-      dateStart <- try( as.Date( as.character(dateStart), format= "%Y-%m-%d", origin="1970-01-01" ) )
+  if (!is.null(dateStart)){
+    if (nchar(dateStart)==4) {
+      if (!quietly) cat("dateStart looks like a year: using calendar year, ignoring dateEnd/n")
+      res <- fourDigToDate(dateStart)
+    } else {
+      dateStart <- as.Date(dateStart, "%Y-%m-%d")
+      if (!is.null(dateEnd)) {
+        if (!quietly) cat("valid dateStart and dateEnd/n")
+        dateEnd <- as.Date(dateEnd, "%Y-%m-%d")
+      }else{
+        if (!quietly) cat("valid dateStart, missing dateEnd - defaulting to 1 year/n")
+        dateEnd <- as.POSIXlt(dateStart)
+        dateEnd$year <- dateEnd$year + 1
+        dateEnd$mday <- dateEnd$mday -1
+        dateEnd <- as.Date(dateEnd)
+      }
+      res<-list()
+      res[["dateStart"]]<-dateStart
+      res[["dateEnd"]]<- dateEnd
     }
-    if( class( dateStart ) == "try-error" || is.na( dateStart ) ){
-      stop("\n","The value for dateStart was not a valid year (YYYY) or date (YYYY-MM-DD)")
-    }else{
-      dateStart <- as.POSIXct(format(as.Date(dateStart), "%Y-%m-%d"), origin = "1970-01-01")
+  }else if(!is.null(year)){
+    if (nchar(year)!=4) {
+      if (!quietly) cat("year supplied, but appears to be a date - just using the year portion, defaulting to 1 year/n")
+      year = format(as.Date(as.POSIXlt(year)),"%Y")
     }
+    res <- fourDigToDate(year)
   }else{
-    dateStart <- as.POSIXct(format(as.Date(paste0(as.numeric(format(Sys.Date(), "%Y")),"-01-01")), origin = "1970-01-01"))
+    if (!quietly) ccat("no dates provided, using current year/n")
+    res <- fourDigToDate()
   }
-
-  if(!is.null(dateEnd)){
-    if (nchar(dateEnd)==4){
-      dateEnd <- try( as.Date( paste0(as.character(dateEnd),"-12-31"), format= "%Y-%m-%d", origin="1970-01-01" ) )
-    }else{
-      dateEnd <- try( as.Date( as.character(dateEnd), format= "%Y-%m-%d", origin="1970-01-01" ) )
-    }
-    if( class( dateEnd ) == "try-error" || is.na( dateEnd ) ){
-      stop("\n","The value for dateEnd was not a valid year (YYYY) or date (YYYY-MM-DD)")
-    }else{
-      dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
-    }
-  }else{
-    last_day <- function(date) {
-      lubridate::ceiling_date(date, "month") - lubridate::days(1)
-    }
-    
-    dateEnd <- as.POSIXlt(dateStart)
-    dateEnd$year <- dateEnd$year + 1
-    if (!is.null(year)) {
-      dateEnd <- last_day(dateEnd)      
-    } else{
-      if (!quietly) cat("No dateEnd was supplied, so dateEnd was set to be 1 yr after dateStart","\n")
-    }
-    dateEnd <- as.POSIXct(format(as.Date(dateEnd), "%Y-%m-%d"), origin = "1970-01-01")
-    
-  }
-
-  if (dateStart>dateEnd){
-    stop("\n","dateStart occurs after dateEnd.  This is not possible.")
-  }
-  res= list()
-  res[["dateStart"]]<- dateStart
-  res[["dateEnd"]]<- dateEnd
   return(res)
 }
