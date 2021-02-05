@@ -72,7 +72,10 @@
 #' @param agg.poly.field default is \code{NULL}.  This identifies the field within 
 #' the shapefile provided to agg.poly.shp that should be used to check for 
 #' sufficient unique values of the sens.fields.
-
+#' @param ignore.col.limit default is \code{FALSE} ESRI's ArcGIS doesn't like when 
+#' a shapefile has more than 255 columns.  By default, this function will halt with a warning 
+#' if it detects that it is producing too many columns.  To ignore the warning, and produce the 
+#' shapefile anyways, set it to TRUE.
 #' @import data.table
 
 #' @return a SpatialPolygonsDataFrame, and generates a shapefile
@@ -106,7 +109,7 @@ assess_privacy <- function(
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL, 
-  ignore.shp.limit = FALSE
+  ignore.col.limit = FALSE
 ){
   #set up
   ts = format(Sys.time(), "%Y%m%d_%H%M")
@@ -300,7 +303,7 @@ assess_privacy <- function(
 
     
     if (create.shps){
-      if (!ignore.shp.limit && max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
+      if (!ignore.col.limit && max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
         warning("\nCan not create shapefiles.  Shapefiles are limited to 255 fields, and your data will have more than that.
 The number of fields is determined by:
 1) the number of unique values found in your facet.field (if present, e.g. bycatch species);

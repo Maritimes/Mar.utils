@@ -20,7 +20,7 @@ assess_privacy(
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL,
-  ignore.shp.limit = FALSE
+  ignore.col.limit = FALSE
 )
 }
 \arguments{
@@ -92,6 +92,11 @@ polygon shapefile can be provided.}
 \item{agg.poly.field}{default is \code{NULL}.  This identifies the field within 
 the shapefile provided to agg.poly.shp that should be used to check for 
 sufficient unique values of the sens.fields.}
+
+\item{ignore.col.limit}{default is \code{FALSE} ESRI's ArcGIS doesn't like when 
+a shapefile has more than 255 columns.  By default, this function will halt with a warning 
+if it detects that it is producing too many columns.  To ignore the warning, and produce the 
+shapefile anyways, set it to TRUE.}
 }
 \value{
 a SpatialPolygonsDataFrame, and generates a shapefile

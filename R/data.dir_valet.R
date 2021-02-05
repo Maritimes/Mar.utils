@@ -1,7 +1,5 @@
-#' @title dataDirValet
+#' @title data.dir_valet
 #' @description This cleans up the data.dir folder for use by various Mar.* packages 
-#' @param db default is \code{"ALL"}. This identifies the dataset you are working 
-#' with.
 #' @param data.dir  The default is a "data" folder within your working directory. This is the path to where you want the
 #' extracted files to go.
 #' @family internal
@@ -9,7 +7,7 @@
 #' @export
 #' @note data is not added to the global environment by this function - changes are made, saved, and
 #' dropped.
-dataDirValet <- function(data.dir=NULL){
+data.dir_valet <- function(data.dir=NULL){
   conf <- c("(MARFISSCI|MARFIS)","(ISDB|OBSERVER)", "(GROUNDFISH|RV)")
   duplicateDestroyer<-function(data.dir=NULL, conf=NULL){
     cat("Checking for duplicate files..\n")
@@ -81,7 +79,7 @@ dataDirValet <- function(data.dir=NULL){
   duplicateDestroyer(data.dir = data.dir, conf=conf)
   prefixFixer(data.dir = data.dir, conf=conf)
   
-  if ("Mar.datawrangling" %in% installed.packages()) Mar.datawrangling::data_tweaks2(db = "ALL", data.dir = data.dir)
+  if ("Mar.datawrangling" %in% utils::installed.packages()) Mar.datawrangling::data_tweaks2(db = "ALL", data.dir = data.dir)
 }
 
 
