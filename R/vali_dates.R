@@ -28,15 +28,15 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
   }
   if (!is.null(dateStart)){
     if (nchar(dateStart)==4) {
-      if (!quietly) cat("dateStart looks like a year: using calendar year, ignoring dateEnd/n")
+      if (!quietly) cat("dateStart looks like a year: using calendar year, ignoring dateEnd\n")
       res <- fourDigToDate(dateStart)
     } else {
       dateStart <- as.Date(dateStart, "%Y-%m-%d")
       if (!is.null(dateEnd)) {
-        if (!quietly) cat("valid dateStart and dateEnd/n")
+        if (!quietly) cat("valid dateStart and dateEnd\n")
         dateEnd <- as.Date(dateEnd, "%Y-%m-%d")
       }else{
-        if (!quietly) cat("valid dateStart, missing dateEnd - defaulting to 1 year/n")
+        if (!quietly) cat("valid dateStart, missing dateEnd - defaulting to 1 year\n")
         dateEnd <- as.POSIXlt(dateStart)
         dateEnd$year <- dateEnd$year + 1
         dateEnd$mday <- dateEnd$mday -1
@@ -48,12 +48,12 @@ vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = 
     }
   }else if(!is.null(year)){
     if (nchar(year)!=4) {
-      if (!quietly) cat("year supplied, but appears to be a date - just using the year portion, defaulting to 1 year/n")
+      if (!quietly) cat("year supplied, but appears to be a date - just using the year portion, defaulting to 1 year\n")
       year = format(as.Date(as.POSIXlt(year)),"%Y")
     }
     res <- fourDigToDate(year)
   }else{
-    if (!quietly) ccat("no dates provided, using current year/n")
+    if (!quietly) ccat("no dates provided, using current year\n")
     res <- fourDigToDate()
   }
   return(res)
