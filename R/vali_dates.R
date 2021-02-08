@@ -6,12 +6,12 @@
 #' 'YYYY' (which will then become Jan 1st).
 #' @param dateEnd default is \code{'NULL'}.  This can be a date in the format of 'YYYY-MM-DD' or
 #' 'YYYY' (which will then become Dec 31st).
-#' @param quietly default is \code{FALSE}. When TRUE, no output will be shown.
+#' @param quietly default is \code{TRUE}. When TRUE, no output will be shown.
 #' @param year default is \code{'NULL'}.
 #' @family datesAndTimes
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = FALSE){
+vali_dates <- function(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = TRUE){
   if (!is.null(dateStart) & !is.null(year)){
     year <- NULL
     if (!quietly) cat('Both "dateStart" and "year" were supplied as parameters.  dateStart will be used.','\n')      
