@@ -115,7 +115,6 @@ assess_privacy <- function(
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   `:=` <- function (x, value) value
   
-  
   analyticChooser <- function(x, calculate){
     #this function is called by the aggregate functions to allow use to select which analytics are calculated for all agg.fields
     res <- NA
@@ -135,7 +134,7 @@ assess_privacy <- function(
   if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)){
     foo <- function(df, id, measure, val) {
       res = data.table::dcast(data.table::setDT(df), paste(paste(id, collapse = " + "), "~", 
-                                                           paste(measure, collapse = " + ")), 
+                                                           paste(measure, collapse = " + ")), function(x) analyticChooser(x, calculate), 
                               value.var = val)
       res = data.table::setDF(res)
       return(res)
