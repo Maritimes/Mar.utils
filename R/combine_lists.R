@@ -4,20 +4,27 @@
 #' will be retained.
 #' @param primary default is \code{NULL}
 #' @param ancilliary default is \code{NULL}
+#' @param quietly default is \code{FALSE}.  By default, this function will indicate the names and values of duplicated (i.e. ancilliary) list elements that will be dropped 
 #' @return list of all of the arguments
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-combine_lists <- function(primary = NULL, ancilliary = NULL){
-  kept <- primary[intersect(names(ancilliary),names(primary))]
-    # if (!quietly & length(setdiff(dups, kept))>0){
-    # cat("Ambiguous parameter(s) detected","\n")
-    # for(c in 1:length(kept)){
-    #   this = names(ignored)[c]
-    #   cat(paste0('The parameter ',this,' will use the value(s) of "', paste0(kept[[this]], collapse=","),'", not "',paste0(dups[[this]], collapse=','),'"'),"\n")
-    # }
-    # }
-
-  final <- append(kept, ancilliary[!(names(ancilliary) %in% names(kept))])
-  return(final)
+combine_lists <- function(primary = NULL, ancilliary = NULL, quietly=FALSE){ 
+  new <- ancilliary[setdiff(names(ancilliary),names(primary))]
+  discarded <- ancilliary[intersect(names(ancilliary),names(primary))]
+  kept <- c(primary, new)
+  
+  if (!quietly & length(discarded)>0){
+    cat("Ambiguous parameter(s) detected","\n")
+    for(c in 1:length(discarded)){
+      this = names(discarded)[c]
+      
+      wantthis <- kept[[this]]
+      if (class(wantthis)=="data.frame") wantthis <-"<the data.frame>"
+      that <- discarded[[this]] 
+      if (class(that)=="data.frame") that <-"<the data.frame>"
+      cat(paste0('The parameter "',this,'" will use the value(s) of "', paste0(wantthis, collapse=","),'", not "',paste0(that, collapse=','),'"'),"\n")
+    }
+  }
+  return(kept)
 }
