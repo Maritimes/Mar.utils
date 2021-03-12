@@ -13,7 +13,6 @@ combine_lists <- function(primary = NULL, ancilliary = NULL, quietly=FALSE){
   new <- ancilliary[setdiff(names(ancilliary),names(primary))]
   discarded <- ancilliary[intersect(names(ancilliary),names(primary))]
   kept <- c(primary, new)
-  
   if (!quietly & length(discarded)>0){
     cat("Ambiguous parameter(s) detected","\n")
     for(c in 1:length(discarded)){
