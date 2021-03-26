@@ -4,36 +4,21 @@
 \alias{where_now}
 \title{where_now}
 \usage{
-where_now(inf = NULL, lvl = 1)
-}
-\arguments{
-\item{inf}{the default is \code{NULL}.  WOrks with \code{as.character(sys.calls()[[sys.nframe() - 1]])}. 
-This is a method for extracting the function information.}
-
-\item{lvl}{the default is \code{1}. This controls how many tabs are used to 
-display the results.  It can be useful when functions call subfunctions}
+where_now(..., callstack = sys.calls())
 }
 \value{
-NULL - it just prints to the screen
+nothing, it just writes messages to the screen
 }
 \description{
 This function indicates which function has been reached, and the 
 parameters it is using
 }
 \seealso{
-Other general_use: 
-\code{\link{clip_by_poly_generic}()},
-\code{\link{combine_lists}()},
-\code{\link{convert2poly}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_to_shp}()},
-\code{\link{df_to_sp}()},
-\code{\link{drop_cols}()},
-\code{\link{pbs2sp_poly}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{updateCheck}()}
+Other debugging: 
+\code{\link{changeDetector}()},
+\code{\link{updateExpected}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{debugging}

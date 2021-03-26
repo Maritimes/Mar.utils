@@ -2,7 +2,7 @@
 #' @description This function indicates which function has been reached, and the 
 #' parameters it is using
 #' @return nothing, it just writes messages to the screen
-#' @family general_use
+#' @family debugging
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 where_now <- function(..., callstack=sys.calls()){

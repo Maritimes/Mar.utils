@@ -24,8 +24,7 @@ Other general_use:
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{where_now}()}
+\code{\link{prepare_shape_fields}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

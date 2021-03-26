@@ -4,16 +4,14 @@
 \alias{combine_lists}
 \title{combine_lists}
 \usage{
-combine_lists(primary = NULL, ancilliary = NULL, quietly = T)
+combine_lists(primary = NULL, ancilliary = NULL, quietly = FALSE)
 }
 \arguments{
 \item{primary}{default is \code{NULL}}
 
 \item{ancilliary}{default is \code{NULL}}
 
-\item{quietly}{default is \code{TRUE}.  If FALSE, this function will notify the
-user that the lists have similarly named elements, and will indicate which
-values will be retained (i.e. those from the primary list)}
+\item{quietly}{default is \code{FALSE}.  By default, this function will indicate the names and values of duplicated (i.e. ancilliary) list elements that will be dropped}
 }
 \value{
 list of all of the arguments
@@ -33,8 +31,7 @@ Other general_use:
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
 \code{\link{prepare_shape_fields}()},
-\code{\link{updateCheck}()},
-\code{\link{where_now}()}
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

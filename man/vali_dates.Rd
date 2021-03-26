@@ -4,7 +4,7 @@
 \alias{vali_dates}
 \title{vali_dates}
 \usage{
-vali_dates(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = FALSE)
+vali_dates(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = TRUE)
 }
 \arguments{
 \item{dateStart}{default is \code{'NULL'}.  This can be a date in the format of 'YYYY-MM-DD' or
@@ -15,7 +15,7 @@ vali_dates(dateStart = NULL, dateEnd = NULL, year = NULL, quietly = FALSE)
 
 \item{year}{default is \code{'NULL'}.}
 
-\item{quietly}{default is \code{FALSE}. When TRUE, no output will be shown.}
+\item{quietly}{default is \code{TRUE}. When TRUE, no output will be shown.}
 }
 \description{
 This function ensures that functions have valid start and end dates. If only\code{dateStart}

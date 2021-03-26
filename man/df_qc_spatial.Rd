@@ -46,8 +46,7 @@ Other general_use:
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
 \code{\link{prepare_shape_fields}()},
-\code{\link{updateCheck}()},
-\code{\link{where_now}()}
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

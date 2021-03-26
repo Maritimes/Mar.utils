@@ -140,6 +140,7 @@ assess_privacy <- function(
       return(res)
     }
     dfLong=df[,c(key.fields,c(facet.field, agg.fields))]
+    
     dfRest= df[,!names(df) %in% c(facet.field, agg.fields)]
     dfRestU <- unique(dfRest)
     if (nrow(dfRest)==nrow(dfRestU)){
