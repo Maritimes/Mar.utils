@@ -1,7 +1,7 @@
 #' @title big_in
 #' @description In Oracle, IN statements are limited to 1000 elements.  When dynamically extracting data based on values a dataframe,
 #' it's pretty easy to exceed this limit.  This function converts huge vectors into a format that Oracle can handle, returning many more than 1000 
-#' results.
+#' results. 
 #' @param vec  The default value is \code{NULL}. 
 #' @param vec.field  The default value is \code{NULL}.  This is the name of the field that the resultant IN statement will search for the values 
 #' of \code{vec} 
@@ -22,7 +22,9 @@
 #' [1] "SELECT field1, field2 from TABLE where field1 = 'value' AND ('_dOh_', field2) IN (('_dOh_',1),('_dOh_',2),<...>('_dOh_',2000))
 #' }
 #' @family util
-#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}l
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
+#' @note The logic for this was stolen from our friends at StackOverflow.com.  Specifically, Sergey11g's response to 
+#' https://stackoverflow.com/questions/400255/how-to-put-more-than-1000-values-into-an-oracle-in-clause
 #' @export
 big_in <- function(vec = NULL, vec.field = NULL, isStrings = FALSE){
   allres <- NA

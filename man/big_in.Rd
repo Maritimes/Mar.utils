@@ -26,6 +26,10 @@ In Oracle, IN statements are limited to 1000 elements.  When dynamically extract
 it's pretty easy to exceed this limit.  This function converts huge vectors into a format that Oracle can handle, returning many more than 1000 
 results.
 }
+\note{
+The logic for this was stolen from our friends at StackOverflow.com.  Specifically, Sergey11g's response to 
+https://stackoverflow.com/questions/400255/how-to-put-more-than-1000-values-into-an-oracle-in-clause
+}
 \examples{
 \dontrun{
 bigVector <- c(1:2000)
@@ -45,6 +49,6 @@ Other util:
 \code{\link{st_err}()}
 }
 \author{
-Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l
+Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
 \concept{util}
