@@ -2,7 +2,7 @@
 #' @description In Oracle, IN statements are limited to 1000 elements.  When dynamically extracting data based on values a dataframe,
 #' it's pretty easy to exceed this limit.  This function converts huge vectors into a format that Oracle can handle, returning many more than 1000 
 #' results. 
-#' @param vec  The default value is \code{NULL}. 
+#' @param vec  The default value is \code{NULL}.  
 #' @param vec.field  The default value is \code{NULL}.  This is the name of the field that the resultant IN statement will search for the values 
 #' of \code{vec} 
 #' @param isStrings The default value is \code{FALSE}. This determines whether the values in the resultant IN statement are surrounded
@@ -10,7 +10,8 @@
 #' characters/strings, it should be set to \code{TRUE}, so it will surround the values with apostrophes and generate a statement like 
 #' \code{field IN ('Archer', 'Lana', 'Krieger')}. 
 #' @return This returns a (potentially really long) valid IN string that can be included in a SQL query as a WHERE condition.  It must be 
-#' prefaced by "WHERE", or "AND" depending on whether other conditions are present
+#' prefaced by "WHERE", or "AND" depending on whether other conditions are present.  If \code{vec} has no valid values, the function will return 
+#' \code{"1=1"} which will allow SQL statements to run.
 #' @examples \dontrun{
 #' bigVector <- c(1:2000)
 #' raw <-  big_in(vec=c(1:2000), vec.field = "field2", isStrings = F)
@@ -27,6 +28,11 @@
 #' https://stackoverflow.com/questions/400255/how-to-put-more-than-1000-values-into-an-oracle-in-clause
 #' @export
 big_in <- function(vec = NULL, vec.field = NULL, isStrings = FALSE){
+  vec <- vec[-NA]
+  if (any(is.null(vec) || is.na(vec) || length(vec)<1 || all(length(vec)==1 && vec==""))){
+    message("Your vec value doesn't have any values")
+    return("1=1")
+  }
   allres <- NA
   for (i in 1:length(vec)){
     thisres <- ifelse(isStrings, paste0("('_dOh_','", vec[i],"')"), paste0("('_dOh_',", vec[i],")"))
