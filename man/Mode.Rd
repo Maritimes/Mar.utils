@@ -19,6 +19,7 @@ stolen from https://stackoverflow.com/questions/2547402/how-to-find-the-statisti
 \seealso{
 Other util: 
 \code{\link{SQL_in}()},
+\code{\link{big_in}()},
 \code{\link{st_err}()}
 }
 \author{
