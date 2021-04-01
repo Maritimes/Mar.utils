@@ -28,7 +28,7 @@
 #' https://stackoverflow.com/questions/400255/how-to-put-more-than-1000-values-into-an-oracle-in-clause
 #' @export
 big_in <- function(vec = NULL, vec.field = NULL, isStrings = FALSE){
-  vec <- vec[-NA]
+  vec <- vec[!is.na(vec)]
   if (any(is.null(vec) || is.na(vec) || length(vec)<1 || all(length(vec)==1 && vec==""))){
     message("Your vec value doesn't have any values")
     return("1=1")
