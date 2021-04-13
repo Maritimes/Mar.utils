@@ -1,11 +1,12 @@
 #' @title where_now
 #' @description This function indicates which function has been reached, and the 
 #' parameters it is using
+#' @param callstack default is \code{sys.calls()}.  Not meant to be changed.
 #' @return nothing, it just writes messages to the screen
 #' @family debugging
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-where_now <- function(..., callstack=sys.calls()){
+where_now <- function(callstack=sys.calls()){
   #entirely stolen from https://stackoverflow.com/questions/7307987/logging-current-function-name
   clean_where <- function(x){
     val <- sapply(x, function(xt){
@@ -22,11 +23,11 @@ where_now <- function(..., callstack=sys.calls()){
     })
     val[grepl("\\<function\\>", val)] <- "FUN"
     val <- val[!grepl("(###|FUN)", val)]
-    val <- head(val, -1)
+    val <- utils::head(val, -1)
     paste(val, collapse="|")
   }
   
   cs <- callstack
   cs <- clean_where(cs)
-  message(paste(cs, ...))
+  message(cs)
 }

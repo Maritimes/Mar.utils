@@ -79,7 +79,9 @@ data.dir_valet <- function(data.dir=NULL){
   duplicateDestroyer(data.dir = data.dir, conf=conf)
   prefixFixer(data.dir = data.dir, conf=conf)
   
-  if ("Mar.datawrangling" %in% utils::installed.packages()) Mar.datawrangling::data_tweaks2(db = "ALL", data.dir = data.dir)
+  if ("Mar.datawrangling" %in% utils::installed.packages()){
+    message("Please run Mar.datawrangling::data_tweaks2(db = 'ALL', data.dir = <data.dir>)")
+  } 
 }
 
 

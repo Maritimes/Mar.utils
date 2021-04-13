@@ -38,9 +38,15 @@ raw <-  big_in(vec=c(1:2000), vec.field = "field2", isStrings = F)
 raw
 [1]  "('_dOh_', field2) IN (('_dOh_',1),('_dOh_',2),...('_dOh_',2000))
 
-qry <- paste0("SELECT field1, field2 from TABLE where field1 = 'value' AND ",big_in(vec=c(1:2000), vec.field = "field2", isStrings = F))
+qry <- paste0("SELECT field1, field2 
+from TABLE 
+where field1 = 'value' 
+AND ",big_in(vec=c(1:2000), vec.field = "field2", isStrings = F))
 qry
-[1] "SELECT field1, field2 from TABLE where field1 = 'value' AND ('_dOh_', field2) IN (('_dOh_',1),('_dOh_',2),<...>('_dOh_',2000))
+[1] "SELECT field1, field2 
+from TABLE 
+where field1 = 'value' 
+AND ('_dOh_', field2) IN (('_dOh_',1),('_dOh_',2),<...>('_dOh_',2000))
 }
 }
 \seealso{

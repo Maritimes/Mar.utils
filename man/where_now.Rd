@@ -4,7 +4,10 @@
 \alias{where_now}
 \title{where_now}
 \usage{
-where_now(..., callstack = sys.calls())
+where_now(callstack = sys.calls())
+}
+\arguments{
+\item{callstack}{default is \code{sys.calls()}.  Not meant to be changed.}
 }
 \value{
 nothing, it just writes messages to the screen
