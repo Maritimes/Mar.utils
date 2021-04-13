@@ -7,28 +7,31 @@
 #' @param df default  is \code{NULL}.  This is optional, but can be a dataframe, where the first column is populated by the "expected" values
 #' @param expected default is \code{NULL} This is a vector of values that should be looked for - e.g. a specific list of VR numbers
 #' @param known default  is \code{NULL} This is the large vector that will be searched for the \code{expected} values - e.g. all known VR numbers
-#' @param stepDesc default is \code{NULL} This text will be used to name the column that gets generated
-#' @param quietly default is \code{FALSE}.  By default, this function will write messages to the screen when an expected value is lost.  Additionally, it will
+#' @param expectedID default is \code{NULL}. This text can be used to describe the vector that is being debugged - e.g. "licences" or "VR_numbers".  It will be used to produce 
+#' more informative messages, and is especially useful if multiple vectors are being debugged simultaneously.
+#' @param stepDesc default is \code{NULL}. If present, this text will become the name of a column in the resultant dataframe describing the relative presence/
+#' absence of the values of the expected vector relative to the \code{known} values.  If longer, it will be trimmed to 25 characters.
+#' @param quietly default is \code{FALSE}. By default, this function will write messages to the screen when an expected value is lost.  Additionally, it will
 #' report when all of the expected values have been lost.  By setting it to \code{TRUE}, it will only return the populated dataframe - it will not write out
 #' messages.
 #' @examples \dontrun{
-#' test <- updateExpected(expected=c("val1","val2","val3"), known=c("val1","val2","val3", "val4"), stepDesc = "example1", quietly = F)
+#' test <- updateExpected(expected=c("val1","val2","val3"), known=c("val1","val2","val3", "val4"), expectedID = "randomvector1", stepDesc = "example1", quietly = F)
 #' test
 #' expected example1
 #' 1     val1     1
 #' 2     val2     1
 #' 3     val3     1
 #'
-#' test2 <- updateExpected(df = test, expected=c("val1","val2","val3"), known=c("val1","val2"), stepDesc = "example2", quietly = F)
-#' Lost during example2: val3
+#' test2 <- updateExpected(df = test, expected=c("val1","val2","val3"), known=c("val1","val2"), expectedID = "randomvector2", stepDesc = "example2", quietly = F)
+#' Lost some randomvector3 during example2: val3
 #' test2
 #' expected example1 example2
 #' 1     val1        1        1
 #' 2     val2        1        1
 #' 3     val3        1        0
 #'
-#' test3 <- updateExpected(df = test2, expected=c("val1","val2","val3"), known=c("val99"), stepDesc = "example3", quietly = F)
-#' Lost during example3: val1, val2
+#' test3 <- updateExpected(df = test2, expected=c("val1","val2","val3"), known=c("val99"), expectedID = "randomvector3", stepDesc = "example3", quietly = F)
+#' Lost some randomvector3 during example3: val1, val2
 #' All of the missing vector has now been lost.
 #' test3
 #' expected example1 example2 example3
@@ -41,17 +44,28 @@
 #' @family debugging
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-updateExpected<-function(df = NULL, expected = NULL, known = NULL, stepDesc = NULL, quietly = FALSE){
+updateExpected<-function(df = NULL, expected = NULL, known = NULL, expectedID = NULL, stepDesc = NULL, quietly = FALSE){
+
+  if (is.null(df) && is.null(expected))return(NULL)
   lost <- NA
-  if(is.null(df)) {
+  allLost <- FALSE  
+  if (is.null(expectedID))expectedID<- "undescribed"
+  if((is.null(df) || class(df) != "data.frame")) {
     presentThis <- (expected %in% known)*1
     res <-cbind.data.frame(expected, presentThis)
-    if (is.null(stepDesc))stepDesc<- "_step1"
+    if (is.null(stepDesc)){
+      stepDesc<- "_step1"
+    }else{
+      stepDesc <- gsub(' ','_', stepDesc)
+      stepDesc <- gsub('\\.','_', stepDesc)
+      stepDesc <- substr(stepDesc, 1, 25) 
+    }
     colnames(res)[colnames(res)=="presentThis"] <- stepDesc
     lost <- res[res[stepDesc]==0,"expected"]
     allLost <- length(lost) == length(expected)
   }else{
-    if (is.null(expected)) expected <- df[,1]
+  
+    if (is.null(expected) || class(expected)=="data.frame") expected <- df[,1]
     presentThis <- (expected %in% known)*1
     res <-cbind.data.frame(expected, presentThis)
 
@@ -68,9 +82,10 @@ updateExpected<-function(df = NULL, expected = NULL, known = NULL, stepDesc = NU
     }else{
       lost <- res[res[ncol(res)]==0 & rowSums(res[2:(ncol(res)-1)]) == ncol(res)-2,"expected"]
     }
-    allLost <- all(rowSums(res[2:ncol(res)]) < ncol(res)-1)
+    if (!all(apply( df[2:ncol(df)], 1, prod)==0) & all(apply( res[2:ncol(res)], 1, prod)==0)) allLost =TRUE
   }
-  if (!quietly & length(lost)>0) message(paste0("Lost during ",stepDesc,": ", paste0(lost, collapse=", ")))
-  if (!quietly & allLost) message("All of the missing vector has now been lost.")
+  if (!quietly & length(lost)>0) message(paste0("Lost some ",expectedID, " during ",stepDesc,": ", paste0(lost, collapse=", ")))
+  if (!quietly & allLost) message(paste0("All of ",expectedID," vector has now been lost."))
+
   return(res)
 }

@@ -19,7 +19,8 @@ characters/strings, it should be set to \code{TRUE}, so it will surround the val
 }
 \value{
 This returns a (potentially really long) valid IN string that can be included in a SQL query as a WHERE condition.  It must be 
-prefaced by "WHERE", or "AND" depending on whether other conditions are present
+prefaced by "WHERE", or "AND" depending on whether other conditions are present.  If \code{vec} has no valid values, the function will return 
+\code{"1=1"} which will allow SQL statements to run.
 }
 \description{
 In Oracle, IN statements are limited to 1000 elements.  When dynamically extracting data based on values a dataframe,
