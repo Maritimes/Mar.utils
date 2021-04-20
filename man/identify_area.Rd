@@ -9,7 +9,8 @@ identify_area(
   lat.field = "LATITUDE",
   lon.field = "LONGITUDE",
   agg.poly.shp = NULL,
-  agg.poly.field = NULL
+  agg.poly.field = NULL,
+  flag.land = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ values (in decimal degrees)}
 \code{agg.poly.shp} that contains the values that should be appended to the 
 input dataframe. If NULL, "NAFO_BEST", will be used, which is the finest
 resolution NAFO subdivision.}
+
+\item{flag.land}{default is \code{TRUE}.  This will result in positions determined to be on 
+land to return the value "<LAND>" in the resulting dataframe.  
+but would require updating}
 }
 \value{
 a DataFrame with the column \code{agg.poly.field} added
