@@ -43,7 +43,7 @@
 make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", createShp=TRUE){
  
   # Pull out coordinates, stack em, create and populate QC status field ----
-  crs.geo <- sp::CRS("+init=epsg:4326") 
+  crs.geo <- sp::CRS(SRS_string="EPSG:4326") 
   dup=length(isdb.df[duplicated(isdb.df), "FISHSET_ID"])
   
   if (dup>0){

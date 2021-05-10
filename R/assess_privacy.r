@@ -159,14 +159,14 @@ assess_privacy <- function(
   df = df_to_sp(df, lat.field, lon.field)
   # df = Mar.utils::df_qc_spatial(df, lat.field, lon.field, FALSE)
   # sp::coordinates(df) = c(lon.field, lat.field)
-  # sp::proj4string(df) = sp::CRS("+init=epsg:4326")
+  # sp::proj4string(df) = sp::CRS(SRS_string="EPSG:4326")
   if (is.null(agg.poly.shp)){
     agg.poly=  Mar.data::NAFOSubunits
     defFields <- c("NAFO_1", "NAFO_2", "NAFO_3","NAFO_BEST")
     # know that the CRS of agg.poly obj is WGS84, but perhaps saved with 
     #slight variations in the text
       sp::proj4string(agg.poly) <- sp::CRS(as.character(NA))
-      sp::proj4string(agg.poly) = sp::CRS("+init=epsg:4326")
+      sp::proj4string(agg.poly) = sp::CRS(SRS_string="EPSG:4326")
     
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO_BEST'
@@ -177,10 +177,10 @@ assess_privacy <- function(
     agg.poly <- rgdal::readOGR(dsn = agg.poly.shp, verbose = FALSE)
     if (is.na(sp::proj4string(agg.poly))) {
       cat('\nNo projection found for input shapefile - assuming geographic.')
-      sp::proj4string(agg.poly) = sp::CRS("+init=epsg:4326")
+      sp::proj4string(agg.poly) = sp::CRS(SRS_string="EPSG:4326")
     }
     #convert the shape to geographic
-    agg.poly <- suppressWarnings(sp::spTransform(agg.poly,sp::CRS("+init=epsg:4326")))
+    agg.poly <- suppressWarnings(sp::spTransform(agg.poly,sp::CRS(SRS_string="EPSG:4326")))
   }
   pip <- sp::over( df, agg.poly , fn = NULL)
   df@data = cbind(df@data, pip)
@@ -257,7 +257,7 @@ assess_privacy <- function(
   # know that the CRS of both grid2Min obj is WGS84, but perhaps saved with 
   #slight variations in the text
   sp::proj4string(grid2Min) <- sp::CRS(as.character(NA))
-  sp::proj4string(grid2Min) = sp::CRS("+init=epsg:4326")
+  sp::proj4string(grid2Min) = sp::CRS(SRS_string="EPSG:4326")
 
   grid2Min$ORD_gr <-  seq.int(nrow(grid2Min)) 
   if (length(allowed.areas)>0){

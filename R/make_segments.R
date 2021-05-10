@@ -21,7 +21,7 @@
 #' output plots and/or shapefiles.  Setting it to "all" includes all positions
 #' in the output plots and/or shapefiles. Setting it to "none" ignores points
 #' and doesn't output any. 
-#' @param the.crs default is \code{"+init=epsg:4326"}. This is the projection 
+#' @param the.crs default is \code{"EPSG:4326"}. This is the projection 
 #' you want any generated data to be output in.  Input data is assumed to be 
 #' from a GPS and should be WGS84 (which is what the default value corresponds 
 #' with).
@@ -38,7 +38,7 @@
 #' @export
 make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE",
                           lat.field= "LATITUDE",lon.field="LONGITUDE",
-                          points = "orphans", the.crs = "+init=epsg:4326", 
+                          points = "orphans", the.crs = "EPSG:4326", 
                           filename = NULL, plot=TRUE, createShp = TRUE){
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
@@ -103,7 +103,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
       plotLines[[i]]<-sp::Lines(li,ID=segs[i])
     }
     plotLines = sp::SpatialLines(plotLines)
-    sp::proj4string(plotLines) <- sp::CRS(the.crs)
+    sp::proj4string(plotLines) <- sp::CRS(SRS_string=the.crs)
     dets = as.data.frame(dataLines[!duplicated(dataLines[c(objField)]),]) 
     rownames(dets) <- dets[,objField]
     plotLines<-sp::SpatialLinesDataFrame(plotLines,data = dets, match.ID = TRUE)

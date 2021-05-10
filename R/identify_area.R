@@ -73,7 +73,7 @@ identify_area <- function(df = NULL,
   }else{
     agg.poly <- sf::st_transform(agg.poly, 4326)
   }
-  df_sf <- sf::st_as_sf(x = df,  coords = c(lon.field, lat.field), crs = "+init=epsg:4326")
+  df_sf <- sf::st_as_sf(x = df,  coords = c(lon.field, lat.field), crs = "EPSG:4326")
   res <- suppressMessages(sf::st_join(df_sf, agg.poly))
   res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<on boundary line>"
   res[!is.na(res$tmp),agg.poly.field]<-sf::st_drop_geometry(res[!is.na(res$tmp),"tmp"])

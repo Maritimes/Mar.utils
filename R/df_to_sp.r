@@ -5,7 +5,7 @@
 #' (in decimal degrees)
 #' @param lon.field the default is \code{"LONGITUDE"}.  the name of the field holding longitude
 #' values (in decimal degrees)
-#' @param the.crs the default is \code{+init=epsg:4326}.  This is the projection 
+#' @param the.crs the default is \code{EPSG:4326}.  This is the projection 
 #' of the incoming data.  This is NOT what you want the projection to be.  
 #' Assigning a projection, and reprojecting are different.
 #' @param autoQC the default is \code{TRUE}.  This runs df_qc_spatial() 
@@ -16,12 +16,12 @@
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-df_to_sp <- function(df = NULL, lat.field="LATITUDE", lon.field="LONGITUDE", the.crs = "+init=epsg:4326", autoQC = TRUE){
+df_to_sp <- function(df = NULL, lat.field="LATITUDE", lon.field="LONGITUDE", the.crs = "EPSG:4326", autoQC = TRUE){
   df = df_qc_spatial(df = df, lat.field = lat.field, lon.field = lon.field, return.bad = FALSE, autoQC=autoQC)
   df.sp = sp::SpatialPointsDataFrame(
     coords = df[, c(lon.field, lat.field)],
     data = df,
-    proj4string = sp::CRS(the.crs)
+    proj4string = sp::CRS(SRS_string=the.crs)
   )
   return(df.sp)
 }
