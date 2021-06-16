@@ -33,7 +33,7 @@ df2sf <- function(input = NULL, lat.field="latitude", lon.field="longitude",
                   poly.IDs =NULL
 ){
   # count how many positions exist for each PID, and merge that info onto the data
-  ptCount <- aggregate(
+  ptCount <- stats::aggregate(
     x = list(npoints = input[,PID]),
     by = list(PID = input[,PID]),
     length

@@ -58,6 +58,7 @@ are for a single polygon and the position are in the correct order.
 Other general_use: 
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
+\code{\link{df2sf}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},

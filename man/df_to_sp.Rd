@@ -8,7 +8,7 @@ df_to_sp(
   df = NULL,
   lat.field = "LATITUDE",
   lon.field = "LONGITUDE",
-  the.crs = "+init=epsg:4326",
+  the.crs = "EPSG:4326",
   autoQC = TRUE
 )
 }
@@ -21,7 +21,7 @@ df_to_sp(
 \item{lon.field}{the default is \code{"LONGITUDE"}.  the name of the field holding longitude
 values (in decimal degrees)}
 
-\item{the.crs}{the default is \code{+init=epsg:4326}.  This is the projection 
+\item{the.crs}{the default is \code{EPSG:4326}.  This is the projection 
 of the incoming data.  This is NOT what you want the projection to be.  
 Assigning a projection, and reprojecting are different.}
 
@@ -41,6 +41,7 @@ Other general_use:
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
 \code{\link{convert2poly}()},
+\code{\link{df2sf}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_to_shp}()},
 \code{\link{drop_cols}()},

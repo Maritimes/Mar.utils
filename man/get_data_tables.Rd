@@ -8,6 +8,7 @@ get_data_tables(
   schema = NULL,
   data.dir = file.path(getwd(), "data"),
   tables = NULL,
+  rownum = NULL,
   usepkg = "rodbc",
   fn.oracle.username = "_none_",
   fn.oracle.password = "_none_",
@@ -28,6 +29,10 @@ extracted files to go.}
 
 \item{tables}{The default value is \code{NULL}.  This is a vector of table 
 names you want to extract that exist in identified \code{schema} of the the database.}
+
+\item{rownum}{The default value is \code{NULL}. This is an integer that can be used to limit the 
+number  of records retrieved from the specified table(s).  If it is left as \code{NULL}, all records 
+retrieved.  Otherwise, it will return the specified number of rows.}
 
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
 connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
