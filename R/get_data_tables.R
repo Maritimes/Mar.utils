@@ -9,6 +9,9 @@
 #' extracted files to go.
 #' @param tables The default value is \code{NULL}.  This is a vector of table 
 #' names you want to extract that exist in identified \code{schema} of the the database.
+#' @param rownum The default value is \code{NULL}. This is an integer that can be used to limit the 
+#' number  of records retrieved from the specified table(s).  If it is left as \code{NULL}, all records 
+#' retrieved.  Otherwise, it will return the specified number of rows.
 #' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
@@ -30,6 +33,7 @@
 get_data_tables<-function(schema=NULL,
                           data.dir = file.path(getwd(), 'data'),
                           tables = NULL,
+                          rownum = NULL,
                           usepkg = 'rodbc', 
                           fn.oracle.username ="_none_",
                           fn.oracle.password="_none_",
@@ -149,7 +153,12 @@ get_data_tables<-function(schema=NULL,
       }
       cat(paste0("\n","Extracting ",missingtables[i],"..."))
       table_naked = gsub(paste0(schema,"."),"",missingtables[i])
-      qry = paste0("SELECT * from ", schema, ".",table_naked)
+      if (is.null(rownum)){
+        where_N = ""
+      }else{
+        where_N = paste0(" WHERE rownum <= ", rownum)
+      }
+      qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
       result= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
       assign(table_naked, result)
       save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
