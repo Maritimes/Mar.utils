@@ -30,6 +30,17 @@ convert2poly <- function(input=NULL,
                          lat.field = 'X', lon.field = 'Y',
                          PID = "PID", SID = "SID", POS= "POS",
                          shp.path = NULL){
+  if (class(input)=="sf" && out =="shp"){
+ 
+    nm <- deparse(substitute(input))
+    thePath <- ifelse(is.null(shp.path), getwd(), shp.path)
+    
+    filePath <- file.path(thePath,paste0(nm,".shp"))
+    
+    sf::st_write(input, dsn = filePath, layer = filePath, driver = "ESRI Shapefile")
+    print(paste0("Saved shapefile to ",thePath,"/",nm,".shp"))
+    return(NULL)
+  }
   skip <- FALSE
   if (is.character(input)){
     nm <- gsub(".csv|.dat","", basename(input))
@@ -59,9 +70,8 @@ convert2poly <- function(input=NULL,
     if(!PID %in% colnames(theInput)) theInput$PID <- 1
     if(!SID %in% colnames(theInput)) theInput$SID <- 1
     if(!POS %in% colnames(theInput)) theInput$POS <- seq(1:nrow(theInput))
-    
-    colnames(theInput)[colnames(theInput)==lat.field] <- "Y"
-    colnames(theInput)[colnames(theInput)==lon.field] <- "X"
+    colnames(theInput)[colnames(theInput)==lat.field] <- "X"
+    colnames(theInput)[colnames(theInput)==lon.field] <- "Y"
     colnames(theInput)[colnames(theInput)==PID] <- "PID"
     colnames(theInput)[colnames(theInput)==SID] <- "SID"
     colnames(theInput)[colnames(theInput)==POS] <- "POS"
