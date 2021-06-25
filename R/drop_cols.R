@@ -16,13 +16,15 @@
 #' fields with values that are shared by all records in a dataframe.
 #' @param keepFields default is \code{NULL}.This is a vector of column names you 
 #' definitely want to retain, regardless of the values.
+#' @param quietly default is \code{FALSE}.  By default, this function will not output messages,
+#' but they can be turned on by setting this to TRUE
 #' @return dataframe
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-drop_cols<-function(df = NULL, justDropNAs = TRUE, uniformFields = 'retain', keepFields = NULL){
+drop_cols<-function(df = NULL, justDropNAs = TRUE, uniformFields = 'retain', keepFields = NULL, quietly=T){
   if (justDropNAs) {
-    cat("\n","Just dropping NA columns")
+    if (!quietly) message("\n","Just dropping NA columns")
     return(df[!sapply(df, function(x) all(is.na(x)))])
   }
 
