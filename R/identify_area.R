@@ -35,14 +35,12 @@ identify_area <- function(df = NULL,
   df_Orig <- df
   df[,"tmp"]<-NA
   handled <- df[F,]
-  
   if(nrow(df[is.na(df[,lat.field])|is.na(df[,lon.field]),])>0){
     coordMissing <- df[is.na(df[,lat.field])|is.na(df[,lon.field]),]
     coordMissing$tmp <- "<missing coord>"
     handled=rbind.data.frame(handled, coordMissing)
     df <-df[!is.na(df[,lat.field])& !is.na(df[,lon.field]),]
   }
-  
   if(nrow(df[(df[,lat.field] > 90 | df[,lat.field] < -90) |(df[,lon.field] > 180 | df[,lon.field] < -180), ])>0){
     coordImpossible <- df[(df[,lat.field] > 90 | df[,lat.field] < -90) |(df[,lon.field] > 180 | df[,lon.field] < -180), ]
     coordImpossible$tmp <- "<impossible coord>"
@@ -75,13 +73,14 @@ identify_area <- function(df = NULL,
   }
   df_sf <- sf::st_as_sf(x = df,  coords = c(lon.field, lat.field), crs = "EPSG:4326")
   res <- suppressMessages(sf::st_join(df_sf, agg.poly))
-  res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<on boundary line>"
+  res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<outside known areas>"
   res[!is.na(res$tmp),agg.poly.field]<-sf::st_drop_geometry(res[!is.na(res$tmp),"tmp"])
   res$tmp <- res$geometry <- NULL
   res <- res[,c(names(res[names(res) %in% names(df_Orig)]),agg.poly.field)]
   res <- merge(df_Orig, res)
+
   bbox<-as.vector(sf::st_bbox(agg.poly))
-  res[which(res$LATITUDE>bbox[4] |res$LATITUDE < bbox[2]| res$LONGITUDE>bbox[3] |res$LONGITUDE < bbox[1]) ,agg.poly.field] <- "<outside known areas>"
+  res[which(res[,lat.field]>bbox[4] |res[,lat.field] < bbox[2]| res[,lon.field]>bbox[3] |res[,lon.field] < bbox[1]) ,agg.poly.field] <- "<outside known areas>"
   if(nrow(handled)>0){
     colnames(handled)[colnames(handled)=="tmp"] <- agg.poly.field
     res <- rbind.data.frame(res, handled)
