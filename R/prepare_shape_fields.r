@@ -65,7 +65,12 @@ prepare_shape_fields <- function(shape){
     allNames[allNames$CNT>10,"NEW"]<-gsub("_","", allNames[allNames$CNT>10,"NEW"])
     allNames <-updateCnt(allNames)
   }
-  #maybe more actions prior to the substr?
+
+  if (max(range(allNames$CNT))>10){
+    allNames[grepl(pattern = "EST", x = allNames$NEW),"NEW"] <- gsub(pattern = "EST", replacement = "", x= allNames[grepl(pattern = "EST", x = allNames$NEW),"NEW"])
+    allNames <-updateCnt(allNames)
+  }
+  
   if (max(range(allNames$CNT))>10){
     # allNames[allNames$CNT>10,"NEW"]<-substr(allNames[allNames$CNT>10,"NEW"], 1, 10) 
     cat("\n!!Despite efforts to shorten them, rgdal will impose some aggressive measures to reduce the field names to the 10 chars allowed by ArcGIS","\n")
