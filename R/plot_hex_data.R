@@ -12,13 +12,16 @@
 #'   \item \code{"layer"} - results in the plot showing the full extent of the gridded area
 #'   \item \code{c(xmin, xmax, ymin, ymax)} - results in a plot restricted to the specified area
 #'   }
+#' @param hideEmptyCells default is \code{TRUE}.  By default, this parameter results in the plot 
+#' only showing grid cells for which data exists (i.e. non-zero).  This offers a dramatic performance 
+#' improvement.  If the entire mesh of predominantly empty cells must be shown, set this to FALSE.
 #' @return an ggplot2 plot
 #' @note if no  PID or POS is provided, it is assumed that the provided positions
 #' are for a single polygon and the position are in the correct order.
 #' @family privacy
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data"){
+plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmptyCells = TRUE){
   
   if (!class(data_sf)[1]=="sf"){
     if(class(data_sf)=="list" && class(data_sf[[1]])=="SpatialPolygonsDataFrame" && names(data_sf[1])=="Grid2Min"){
@@ -52,8 +55,13 @@ plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data"){
   
   # got field, remove unused fields
   thisData <- data_sf[,c(flds_sf,fld)]
-  # set zero values to NA, so they plot transparently
-  thisData[[fld]][thisData[[fld]]==0] <- NA
+  
+  if (hideEmptyCells){
+    thisData <- thisData[thisData[[fld]] !=0, ]
+  }else{
+    # set zero values to NA, so they plot transparently
+    thisData[[fld]][thisData[[fld]]==0] <- NA
+  }
   
   # determine desired map extent, using extent parameter
   if (class(extent) == "numeric"){

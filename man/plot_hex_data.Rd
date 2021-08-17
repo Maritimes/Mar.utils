@@ -4,7 +4,12 @@
 \alias{plot_hex_data}
 \title{plot_hex_data}
 \usage{
-plot_hex_data(data_sf = NULL, plotfld = NULL, extent = "data")
+plot_hex_data(
+  data_sf = NULL,
+  plotfld = NULL,
+  extent = "data",
+  hideEmptyCells = TRUE
+)
 }
 \arguments{
 \item{data_sf}{default is \code{NULL}.  an sf version of the Grid2Min object from assess_privacy.}
@@ -21,6 +26,10 @@ non-zero
   \item \code{"layer"} - results in the plot showing the full extent of the gridded area
   \item \code{c(xmin, xmax, ymin, ymax)} - results in a plot restricted to the specified area
   }}
+
+\item{hideEmptyCells}{default is \code{TRUE}.  By default, this parameter results in the plot 
+only showing grid cells for which data exists (i.e. non-zero).  This offers a dramatic performance 
+improvement.  If the entire mesh of predominantly empty cells must be shown, set this to FALSE.}
 }
 \value{
 an ggplot2 plot
