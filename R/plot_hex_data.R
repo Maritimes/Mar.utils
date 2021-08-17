@@ -66,11 +66,15 @@ plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data"){
     # 'layer' is extent of entire sf object
     thisbbox <- sf::st_bbox(data_sf)
   }
-
-   p <- ggplot2::ggplot() +
+  
+  coastline <-rnaturalearth::ne_coastline(scale=10,returnclass = "sf")
+  p <- ggplot2::ggplot() +
+    ggplot2::geom_sf(data = coastline, ggplot2::aes(colour=NA)) +
     ggplot2::geom_sf(data = thisData, ggplot2::aes(colour="#E6D5DBDB",fill = get(fld))) +
     ggplot2::scale_fill_viridis_c(direction = -1, na.value = NA, name =fld) +
     ggplot2::scale_colour_identity() +
-    ggplot2::coord_sf(xlim = c(thisbbox$xmin, thisbbox$xmax), ylim = c(thisbbox$ymin, thisbbox$ymax))
+    ggplot2::geom_sf(data = coastline, ggplot2::aes(colour="grey16")) +
+    ggplot2::coord_sf(xlim = c(thisbbox$xmin, thisbbox$xmax), ylim = c(thisbbox$ymin, thisbbox$ymax)) +
+    ggplot2::theme_bw()
   return(p)
 }
