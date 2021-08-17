@@ -1,7 +1,7 @@
 #' @title convert2poly
 #' @description This function will accept a PBSMapping style csv, a df or a 
 #' spatialpolygondataframe and turn it into an  sf object, an sp object or a shapefile.
-#' @param input a PBSMapping PolySet to be converted (csv or df).
+#' @param input a shapefile, SpatialPolygonsDataFrame, or PBSMapping PolySet to be converted (csv or df).
 #' @param header indicates whether or not the input data has an initial row
 #' describing the data.
 #' @param out default is \code{'sf'}.  This indicates whether an \code{sf} object, 
@@ -61,7 +61,7 @@ convert2poly <- function(input=NULL,
   }else if (class(input) == "data.frame"){
     nm <- deparse(substitute(input))
     theInput <- input
-  }else if (class(input) == "SpatialPolygons"){
+  }else if (class(input) == "SpatialPolygonsDataFrame"){
     nm <- deparse(substitute(input))
     polySpDf<- input
     skip <- TRUE

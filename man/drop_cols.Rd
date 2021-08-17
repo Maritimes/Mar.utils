@@ -8,7 +8,8 @@ drop_cols(
   df = NULL,
   justDropNAs = TRUE,
   uniformFields = "retain",
-  keepFields = NULL
+  keepFields = NULL,
+  quietly = T
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ fields with values that are shared by all records in a dataframe.}
 
 \item{keepFields}{default is \code{NULL}.This is a vector of column names you 
 definitely want to retain, regardless of the values.}
+
+\item{quietly}{default is \code{FALSE}.  By default, this function will not output messages,
+but they can be turned on by setting this to TRUE}
 }
 \value{
 dataframe

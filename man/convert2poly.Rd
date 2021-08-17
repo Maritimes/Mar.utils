@@ -17,7 +17,7 @@ convert2poly(
 )
 }
 \arguments{
-\item{input}{a PBSMapping PolySet to be converted (csv or df).}
+\item{input}{a shapefile, SpatialPolygonsDataFrame, or PBSMapping PolySet to be converted (csv or df).}
 
 \item{header}{indicates whether or not the input data has an initial row
 describing the data.}
