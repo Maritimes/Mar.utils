@@ -121,6 +121,11 @@ unique values in the \code{facet.field}, this will result in (3*3*30 =) 270
 fields plus 3 or 4 additional housekeeping fields. In this event, a warning 
 will be provided, but no shapefiles will be output.
 }
+\seealso{
+Other privacy: 
+\code{\link{plot_hex_data}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{privacy}

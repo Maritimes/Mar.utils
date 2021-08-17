@@ -79,7 +79,7 @@
 #' @import data.table
 
 #' @return a SpatialPolygonsDataFrame, and generates a shapefile
-
+#' @family privacy
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 #' @note If sensitive fields have names that are different than what is provided in the \code{sen.fields}, 
