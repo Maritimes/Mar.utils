@@ -60,6 +60,11 @@
 #' privacy constraints), and 2) the 2 min gridded data (only for within those 
 #' polygons that meet the privacy constraints).
 
+#' @param create.centroid.csv default is \code{FALSE}.  This indicates whether or not a csv  should 
+#' be created for the 2 min gridded data (only for within those polygons that meet the privacy 
+#' constraints).  This is a more portable option than the shapefiles or SpatialPolygonsDataFrame 
+#' (i.e. it is a dramatically smaller file, usable without a GIS).
+#' 
 #' @param file.id default is \code{NULL} Whatever is entered here will be used 
 #' to name the output shapefiles and/or plots.  If nothing is enetered, the 
 #' output files will just be named using timestamps.
@@ -106,6 +111,7 @@ assess_privacy <- function(
   key.fields = NULL,
   for.public = TRUE,
   create.shps = TRUE,
+  create.centroid.csv = FALSE,
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL, 
@@ -123,6 +129,20 @@ assess_privacy <- function(
     if ("MEAN" %in% calculate)  res= c(res, round(mean(x), 4))
     res = res[!is.na(res)]
     return(res)
+  }
+  
+  mkCentroidDf <- function(grid = NULL){
+    # the default polygons are large.  This can convert them to csvs 
+    this <- as.data.frame(geosphere::centroid(grid))
+    colnames(this) <- c("lon", "lat") 
+    this <- data.frame("ID" = 1:nrow(this), this)
+    sp::coordinates(this) <- c("lon", "lat") 
+    sp::proj4string(this) <- sp::proj4string(grid) # assign projection
+    
+    this@data <- sp::over(x = this, y = grid, returnList = FALSE)
+    this@data[,c("LON","LAT")] <- sp::coordinates(this)
+    this_csv <- this@data
+    return(this_csv)
   }
   
   #deal with cases where differing rows may refer to different species in the same sets
@@ -287,6 +307,7 @@ assess_privacy <- function(
     file.id = ifelse(!is.null(file.id),paste0(file.id,"_"),"")
     POLY.agg.name = paste0(file.id,'POLY_AGG_', ts)
     this.df.name = paste0(file.id,'Grid2Min_', ts)
+    this.csv.name = paste0(file.id,'Grid2MinCentroid_', ts)
     
     # there are 3 analytics possible within the agg function via (analyticChooser) - CNT, SUM and MEAN
     # the resultant column get added to the data with the original names with "*.1", "*.2", or "*.3"
@@ -301,8 +322,13 @@ assess_privacy <- function(
       colnames(POLY.agg@data) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(POLY.agg@data))
       colnames(grid2Min@data) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(grid2Min@data))
     }
-
-    
+results <- list()
+    if (create.centroid.csv) {
+      this <- mkCentroidDf(grid2Min)
+      results$centroidCsv <- this
+      write.csv(this, paste0(this.csv.name,".csv"))
+      message(paste0("\nCreated csv ", getwd(), .Platform$file.sep, this.csv.name,".csv\n"))
+    }
     if (create.shps){
       if (!ignore.col.limit && max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
         warning("\nCan not create shapefiles.  Shapefiles are limited to 255 fields, and your data will have more than that.
@@ -314,13 +340,14 @@ The number of fields is determined by:
       }else{
       POLY.agg = prepare_shape_fields(POLY.agg) 
       rgdal::writeOGR(obj = POLY.agg, dsn= getwd(), layer = POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
-      cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp\n"))
+      message(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp\n"))
       grid2Min = prepare_shape_fields(grid2Min)
       rgdal::writeOGR(obj = grid2Min, dsn=getwd(), layer = this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
-      cat(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp\n"))
+      message(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp\n"))
       }
     }
-    results= list("Grid2Min" = grid2Min, "POLY_AGG" = POLY.agg)
+    results$Grid2Min <- grid2Min
+    results$POLY_AGG <- POLY.agg
   }else{
     print("No polygon has enough unique values to allow aggregated data to be shown")
     results= list("Grid2Min" = NULL, "POLY_AGG" = NULL)

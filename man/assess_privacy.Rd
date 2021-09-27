@@ -17,6 +17,7 @@ assess_privacy(
   key.fields = NULL,
   for.public = TRUE,
   create.shps = TRUE,
+  create.centroid.csv = FALSE,
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL,
@@ -79,6 +80,11 @@ shapefiles should be created for 1) the polygon file (with aggregated values
 for each polygon and an indication of whether or not each polygon meets the 
 privacy constraints), and 2) the 2 min gridded data (only for within those 
 polygons that meet the privacy constraints).}
+
+\item{create.centroid.csv}{default is \code{FALSE}.  This indicates whether or not a csv  should 
+be created for the 2 min gridded data (only for within those polygons that meet the privacy 
+constraints).  This is a more portable option than the shapefiles or SpatialPolygonsDataFrame 
+(i.e. it is a dramatically smaller file, usable without a GIS).}
 
 \item{file.id}{default is \code{NULL} Whatever is entered here will be used 
 to name the output shapefiles and/or plots.  If nothing is enetered, the 
