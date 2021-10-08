@@ -26,6 +26,9 @@
 #' run such that it checks for the existence of the files, but doesn't load them.
 #' @param env This the the environment you want this function to work in.  The 
 #' default value is \code{.GlobalEnv}.
+#' @param fuzzyMatch default is \code{TRUE}.  This allows source data tables to match with
+#' (generally) synonymous  schema identifiers (i.e. MARFIS.==MARFISSCI.; RV.==GROUNDFISH.;
+#' ISDB.=OBSERVER.)  Changing to False forces an exact match.
 #' @param quietly default is \code{FALSE}.  If TRUE, no output messages will be shown.
 #' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
@@ -40,7 +43,10 @@ get_data_tables<-function(schema=NULL,
                           fn.oracle.dsn="_none_",
                           checkOnly = FALSE,
                           env=.GlobalEnv,
-                          quietly=F){
+                          fuzzyMatch = TRUE,
+                          quietly=TRUE){
+  
+  
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly){
@@ -55,24 +61,22 @@ get_data_tables<-function(schema=NULL,
     loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
-      
-      
-      if (grepl(x= thisP,pattern = "MARFIS\\.|MARFISSCI\\.")){
-        if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T))) {
-          thisP = gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T)
-        }
-      } else  if (grepl(x= thisP,pattern = "RV\\.|GROUNDFISH.")){
-        if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T))) {
-          thisP = gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T)
-        }
-      } else if (grepl(x= thisP,pattern = "ISDB\\.|OBSERVER.")){
-        if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) {
-          thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
+      if (fuzzyMatch){
+        if (grepl(x= thisP,pattern = "MARFIS\\.|MARFISSCI\\.")){
+          if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T))) {
+            thisP = gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T)
+          }
+        } else  if (grepl(x= thisP,pattern = "RV\\.|GROUNDFISH.")){
+          if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T))) {
+            thisP = gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T)
+          }
+        } else if (grepl(x= thisP,pattern = "ISDB\\.|OBSERVER.")){
+          if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) {
+            thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
+          }
         }
       }
-      
-
-      
+      thisP = gsub(pattern = "//", replacement = "/", x = thisP)
       
       if(checkOnly) {
         if(file.exists(thisP)){
@@ -88,12 +92,10 @@ get_data_tables<-function(schema=NULL,
       fileAge = file.info(thisP)$mtime
       fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
       if (!quietly) cat(paste0(" (Data modified ", fileAge, " days ago.)"))
-      # if ((!quietly)  & fileAge > 90) 
-      #   cat(paste("\n!!! This data was extracted more than 90 days ago - consider re-extracting it"))
     }
     sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)  
     if (!quietly) 
-    return(TRUE)
+      return(TRUE)
   }
   
   reqd = toupper(paste0(schema, ".", tables))
@@ -131,7 +133,6 @@ get_data_tables<-function(schema=NULL,
       cat("\nCan't get the data without a DB connection.  Aborting.\n")
       return(NULL)
     }
-    
     missingtables = tables[which(res==-1)]
     for (i in 1:length(missingtables)){
       if (!quietly) cat(paste0("\n","Verifying access to ",missingtables[i]," ..."))
