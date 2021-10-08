@@ -4,17 +4,19 @@
 \alias{where_now}
 \title{where_now}
 \usage{
-where_now(callstack = sys.calls())
+where_now(returnTime = FALSE, callstack = sys.calls())
 }
 \arguments{
+\item{returnTime}{default is \code{FALSE}.  If TRUE, this function will return a value for 
+proc.time, facilitating timing of functions}
+
 \item{callstack}{default is \code{sys.calls()}.  Not meant to be changed.}
 }
 \value{
 nothing, it just writes messages to the screen
 }
 \description{
-This function indicates which function has been reached, and the 
-parameters it is using
+This function indicates which function has been reached.
 }
 \seealso{
 Other debugging: 

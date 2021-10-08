@@ -15,7 +15,8 @@ get_data_tables(
   fn.oracle.dsn = "_none_",
   checkOnly = FALSE,
   env = .GlobalEnv,
-  quietly = F
+  fuzzyMatch = TRUE,
+  quietly = TRUE
 )
 }
 \arguments{
@@ -53,6 +54,10 @@ run such that it checks for the existence of the files, but doesn't load them.}
 
 \item{env}{This the the environment you want this function to work in.  The 
 default value is \code{.GlobalEnv}.}
+
+\item{fuzzyMatch}{default is \code{TRUE}.  This allows source data tables to match with
+(generally) synonymous  schema identifiers (i.e. MARFIS.==MARFISSCI.; RV.==GROUNDFISH.;
+ISDB.=OBSERVER.)  Changing to False forces an exact match.}
 
 \item{quietly}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
 }
