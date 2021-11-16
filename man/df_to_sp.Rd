@@ -38,6 +38,7 @@ This function takes a dataframe and converts in to a spatialpointsdataframe
 }
 \seealso{
 Other general_use: 
+\code{\link{aggregator}()},
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
 \code{\link{convert2poly}()},

@@ -50,6 +50,7 @@ since the use of distances requires projecting the data.
 }
 \seealso{
 Other general_use: 
+\code{\link{aggregator}()},
 \code{\link{combine_lists}()},
 \code{\link{convert2poly}()},
 \code{\link{df2sf}()},

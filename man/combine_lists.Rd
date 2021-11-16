@@ -23,6 +23,7 @@ will be retained.
 }
 \seealso{
 Other general_use: 
+\code{\link{aggregator}()},
 \code{\link{clip_by_poly_generic}()},
 \code{\link{convert2poly}()},
 \code{\link{df2sf}()},

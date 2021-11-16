@@ -56,6 +56,7 @@ are for a single polygon and the position are in the correct order.
 }
 \seealso{
 Other general_use: 
+\code{\link{aggregator}()},
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
 \code{\link{df2sf}()},

@@ -44,6 +44,7 @@ based on the uniformity of their values.
 }
 \seealso{
 Other general_use: 
+\code{\link{aggregator}()},
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
 \code{\link{convert2poly}()},
