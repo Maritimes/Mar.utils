@@ -42,6 +42,13 @@ shown.}
 This function facilitates creating a connection to Oracle, and
 allows connection via RODBC or ROracle, depending on the value of usepkg.
 }
+\note{
+This function temporarily changes the system values for "TZ" and "ORA_SDTZ" to "GMT" to 
+ensure that dates and times extracted from the various databases remain correct.  It does this 
+by running \code{Sys.setenv(TZ = "GMT")}  and \code{Sys.setenv(ORA_SDTZ = "GMT")}.  Once a 
+connection is established (or failes to be established), it restores the values that previously 
+existed.
+}
 \seealso{
 Other dfo_extractions: 
 \code{\link{get_data_tables}()}

@@ -23,12 +23,24 @@
 #' shown.
 #' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
+#' @note This function temporarily changes the system values for "TZ" and "ORA_SDTZ" to "GMT" to 
+#' ensure that dates and times extracted from the various databases remain correct.  It does this 
+#' by running \code{Sys.setenv(TZ = "GMT")}  and \code{Sys.setenv(ORA_SDTZ = "GMT")}.  Once a 
+#' connection is established (or failes to be established), it restores the values that previously 
+#' existed. 
 #' @export
 make_oracle_cxn <- function(usepkg = 'rodbc', 
                             fn.oracle.username ="_none_",
                             fn.oracle.password="_none_",
                             fn.oracle.dsn="_none_",
                             quietly = FALSE) {
+  orig_TZ <- Sys.getenv("TZ")
+  orig_ORA_SDTZ <- Sys.getenv("ORA_SDTZ")
+  Sys.setenv(TZ = "GMT")
+  Sys.setenv(ORA_SDTZ = "GMT")
+  if (!quietly){
+    message("set Sys.setenv(TZ='GMT') and Sys.setenv(ORA_SDTZ='GMT')")
+  }
   oracle_cxn = NULL
   use.roracle <-function(oracle.dsn, oracle.username, oracle.password, quietly){
     oracle_cxn <-tryCatch(
@@ -42,11 +54,13 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
     if (class(oracle_cxn)[1]=="OraConnection") {
       if (!quietly) cat("\nSuccessfully connected to Oracle via ROracle\n")
       results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
+      Sys.setenv(TZ = orig_TZ)
+      Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
     } else {
       if (!quietly) cat("\nROracle attempt failed\n")
-      # results = list(usepkg='roracle', channel = -1, thecmd=NA)
-      # return(results)
+      Sys.setenv(TZ = orig_TZ)
+      Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(-1)
     }
   }
@@ -62,11 +76,15 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
     if (class(oracle_cxn)[1]=="RODBC") {
       if (!quietly) cat("\nSuccessfully connected to Oracle via RODBC\n")
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
+      Sys.setenv(TZ = orig_TZ)
+      Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
     } else {
       if (!quietly) cat("\nRODBC attempt failed\n")
       # results = list(usepkg='rodbc', channel = -1, thecmd=NA)
       # return(results)
+      Sys.setenv(TZ = orig_TZ)
+      Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(-1)
     }
   }
@@ -74,9 +92,13 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
   if (!is.null(oracle_cxn)){
     if (class(oracle_cxn) == 'RODBC'){
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
+      Sys.setenv(TZ = orig_TZ)
+      Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
     }else if (class(oracle_cxn)[1]=="OraConnection") {
       results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
+      Sys.setenv(TZ = orig_TZ)
+      Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
     } 
   } else {

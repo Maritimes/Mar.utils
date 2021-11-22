@@ -39,7 +39,8 @@ aggregator = function(df = NULL,
   df <- df[,c(lat.field, lon.field, agg.fields)]
   
   analyticChooser <- function(x, calculate){
-    #this function is called by the aggregate functions to allow use to select which analytics are calculated for all agg.fields
+    #this function is called by the aggregate functions to allow use 
+    #to select which analytics are calculated for all agg.fields
     res <- NA
     if ("COUNT" %in% calculate)  res= c(res, round(length(x[x!=0]), 0))
     if ("SUM" %in% calculate)  res= c(res, round(sum(x), 4))
