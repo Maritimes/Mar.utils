@@ -31,9 +31,11 @@ drop_cols<-function(df = NULL, justDropNAs = TRUE, uniformFields = 'retain', kee
   tempdf =df
   #NAs tend to get ignored by the uniqueness checks so we copy the df and replace NAs with -666
   #can't replace logicals or dates with -666, so convert these field types to numeric first
-  tempdf[, sapply(tempdf, class) %in% c('Date')]<-as.numeric(unlist(tempdf[, sapply(tempdf, class) %in% c('Date')]))
-  tempdf[, sapply(tempdf, class) %in% c('logical')]<-as.numeric(tempdf[, sapply(tempdf, class) %in% c('logical')])
-  tempdf[, sapply(tempdf, class) %in% c('character', 'numeric','integer')][is.na(tempdf[, sapply(tempdf, class) %in% c('character', 'numeric','integer')])]<--666
+
+  tt<- lapply(tempdf,class)
+  if (any("Date" %in% tt)) tempdf[, sapply(tempdf, class) %in% c('Date')]<-as.numeric(unlist(tempdf[, sapply(tempdf, class) %in% c('Date')]))
+  if (any("logical" %in% tt)) tempdf[, sapply(tempdf, class) %in% c('logical')]<-as.numeric(tempdf[, sapply(tempdf, class) %in% c('logical')])
+  if (any(c('character', 'numeric','integer') %in% tt)) tempdf[, sapply(tempdf, class) %in% c('character', 'numeric','integer')][is.na(tempdf[, sapply(tempdf, class) %in% c('character', 'numeric','integer')])]<--666
 
   uniformFields <- tolower(uniformFields)
 
