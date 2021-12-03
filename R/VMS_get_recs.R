@@ -31,6 +31,10 @@
 #' has a single VMS position in the results, padding it will add additional 
 #' points before and after the intrusion which can illustrate what it was doing 
 #' at the time. 
+#' @param minLon default is \code{NULL}. This can be used to set a minimum Longitude
+#' @param maxLon default is \code{NULL}. This can be used to set a maximum Longitude
+#' @param minLat default is \code{NULL}. This can be used to set a minimum Latitude
+#' @param maxLat default is \code{NULL}. This can be used to set a maximum Latitude
 #' @param dateStart default is \code{NULL}. This is the start date ('YYYY-MM-DD') 
 #' for your VMS data search
 #' @param dateEnd default is \code{NULL}. This is the end date ('YYYY-MM-DD') 
@@ -54,29 +58,56 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                          fn.oracle.password = "_none_", 
                          fn.oracle.dsn = "_none_",
                          usepkg = 'rodbc', dateStart = NULL, dateEnd = NULL, 
-                       vrnList = NULL, hrBuffer = 4,  shp = NULL, shp.field=NULL, 
-                       simpleQC = TRUE, rowNum = 50000, quietly = F){
+                         vrnList = NULL, hrBuffer = 4,   
+                         minLon = NULL, maxLon = NULL,
+                         minLat = NULL, maxLat = NULL, 
+                         shp = NULL, shp.field=NULL, 
+                         simpleQC = TRUE, rowNum = 50000,
+                       quietly = F){
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE <= to_date('",dateEnd,"','YYYY-MM-DD')") 
   
   if (!is.null(vrnList)) {
-    if (length(vrnList)>1000){
-      cat("\nToo many vessels to extract VMS data (max of 1000)")
-      return(NA)
-    }
-    whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
+    # if (length(vrnList)>1000){
+    #   cat("\nToo many vessels to extract VMS data (max of 1000)")
+    #   return(NA)
+    # }
+    #whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
+    whereVRN = paste0("AND ",Mar.utils::big_in(vec=unique(vrnList), vec.field="VR_NUMBER"))
   }else{
     whereVRN = ""
   }
   sqlLimit = paste0(" AND ROWNUM <= ",rowNum)
-  
+  if (!is.null(minLon)){
+    W_minX <- paste0("LONGITUDE >=",minLon)
+  }else{
+    W_minX <- " 1 = 1"
+  }
+  if (!is.null(maxLon)){
+    W_maxX <- paste0("LONGITUDE <=",maxLon)
+  }else{
+    W_maxX <- "1 = 1"
+  }
+  if (!is.null(minLat)){
+    W_minY <- paste0("LATITUDE >=",minLat)
+  }else{
+    W_minY <- "1 = 1"
+  }
+  if (!is.null(maxLat)){
+    W_maxY <- paste0("LATITUDE <=",maxLat)
+  }else{
+    W_maxY <- "1 = 1"
+  }
   run_ts = as.integer(Sys.time())
   # go to VMS source, and retrieve records
   recSQL = paste0("select VR_NUMBER,LATITUDE,LONGITUDE,POSITION_UTC_DATE,SPEED_KNOTS,UPDATE_DATE
               from MFD_OBFMI.VMS_ALL 
               WHERE POSITION_UTC_DATE>= to_date('",dateStart,"','YYYY-MM-DD') ",whereDateEnd, 
-                  " ",whereVRN, sqlLimit
-  )
+                  " AND (",W_minX, " AND ",
+                          W_maxX, " AND ", 
+                          W_minY,  " AND ",
+                          W_maxY,") ",whereVRN, sqlLimit)
+
   oracle_cxn = make_oracle_cxn(fn.oracle.username =fn.oracle.username, 
                                fn.oracle.password = fn.oracle.password, 
                                fn.oracle.dsn = fn.oracle.dsn,

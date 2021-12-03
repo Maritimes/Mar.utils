@@ -13,6 +13,10 @@ VMS_get_recs(
   dateEnd = NULL,
   vrnList = NULL,
   hrBuffer = 4,
+  minLon = NULL,
+  maxLon = NULL,
+  minLat = NULL,
+  maxLat = NULL,
   shp = NULL,
   shp.field = NULL,
   simpleQC = TRUE,
@@ -59,6 +63,14 @@ VMS data you would like to pad your area search by.  For example, if a vessel
 has a single VMS position in the results, padding it will add additional 
 points before and after the intrusion which can illustrate what it was doing 
 at the time.}
+
+\item{minLon}{default is \code{NULL}. This can be used to set a minimum Longitude}
+
+\item{maxLon}{default is \code{NULL}. This can be used to set a maximum Longitude}
+
+\item{minLat}{default is \code{NULL}. This can be used to set a minimum Latitude}
+
+\item{maxLat}{default is \code{NULL}. This can be used to set a maximum Latitude}
 
 \item{shp}{default is \code{NULL}.  This is the shapefile that has 
 polygons that should be checked for existence of VMS data.}
