@@ -10,6 +10,7 @@ aggregator(
   lon.field = "LONGITUDE",
   agg.fields = NULL,
   agg.minutes = 5,
+  facet.field = NULL,
   calculate = c("COUNT", "SUM", "MEAN")
 )
 }
@@ -29,6 +30,11 @@ fields needs to be numeric.  The output aggregated data will ONLY have the \code
 
 \item{agg.minutes}{the default is \code{5}.  This specifies how many minutes the data should be 
 aggregated by.}
+
+\item{facet.field}{default is \code{NULL}.  In cases like bycatch data, you may have a dataframe
+where each row might represent different species.  You probably want a breakdown of each individual
+species, rather than summing them all up to get some generic weight of all species combined. This is 
+the field that will be used to aggregate data by common values (like Species_Code) .}
 
 \item{calculate}{the default is \code{c("MEAN", "COUNT", "SUM")}. These are the 
 analytics which should be performed for every field identified in \code{agg.field}.

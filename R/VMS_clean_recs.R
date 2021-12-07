@@ -55,7 +55,8 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   if ("UPDATE_DATE" %in% names(vmsdf)){
     #For cases where a vessel has multiple positions at a single time, I use 
     #UPDATE_DATE to get only the most recently updated position
-    vmsdf = vmsdf[order(vmsdf[objField],vmsdf[timeField],vmsdf$UPDATE_DATE),] 
+    vmsdf = dplyr::arrange(vmsdf, vmsdf[objField], vmsdf[timeField], UPDATE_DATE)
+    # vmsdf = vmsdf[order(xtfrm(vmsdf[objField]),xtfrm(vmsdf[timeField]),vmsdf$UPDATE_DATE),] 
     vmsdf = data.table::setDT(vmsdf)
     vmsdf = vmsdf[,utils::tail(.SD,1),by=list("newObjField" = get(objField),"newTimeField" = get(timeField))]
     vmsdf = as.data.frame(vmsdf)

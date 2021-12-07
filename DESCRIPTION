@@ -9,6 +9,7 @@ Depends:
 Imports:
     curl,
     data.table,
+    dplyr,
     geosphere,
     lubridate,
     maptools,

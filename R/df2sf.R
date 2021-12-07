@@ -40,7 +40,6 @@ df2sf <- function(input = NULL, lat.field="latitude", lon.field="longitude",
   )
   input <- merge(input, ptCount, by.x = PID, by.y = "PID")
   rm(ptCount)
-
   thePoints <- input[input[,type.field] %in% point.IDs,]
   badPoints <- thePoints[thePoints$npoints > 1,]
   if (nrow(badPoints)>0){
@@ -53,7 +52,6 @@ df2sf <- function(input = NULL, lat.field="latitude", lon.field="longitude",
     rm(fixedPoints)
   }
   rm(badPoints)
-
   theLines <- input[input[,type.field] %in% line.IDs,]
   badLines <- theLines[theLines$npoints < 2,]
   if (nrow(badLines)>0){
@@ -65,11 +63,13 @@ df2sf <- function(input = NULL, lat.field="latitude", lon.field="longitude",
 
   if(!is.null(ORD)) theLines = theLines[with(theLines, order(get(PID),get(ORD))), ]
 
+  
 
   thePolysO <- input[input[,type.field] %in% poly.IDs,]
   thePolys <- thePolysO[FALSE,]
   # check each poly and ensure that last coord is same as first, if not, add it
   allPolys = unique(thePolysO[,PID])
+  if(length(allPolys)>0){
   for (p in 1:length(allPolys)){
     thisPoly = thePolysO[thePolysO[PID] == allPolys[p],]
     if(!is.null(ORD)) thisPoly = thisPoly[with(thisPoly, order(get(ORD))), ]
@@ -81,7 +81,8 @@ df2sf <- function(input = NULL, lat.field="latitude", lon.field="longitude",
     thePolys <- rbind.data.frame(thePolys, thisPoly)
     rm(thisPoly)
   }
-  rm(list=c("thePolysO", "p"))
+  }
+  rm(list=c("thePolysO"))
   badPolys <- thePolys[thePolys$npoints < 4,]
   if (nrow(badPolys)>0){
     message("\nThe following 'polys' each had less than 3 unique positions, and were ignored:\n")

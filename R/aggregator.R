@@ -10,6 +10,11 @@
 
 #' @param lon.field the default is \code{"LONGITUDE"}.  This is the name of the field holding 
 #' longitude values (in decimal degrees)
+#' 
+#' @param facet.field default is \code{NULL}.  In cases like bycatch data, you may have a dataframe
+#' where each row might represent different species.  You probably want a breakdown of each individual
+#' species, rather than summing them all up to get some generic weight of all species combined. This is 
+#' the field that will be used to aggregate data by common values (like Species_Code) .
 
 #' @param agg.fields the default is \code{NULL}.  This is a vector of 1 or more fields in the data 
 #' that contain the values you want to aggregate (e.g. calculate the mean, sum or count of).  These 
@@ -35,8 +40,9 @@ aggregator = function(df = NULL,
                       lon.field = "LONGITUDE",
                       agg.fields = NULL,
                       agg.minutes = 5,
+                      facet.field = NULL,
                       calculate = c("COUNT", "SUM", "MEAN")) {
-  df <- df[,c(lat.field, lon.field, agg.fields)]
+  df <- df[,c(lat.field, lon.field, agg.fields, facet.field)]
   
   analyticChooser <- function(x, calculate){
     #this function is called by the aggregate functions to allow use 
@@ -58,14 +64,22 @@ aggregator = function(df = NULL,
   
   df[agg.fields][is.na(df[agg.fields])] <-0
   df[agg.fields] <- sapply(df[agg.fields], as.numeric)
+  if(is.null(facet.field)){
+    df.agg = as.data.frame(as.list(aggregate(
+      df[agg.fields],
+      by = df[c("LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
+      function(x) analyticChooser(x, calculate)
+    )))
+  }else{
+    df.agg = as.data.frame(as.list(aggregate(
+      df[agg.fields],
+      by = df[c(facet.field, "LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
+      function(x) analyticChooser(x, calculate)
+    )))  
+    if (!"MEAN" %in% calculate) df.agg <- reshape2::dcast(df.agg , LATITUDE_BOOYUCKASHA+LONGITUDE_BOOYUCKASHA  ~ get(facet.field) , value.var = "CNT", fun.aggregate = sum)
+  }
   
-  df.agg = as.data.frame(as.list(aggregate(
-    df[agg.fields],
-    by = df[c("LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
-    function(x) analyticChooser(x, calculate)
-  )))
-  
-  usedAnal <- intersect(c( "COUNT", "SUM", "MEAN"), calculate) # this returns the ones that were run
+  usedAnal <- intersect(c( "COUNT", "SUM"), calculate) # this returns the ones that were run
   nums <- match(calculate,usedAnal)   
   for (i in 1:length(nums)){
     thisSearch = nums[i]
@@ -73,7 +87,7 @@ aggregator = function(df = NULL,
     colnames(df.agg) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(df.agg))
   }
   
-  
+  df.agg[is.na(df.agg)] <- 0
   colnames(df.agg)[colnames(df.agg)=="LATITUDE_BOOYUCKASHA"] <- lat.field
   colnames(df.agg)[colnames(df.agg)=="LONGITUDE_BOOYUCKASHA"] <- lon.field
   return(df.agg)
