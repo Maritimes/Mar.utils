@@ -326,7 +326,7 @@ results <- list()
     if (create.centroid.csv) {
       this <- mkCentroidDf(grid2Min)
       results$centroidCsv <- this
-      write.csv(this, paste0(this.csv.name,".csv"))
+      utils::write.csv(this, paste0(this.csv.name,".csv"))
       message(paste0("\nCreated csv ", getwd(), .Platform$file.sep, this.csv.name,".csv\n"))
     }
     if (create.shps){

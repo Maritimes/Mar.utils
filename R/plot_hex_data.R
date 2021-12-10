@@ -49,7 +49,7 @@ plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmpt
   }else{
     fld <- NA
     while (is.na(fld)){
-      fld <- select.list(choices=flds_choice,multiple = F, graphics = T)
+      fld <- utils::select.list(choices=flds_choice,multiple = F, graphics = T)
     }
   }
   
@@ -65,7 +65,7 @@ plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmpt
   
   # determine desired map extent, using extent parameter
   if (class(extent) == "numeric"){
-    thisbbox <- as.list(setNames(extent , c("xmin", "xmax","ymin","ymax")))
+    thisbbox <- as.list(stats::setNames(extent , c("xmin", "xmax","ymin","ymax")))
   } else if (extent == "data"){ 
     # default is extent on non-zero data
     thisbbox <- thisData[!is.na(thisData[[fld]]),]

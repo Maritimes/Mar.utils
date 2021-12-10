@@ -65,13 +65,13 @@ aggregator = function(df = NULL,
   df[agg.fields][is.na(df[agg.fields])] <-0
   df[agg.fields] <- sapply(df[agg.fields], as.numeric)
   if(is.null(facet.field)){
-    df.agg = as.data.frame(as.list(aggregate(
+    df.agg = as.data.frame(as.list(stats::aggregate(
       df[agg.fields],
       by = df[c("LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
       function(x) analyticChooser(x, calculate)
     )))
   }else{
-    df.agg = as.data.frame(as.list(aggregate(
+    df.agg = as.data.frame(as.list(stats::aggregate(
       df[agg.fields],
       by = df[c(facet.field, "LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
       function(x) analyticChooser(x, calculate)
