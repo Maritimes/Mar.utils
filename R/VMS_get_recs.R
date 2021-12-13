@@ -73,7 +73,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
     #   return(NA)
     # }
     #whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
-    whereVRN = paste0("AND ",Mar.utils::big_in(vec=unique(vrnList), vec.field="VR_NUMBER"))
+    whereVRN = paste0("AND ",Mar.utils::big_in(vec=unique(vrnList), vec.field="VR_NUMBER", isStrings = T))
   }else{
     whereVRN = ""
   }

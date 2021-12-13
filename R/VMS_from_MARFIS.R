@@ -81,7 +81,7 @@ VMS_from_MARFIS <- function(df=NULL,
   dateRange <- as.Date(c(min(df$pseudo_start), max(df$LANDED_DATE)))
   vrns<- sort(unique(df$VR_NUMBER))
   message("Starting VMS extraction - this can take a long time - grab a coffee")
-  if (is.na(bbox)){
+  if (all(is.na(bbox))){
     theVMS <- VMS_get_recs(fn.oracle.username = fn.oracle.username, 
                            fn.oracle.password = fn.oracle.password, 
                            fn.oracle.dsn = fn.oracle.dsn,
@@ -111,6 +111,8 @@ VMS_from_MARFIS <- function(df=NULL,
   
   # theVMS <- readRDS("theVMS.RDS")
   df<-unique(df[df$VR_NUMBER %in% theVMS$VR_NUMBER,])
+  #maybe output the vessels for which no VMS was found (and were dropped)
+  
   #filtered landings, now filter VMS to ensure we have VMS data to join
   theVMS <- theVMS[theVMS$VR_NUMBER %in% df$VR_NUMBER,]
   
@@ -124,9 +126,10 @@ VMS_from_MARFIS <- function(df=NULL,
   combined <- combined[!is.na(combined$LICENCE_ID), !duplicated(colnames(combined))]
   
   if (!is.null(data.dir)){
+    e = new.env()
     get_data_tables(usepkg = usepkg, fn.oracle.username = fn.oracle.username, fn.oracle.password = fn.oracle.password, fn.oracle.dsn = fn.oracle.dsn, 
-                    schema = "MARFISSCI", data.dir = data.dir, tables = "MARFLEETS_LIC")
-    theseLics <- MARFLEETS_LIC[MARFLEETS_LIC$LICENCE_ID %in% combined$LICENCE_ID, c("LICENCE_ID", "GEAR_CODE","GEAR", "SPECIES")]
+                    schema = "MARFISSCI", data.dir = data.dir, tables = "MARFLEETS_LIC", env = e)
+    theseLics <- e$MARFLEETS_LIC[e$MARFLEETS_LIC$LICENCE_ID %in% combined$LICENCE_ID, c("LICENCE_ID", "GEAR_CODE","GEAR", "SPECIES")]
     combined <- merge(combined, theseLics, by=c("LICENCE_ID", "GEAR_CODE"), all.x=T)
   }else{
     message("If a data.dir provided, GEAR and Licenced species informaton will be added to the output.")
