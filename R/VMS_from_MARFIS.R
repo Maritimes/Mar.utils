@@ -34,6 +34,7 @@
 #' @param make_segments_shp the default is \code{FALSE}. This indicates whether or not a shapefile
 #' should be created of all of the VMS data as lines (in addition to a data frame). 
 #' \code{make_segments} must be TRUE for shapefiles to be generated. 
+#' @import data.table
 #' @return a list containing a data.frame called "marf_VMS" of the joined marfis/VMS data, and, 
 #' if \code{make_segments} is TRUE, an sp object called "marf_VMS_segments". Additionally, if 
 #' make_segments and make_segments_shp are bothe TRUE, a shapefile will be created in the working 
@@ -74,7 +75,7 @@ VMS_from_MARFIS <- function(df=NULL,
   }
  
   df <- data.table::setDT(df) 
-  df <- setorder(df, VR_NUMBER, LANDED_DATE) 
+  df <- data.table::setorder(df, VR_NUMBER, LANDED_DATE) 
   df <-df[, pseudo_start := shift(LANDED_DATE, type= "lag"), by= VR_NUMBER ]
   df <- data.table::setDF(df) 
   df[is.na(df$pseudo_start),"pseudo_start"] <- df[is.na(df$pseudo_start),"LANDED_DATE"] - as.difftime(look_ahead_days, units="days")
@@ -111,6 +112,10 @@ VMS_from_MARFIS <- function(df=NULL,
   
   # theVMS <- readRDS("theVMS.RDS")
   df<-unique(df[df$VR_NUMBER %in% theVMS$VR_NUMBER,])
+  
+  #change dates to posixct so they can be compared to vms
+  df$LANDED_DATE <- as.POSIXct(df$LANDED_DATE)
+  df$pseudo_start <- as.POSIXct(df$pseudo_start)
   #maybe output the vessels for which no VMS was found (and were dropped)
   
   #filtered landings, now filter VMS to ensure we have VMS data to join
@@ -129,12 +134,12 @@ VMS_from_MARFIS <- function(df=NULL,
     e = new.env()
     get_data_tables(usepkg = usepkg, fn.oracle.username = fn.oracle.username, fn.oracle.password = fn.oracle.password, fn.oracle.dsn = fn.oracle.dsn, 
                     schema = "MARFISSCI", data.dir = data.dir, tables = "MARFLEETS_LIC", env = e)
-    theseLics <- e$MARFLEETS_LIC[e$MARFLEETS_LIC$LICENCE_ID %in% combined$LICENCE_ID, c("LICENCE_ID", "GEAR_CODE","GEAR", "SPECIES")]
+    theseLics <- unique(e$MARFLEETS_LIC[e$MARFLEETS_LIC$LICENCE_ID %in% combined$LICENCE_ID, c("LICENCE_ID", "GEAR_CODE","GEAR", "SPECIES")])
     combined <- merge(combined, theseLics, by=c("LICENCE_ID", "GEAR_CODE"), all.x=T)
   }else{
     message("If a data.dir provided, GEAR and Licenced species informaton will be added to the output.")
   }
-  combined <- setorder(combined, VR_NUMBER, LICENCE_ID, GEAR_CODE, POSITION_UTC_DATE)  #LICENCE_ID, GEAR_CODE, 
+  combined <- data.table::setorder(combined, VR_NUMBER, LICENCE_ID, GEAR_CODE, POSITION_UTC_DATE)  #LICENCE_ID, GEAR_CODE, 
   res<-list()
   res$marf_VMS <- combined
   combined$m.pseudo_start <- NULL
