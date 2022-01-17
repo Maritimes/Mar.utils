@@ -82,7 +82,7 @@ that identifies the area(s).}
 \item{simpleQC}{default is \code{TRUE}. If True, this drops records where the 
 latitude is 0, 90 or -90 or the longitude is 0, 180 or -180.}
 
-\item{rowNum}{default is \code{50000}.  This is the maximimum number of VMS 
+\item{rowNum}{default is \code{50000}.  This is the maximum number of VMS 
 records that can be extracted. It is in place to prevent crashing your 
 application.}
 

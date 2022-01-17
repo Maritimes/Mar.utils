@@ -106,7 +106,7 @@ VMS_from_MARFIS <- function(df=NULL,
                            quietly = T)
   }
   if (nrow(theVMS)==1000000)warning("Hit extraction row limit")
-  theVMS <- VMS_clean_recs(df=theVMS)
+  theVMS <- Mar.utils::VMS_clean_recs(df=theVMS)
   theVMS$VR_NUMBER <- as.numeric(theVMS$VR_NUMBER)
   theVMS$elapsedDist_m <- theVMS$elapsedTime_min  <- NULL
   

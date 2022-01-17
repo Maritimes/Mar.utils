@@ -46,7 +46,7 @@ get_data_tables<-function(schema=NULL,
                           fuzzyMatch = TRUE,
                           quietly=TRUE){
   
-  
+  browser()
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly){

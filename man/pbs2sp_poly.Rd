@@ -32,6 +32,7 @@ Other general_use:
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{prepare_shape_fields}()},
+\code{\link{subset_by_time}()},
 \code{\link{updateCheck}()}
 }
 \author{

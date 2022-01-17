@@ -30,6 +30,7 @@ Other general_use:
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
+\code{\link{subset_by_time}()},
 \code{\link{updateCheck}()}
 }
 \author{

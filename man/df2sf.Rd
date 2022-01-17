@@ -67,6 +67,7 @@ Other general_use:
 \code{\link{drop_cols}()},
 \code{\link{pbs2sp_poly}()},
 \code{\link{prepare_shape_fields}()},
+\code{\link{subset_by_time}()},
 \code{\link{updateCheck}()}
 }
 \author{

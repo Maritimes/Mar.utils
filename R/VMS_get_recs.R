@@ -44,7 +44,7 @@
 #' that the only positions returned match particular vessel(s).
 #' @param simpleQC default is \code{TRUE}. If True, this drops records where the 
 #' latitude is 0, 90 or -90 or the longitude is 0, 180 or -180. 
-#' @param rowNum default is \code{50000}.  This is the maximimum number of VMS 
+#' @param rowNum default is \code{50000}.  This is the maximum number of VMS 
 #' records that can be extracted. It is in place to prevent crashing your 
 #' application.
 #' @param quietly default is \code{FALSE}.  This indicates whether or not
@@ -68,11 +68,6 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
   whereDateEnd = paste0("AND POSITION_UTC_DATE <= to_date('",dateEnd,"','YYYY-MM-DD')") 
   
   if (!is.null(vrnList)) {
-    # if (length(vrnList)>1000){
-    #   cat("\nToo many vessels to extract VMS data (max of 1000)")
-    #   return(NA)
-    # }
-    #whereVRN = paste0("AND VR_NUMBER IN (",SQL_in(vrnList, apos = TRUE),")") 
     whereVRN = paste0("AND ",Mar.utils::big_in(vec=unique(vrnList), vec.field="VR_NUMBER", isStrings = T))
   }else{
     whereVRN = ""

@@ -11,7 +11,9 @@ VMS_clean_recs(
   objField = "VR_NUMBER",
   timeField = "POSITION_UTC_DATE",
   minDist_m = 50,
-  maxBreak_mins = 1440
+  maxBreak_mins = 1440,
+  minKnots = NULL,
+  maxKnots = NULL
 )
 }
 \arguments{
@@ -38,6 +40,12 @@ should be greater than zero to avoid records for vessels sitting in port.}
 
 \item{maxBreak_mins}{the default is \code{1440}.  This is the maximum time (in mins)
 that is allowed between positions before a new "trek" is created.}
+
+\item{minKnots}{default is \code{NULL}.  This is the minimum vessel speed that should be include 
+in the output}
+
+\item{maxKnots}{default is \code{NULL}.  This is the maximum vessel speed that should be include 
+in the output}
 }
 \value{
 a dataframe with an additional "trek" column identifying a number of
