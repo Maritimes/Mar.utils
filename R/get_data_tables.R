@@ -137,7 +137,6 @@ get_data_tables<-function(schema=NULL,
       if (!quietly) cat(paste0("\n","Verifying access to ",missingtables[i]," ..."))
       qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
       
-      
       m = tryCatch(
         {
           oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
@@ -146,24 +145,27 @@ get_data_tables<-function(schema=NULL,
           return(-1)
         }
       )
-      
-      if (m==-1){
+      if (is.numeric(m) && m==-1){
         cat("\nCan't find or access the specified table")
-        break
+        cat(qry)
+        next
+      }else if (is.data.frame(m) && nrow(m) == 0){
+        cat("\nTable exists but contains no data")
+        next
       }
-      cat(paste0("\n","Extracting ",missingtables[i],"..."))
-      table_naked = gsub(paste0(schema,"."),"",missingtables[i])
-      if (is.null(rownum)){
-        where_N = ""
-      }else{
-        where_N = paste0(" WHERE rownum <= ", rownum)
-      }
-      qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
-      result= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
-      assign(table_naked, result)
-      save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
-      if (!quietly) cat(paste("\n","Got", missingtables[i]))
       if(!checkOnly) {
+        cat(paste0("\n","Extracting ",missingtables[i],"..."))
+        table_naked = gsub(paste0(schema,"."),"",missingtables[i])
+        if (is.null(rownum)){
+          where_N = ""
+        }else{
+          where_N = paste0(" WHERE rownum <= ", rownum)
+        }
+        qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
+        result= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
+        assign(table_naked, result)
+        save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
+        if (!quietly) cat(paste("\n","Got", missingtables[i]))
         assign(x = missingtables[i],value = get(table_naked), envir = env)
         if (!quietly) cat(paste0("\n","Loaded ",missingtables[i]))
       }

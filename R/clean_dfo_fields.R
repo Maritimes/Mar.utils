@@ -12,7 +12,7 @@
 #' @export
 clean_dfo_fields<- function(df = NULL, customCrap = NULL){
   knownCrap = c('CUSER','CDATE','UUSER','UDATE','LAST_UPDATE','LAST_UPDATE_BY',
-                'LAST_UPDATE_DATE','CREATED_BY','CREATED_DATE','OWNER_GROUP')
+                'LAST_UPDATE_DATE','CREATED_BY','CREATED_DATE','OWNER_GROUP','MON_DOC_CUSER')
   df = df[,!names(df) %in% knownCrap]
   df = df[,!names(df) %in% customCrap]
   return(df)
