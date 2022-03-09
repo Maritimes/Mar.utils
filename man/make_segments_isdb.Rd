@@ -8,7 +8,9 @@ make_segments_isdb(
   isdb.df,
   do.qc = FALSE,
   return.choice = "lines",
-  createShp = TRUE
+  filename = NULL,
+  createShp = TRUE,
+  quietly = FALSE
 )
 }
 \arguments{
@@ -34,8 +36,13 @@ The QC data checks the positions of each FISHSET for NAs, Zeroes, or
 otherwise data.  Additionally, if the line has a length of zero, that is 
 noted as well.}
 
+\item{filename}{default is \code{NULL}.  If you are outputting shapefiles, 
+you can specify a name for them here.  They will also get a timestamp.}
+
 \item{createShp}{default is \code{TRUE}. This determines whether or not 
 shapefiles will be generated in your working directory.}
+
+\item{quietly}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
 }
 \description{
 This function takes a df of the isdb data (including fields

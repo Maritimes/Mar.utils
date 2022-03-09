@@ -9,7 +9,6 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 prepare_shape_fields <- function(shape){
-  
   updateCnt<-function(df){
     df$CNT<- nchar(df$NEW)
     return(df)
@@ -73,7 +72,7 @@ prepare_shape_fields <- function(shape){
   
   if (max(range(allNames$CNT))>10){
     # allNames[allNames$CNT>10,"NEW"]<-substr(allNames[allNames$CNT>10,"NEW"], 1, 10) 
-    cat("\n!!Despite efforts to shorten them, rgdal will impose some aggressive measures to reduce the field names to the 10 chars allowed by ArcGIS","\n")
+    message("\n!!Despite efforts to shorten them, rgdal will impose some aggressive measures to reduce the field names to the 10 chars allowed by ArcGIS","\n")
     #cat(allNames$NEW)
     #allNames <-updateCnt(allNames)
   }

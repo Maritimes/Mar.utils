@@ -36,22 +36,34 @@
 ##' The QC data checks the positions of each FISHSET for NAs, Zeroes, or 
 ##' otherwise data.  Additionally, if the line has a length of zero, that is 
 ##' noted as well.
+#' @param filename default is \code{NULL}.  If you are outputting shapefiles, 
+#' you can specify a name for them here.  They will also get a timestamp. 
 #' @param createShp default is \code{TRUE}. This determines whether or not 
 #' shapefiles will be generated in your working directory.
+#' @param quietly default is \code{FALSE}.  If TRUE, no output messages will be shown.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", createShp=TRUE){
- 
+make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", filename = NULL, createShp=TRUE, quietly = FALSE){
+  name=""
+  ts = format(Sys.time(), "%Y%m%d_%H%M")
+  if (is.null(filename)) {
+    name = ts
+  }else{
+    name = filename
+    name = gsub('()','',name)
+    name = gsub('\\.','',name)
+    name = paste(name,"_",ts,sep="" )
+  }
   # Pull out coordinates, stack em, create and populate QC status field ----
   crs.geo <- sp::CRS(SRS_string="EPSG:4326") 
   dup=length(isdb.df[duplicated(isdb.df), "FISHSET_ID"])
   
   if (dup>0){
     isdb.df <- isdb.df[!duplicated(isdb.df), ]
-    cat(paste("\n",dup," duplicate rows were removed from your data"))
+    if (!quietly) message(paste("\n",dup," duplicate rows were removed from your data"))
   }
   rownames(isdb.df) <- isdb.df$FISHSET_ID
-
+  
   p1=cbind(isdb.df[c("FISHSET_ID","LAT1","LONG1", "DATE_TIME1")],"1")
   colnames(p1)<-c("FISHSET_ID", "LAT", "LONG", "DATETIME","P")
   p2=cbind(isdb.df[c("FISHSET_ID","LAT2","LONG2", "DATE_TIME2")],"2")
@@ -66,7 +78,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", 
   rm(p3)
   rm(p4)
   isdbPos <- isdbPos[order(isdbPos$FISHSET_ID, isdbPos$P),]
-
+  
   if (do.qc) {
     isdbPos$QC <- ""
     isdbPos$QCTIME <- ""
@@ -77,31 +89,31 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", 
     isdbPos[which(lubridate::year(isdbPos$DATETIME) == 9999),"DATETIME"]<-NA
     #earliest date is 1977
     validYear<-c(1977:lubridate::year(Sys.Date()))
-
+    
     if (length(unique(isdbPos[!(lubridate::year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"FISHSET_ID"]))>0){
       isdbPos[!(lubridate::year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"QCTIME"]<- 'Invalid year'
       fishsetsBadTime = c(fishsetsBadTime, unique(isdbPos[!(lubridate::year(isdbPos$DATETIME) %in% validYear) & !is.na(isdbPos$DATETIME),"FISHSET_ID"]))
     }
     #more date analysis after bad pos recs have been dropped 
   }
-
+  
   #Just drop NAs - they're really common, and evident from nVertices
   posNA = length(isdbPos[is.na(isdbPos$LAT) | is.na(isdbPos$LONG),])
   if (posNA>0) isdbPos[is.na(isdbPos$LAT) | is.na(isdbPos$LONG),"LONG"] <- NA
-
+  
   #Following are flagged conditions - capture for QC
   posBad = length(isdbPos[which(isdbPos$LONG<=-180 | isdbPos$LONG>=180 | 
-                             isdbPos$LAT > 90 | isdbPos$LAT < -90 |
-                             isdbPos$LONG>0 & isdbPos$LONG < 180 |
-                             isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])
+                                  isdbPos$LAT > 90 | isdbPos$LAT < -90 |
+                                  isdbPos$LONG>0 & isdbPos$LONG < 180 |
+                                  isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])
   if (posBad>0){
     if (do.qc) {
       if (length(isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>= 180 | 
-                            isdbPos$LAT>90 | isdbPos$LAT< -90),"LONG"])>0){
+                               isdbPos$LAT>90 | isdbPos$LAT< -90),"LONG"])>0){
         isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>=180 | 
-                       isdbPos$LAT>90 | isdbPos$LAT< -90),"QC"] <- 'pos:impossible'
+                        isdbPos$LAT>90 | isdbPos$LAT< -90),"QC"] <- 'pos:impossible'
         fishsetsBadPt = c(fishsetsBadPt, unique(isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>=180 | 
-                                                               isdbPos$LAT>90 | isdbPos$LAT< -90),"FISHSET_ID"]))
+                                                                isdbPos$LAT>90 | isdbPos$LAT< -90),"FISHSET_ID"]))
       }
       #coordinates of 0 are almost certainly wrong (for ISDB) - these will be dropped
       if (length(isdbPos[which(isdbPos$LAT == 0 | isdbPos$LONG==0),"LONG"])>0){
@@ -112,43 +124,43 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", 
       posHem = length(isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"LONG"] )
       if (posHem>0){
         isdbPos[which(isdbPos$LONG>0 & isdbPos$LONG < 180),"QC"] <- 'pos:HEMISPHERE'
-        cat(paste0("\n",posHem," coords seem to be in the wrong hemisphere, but will be plotted as-is"))
+        if (!quietly) message(paste0("\n",posHem," coords seem to be in the wrong hemisphere, but will be plotted as-is"))
       }
     }
     #Flag posBad for drop (except wrong hemisphere)
     isdbPos[which(isdbPos$LONG<= -180 | isdbPos$LONG>=180 | 
-                 isdbPos$LAT>90 | isdbPos$LAT< -90 |
-                 isdbPos$LAT == 0 | isdbPos$LONG==0) ,"LONG"] <- NA
+                    isdbPos$LAT>90 | isdbPos$LAT< -90 |
+                    isdbPos$LAT == 0 | isdbPos$LONG==0) ,"LONG"] <- NA
   }
-
+  
   # Do the removal (drop all records which contain an NA -----------------------
   isdbPos <- isdbPos[stats::complete.cases(isdbPos),] 
- 
+  
   if (do.qc){
     isdbTim <- isdbPos[,c("FISHSET_ID","DATETIME", "P","QCTIME")] 
     isdbTim.qc <- unique(isdbTim[,c("FISHSET_ID","QCTIME")])
     for (k in 1:length(isdbTim.qc[,"FISHSET_ID"])){
       this = isdbTim[isdbTim$FISHSET_ID==isdbTim.qc[k,"FISHSET_ID"],]
       this = this[order(this$P),]
-        for (j in 1:nrow(this)-1){
-          if (nrow(this)<2) next
-          d = as.numeric(difftime(this$DATETIME[nrow(this)], this$DATETIME[nrow(this)-1]), units = "hours")
-          if (d < 0) {
-            isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("Negative Time",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
-            fishsetsBadTime = c(fishsetsBadTime, isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"FISHSET_ID"])
-            } else if (d == 0) {
-              isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("No Time between pts",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
-              fishsetsBadTime = c(fishsetsBadTime, isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"FISHSET_ID"])
-            }else if (d > 48) {
-            isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("Time between pts > 48hr",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
-          }else if (d < 0.008) {
-            isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("Time between pts < 5min",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
-          }
-          this = this[-nrow(this),] 
+      for (j in 1:nrow(this)-1){
+        if (nrow(this)<2) next
+        d = as.numeric(difftime(this$DATETIME[nrow(this)], this$DATETIME[nrow(this)-1]), units = "hours")
+        if (d < 0) {
+          isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("Negative Time",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
+          fishsetsBadTime = c(fishsetsBadTime, isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"FISHSET_ID"])
+        } else if (d == 0) {
+          isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("No Time between pts",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
+          fishsetsBadTime = c(fishsetsBadTime, isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"FISHSET_ID"])
+        }else if (d > 48) {
+          isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("Time between pts > 48hr",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
+        }else if (d < 0.008) {
+          isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]<-paste(c("Time between pts < 5min",isdbTim.qc[isdbTim.qc$FISHSET_ID==this$FISHSET_ID[1],"QCTIME"]), collapse = ", ")
         }
+        this = this[-nrow(this),] 
+      }
     }
   }
- 
+  
   all.sets.lines<-list()
   
   if (do.qc){
@@ -194,12 +206,12 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", 
     }
   }
   if(length(all.sets.lines)>0){
-  #drop any lines that have zero length
-  all.sets.lines = all.sets.lines[!sapply(all.sets.lines, is.null)]
-  all.sets.lines = sp::SpatialLines(all.sets.lines)
-  sp::proj4string(all.sets.lines) <- crs.geo
+    #drop any lines that have zero length
+    all.sets.lines = all.sets.lines[!sapply(all.sets.lines, is.null)]
+    all.sets.lines = sp::SpatialLines(all.sets.lines)
+    sp::proj4string(all.sets.lines) <- crs.geo
   }
-  cat(paste0("\n",length(all.sets.lines), " of ", nrow(isdb.df), " sets could be made into lines having at least 2 points."))
+  if (!quietly) message(paste0("\n",length(all.sets.lines), " of ", nrow(isdb.df), " sets could be made into lines having at least 2 points."))
   
   if (do.qc){
     #Sort the qc field prior to merging into line df
@@ -213,48 +225,50 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", 
     #clean up fields
     isdb.qc$QCTIME<-sub(",$","",trimws(isdb.qc$QCTIME))
     isdb.qc$QCPOS<-sub(",$","",trimws(isdb.qc$QCPOS))
-
+    isdb.qc <- unique(isdb.qc)
     if(length(all.sets.lines)>0){
-    all.sets.lines<-sp::SpatialLinesDataFrame(all.sets.lines, isdb.qc, match.ID = "FISHSET_ID")
-    fishsetsBadPt = setdiff(fishsetsBadPt, all.sets.lines@data$FISHSET_ID)
+      # if (grepl(pattern = "60", x = nm))browser()
+      if(length(unique(isdb.qc$FISHSET_ID)) != length(isdb.qc$FISHSET_ID))browser()
+      all.sets.lines<-sp::SpatialLinesDataFrame(all.sets.lines, isdb.qc, match.ID = "FISHSET_ID")
+      fishsetsBadPt = setdiff(fishsetsBadPt, all.sets.lines@data$FISHSET_ID)
     }
     if (any(!is.na(fishsetsBadPt))){
       fishsetsBadPt <- fishsetsBadPt[!is.na(fishsetsBadPt)]
-      cat(paste0("\n","The following ",length(fishsetsBadPt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:"))
+      if (!quietly) message(paste0("\n","The following ",length(fishsetsBadPt)," sets are unplottable, due to either insufficient valid coordinate pairs or zero-length lines:"))
       for (j in 1:length(fishsetsBadPt)){
-        cat(paste0("\n\t ",fishsetsBadPt[j],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadPt[j]),"QCPOS"]))
+        if (!quietly) message(paste0("\n\t ",fishsetsBadPt[j],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadPt[j]),"QCPOS"]))
       }
     }
     if  (any(!is.na(fishsetsBadTime))){
       fishsetsBadTime <- fishsetsBadTime[!is.na(fishsetsBadTime)]
-      cat(paste0("\n","The following ",length(fishsetsBadTime)," sets reported invalid dates/times, due to identical values across positions, or time-order mismatch:"))
+      if (!quietly) message(paste0("\n","The following ",length(fishsetsBadTime)," sets reported invalid dates/times, due to identical values across positions, or time-order mismatch:"))
       for (l in 1:length(fishsetsBadTime)){
-        cat(paste0("\n\t ",fishsetsBadTime[l],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadTime[l]),"QCTIME"]))
+        if (!quietly) message(paste0("\n\t ",fishsetsBadTime[l],": ",isdb.qc[which(isdb.qc$FISHSET_ID == fishsetsBadTime[l]),"QCTIME"]))
       }
     }
   }else{
-    cat("\n","For more info on the lines that failed or other issues, run this with function with 'do.qc=TRUE'")
+    if (!quietly) message("\n","For more info on the lines that failed or other issues, run this with function with 'do.qc=TRUE'")
     if(length(all.sets.lines)>0){
       all.sets.lines<-sp::SpatialLinesDataFrame(all.sets.lines, isdb.df[1], match.ID = "FISHSET_ID")
     }
   }
   #add original attribs to line
+
   if(length(all.sets.lines)>0){
     all.sets.lines@data= merge(all.sets.lines@data, isdb.df)
+    
+    if (createShp) {
+      all.sets.lines = prepare_shape_fields( all.sets.lines)
+      rgdal::writeOGR(obj =  all.sets.lines, layer =paste0(name,"_isdb_lines"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
+      if (!quietly) message(paste0("\nA shapefile ('isdb_lines') was written to  ",paste0(getwd(),"/",nm,".shp")))
+    }
   }
-  
-  if (createShp) {
-    all.sets.lines = Mar.utils::prepare_shape_fields( all.sets.lines)
-    rgdal::writeOGR(obj =  all.sets.lines, layer =paste0("isdb_lines"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
-    cat(paste0("\nA shapefile ('isdb_lines') was written to  ",getwd(),": "))
-  }
-  
-  
   if (return.choice != "lines" & do.qc){
+
     return(isdb.qc)
   }else{
     if(length(all.sets.lines)>0){
-    return(all.sets.lines)
+      return(all.sets.lines)
     }else{
       return(NULL)
     }

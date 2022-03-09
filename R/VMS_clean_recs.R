@@ -20,6 +20,10 @@
 #' that is allowed between positions before a new "trek" is created. 
 #' @return a dataframe with an additional "trek" column identifying a number of
 #' discrete paths for each unique value of \code{objField}.
+#' @param minKnots  default is \code{NULL}.  This is the minimum vessel speed that should be include 
+#' in the output
+#' @param maxKnots default is \code{NULL}.  This is the maximum vessel speed that should be include 
+#' in the output
 #' @import data.table
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
@@ -36,87 +40,105 @@
 #' (i.e. 1440 minutes) will be used.
 VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE",
-                          minDist_m = 50, maxBreak_mins = 1440){
+                          minDist_m = 50, maxBreak_mins = 1440,
+                          minKnots = NULL, maxKnots = NULL){
+  
+  LATITUDE__ <- LONGITUDE__ <- objField__ <- timeField__ <- NA
+  
+  colnames(df)[colnames(df)==lat.field] <- "LATITUDE__"
+  colnames(df)[colnames(df)==lon.field] <- "LONGITUDE__"
+  colnames(df)[colnames(df)==objField] <- "objField__"
+  colnames(df)[colnames(df)==timeField] <- "timeField__"
+  e <- new.env()
+  e$loopagain <- TRUE
+  
+  addDistTime <- function(df=NULL){
+    dfn_0 <- nrow(df)
+    df = data.table::setDT(df)
+    df[,distCalc:=round(geosphere::distGeo(cbind(LONGITUDE__, LATITUDE__))),by=objField__]
+    df[,time_min:=as.numeric(difftime(timeField__, data.table::shift(timeField__, fill = timeField__[1L]), units = "min")),by=objField__]
+    df <- data.table::setDF(df)
+    #distCalc above associates distance with the record *before* the movement 
+    #occurred.  The following bumps all of the distance calculations down to the 
+    #next record.
+    df['distCalc'] <- c(-1, utils::head(df['distCalc'], dim(df)[1] - 1)[[1]])
+    df[is.na(df$distCalc),"distCalc"] <- -1
+    
+    df$KEEP<-FALSE
+    df[df$distCalc >= minDist_m ,"KEEP"] <- TRUE
+    df[df$time_min <= maxBreak_mins,"KEEP"] <- TRUE
+    df[df$distCalc == -1 & df$time_min ==0, "KEEP"] <- TRUE
+    df <- df[which(df$KEEP==TRUE),]
+    df$KEEP<-NULL
+    dfn_1 <- nrow(df)
+    if (dfn_0 ==dfn_1){
+      e$loopagain = FALSE
+    }
+    return(df)
+  }
+  
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
   `:=` <- function (x, value) value
   distCalc <- time_min <- elapsedDist_m <- elapsedTime_min <- .SD <- UPDATE_DATE <- NULL
-  vmsdf=df
-  n1 = nrow(vmsdf)
+  n1 = nrow(df)
   # cat("initial no:",n1,"\n")
   #round values to remove near-duplicates:
   #1) dd coords to 4 decimals (~10m resolution);
   #2) time to nearest 5 minutes
-  vmsdf[,lat.field]<-round( vmsdf[,lat.field],4)
-  vmsdf[,lon.field]<-round( vmsdf[,lon.field],4)
-  vmsdf[,timeField] <- as.POSIXct(round(as.numeric(vmsdf[,timeField])/(300))*(300),origin='1970-01-01')
+  df$LATITUDE__<-round( df$LATITUDE__,4)
+  df$LONGITUDE__<-round( df$LONGITUDE__,4)
+  df$timeField__ <- as.POSIXct(round(as.numeric(df$timeField__)/(300))*(300),origin='1970-01-01')
   #remove the recs that our rounding has turned into duplicates
-  vmsdf= unique(vmsdf)
-  if ("UPDATE_DATE" %in% names(vmsdf)){
+  df= unique(df)
+  if ("UPDATE_DATE" %in% names(df)){
     #For cases where a vessel has multiple positions at a single time, I use 
     #UPDATE_DATE to get only the most recently updated position
-    vmsdf = dplyr::arrange(vmsdf, vmsdf[objField], vmsdf[timeField], UPDATE_DATE)
-    # vmsdf = vmsdf[order(xtfrm(vmsdf[objField]),xtfrm(vmsdf[timeField]),vmsdf$UPDATE_DATE),] 
-    vmsdf = data.table::setDT(vmsdf)
-    vmsdf = vmsdf[,utils::tail(.SD,1),by=list("newObjField" = get(objField),"newTimeField" = get(timeField))]
-    vmsdf = as.data.frame(vmsdf)
-    vmsdf[objField]<-NULL
-    vmsdf[timeField]<-NULL
-    colnames(vmsdf)[colnames(vmsdf)=="newObjField"] <- objField
-    colnames(vmsdf)[colnames(vmsdf)=="newTimeField"] <- timeField
+    # df = dplyr::arrange(df, df[objField], df[timeField], UPDATE_DATE)
+    df = data.table::setorder(df, objField__, timeField__, UPDATE_DATE)
+    
+    # df = df[order(xtfrm(df[objField]),xtfrm(df[timeField]),df$UPDATE_DATE),] 
+    df = data.table::setDT(df)
+    
+    df = df[,utils::tail(.SD,1),by=list("objField__" = objField__,"timeField__" = timeField__)]
   }
-  vmsdf = data.table::setDT(vmsdf)
-  vmsdf[,distCalc:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
-  vmsdf[,time_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
-  vmsdf <- as.data.frame(vmsdf)
-  vmsdf$time_min<-as.numeric(vmsdf$time_min)
-  # pingRate = median(vmsdf$time_min) 
-  # if (is.null(maxBreak_mins))  maxBreak_mins = 10*pingRate
+
+  while (e$loopagain == TRUE) {
+    df<- addDistTime(df)
+  }
   
-  #distCalc above associates distance with the record *before* the movement 
-  #occurred.  The following bumps all of the distance calculations down to the 
-  #next record.
-  vmsdf['distCalc'] <- c(-1, utils::head(vmsdf['distCalc'], dim(vmsdf)[1] - 1)[[1]])
-  #if the position has not changed since the last one, then it's probably 
-  #non-informative.  However, if enough time has passed (i.e. 10*pingRate), maybe
-  #it's the start of a new trip? 
-  vmsdf$KEEP<-NA
-  vmsdf[which(vmsdf$distCalc >= minDist_m | vmsdf$distCalc ==-1 | vmsdf$time_min > maxBreak_mins), "KEEP"] <- TRUE
-  vmsdf <- vmsdf[which(vmsdf$KEEP==TRUE),]
-  # cat("post-redundants:",nrow(vmsdf),"\n")
-  vmsdf$KEEP<-NULL
-  vmsdf = data.table::setDT(vmsdf)
-  vmsdf[,elapsedDist_m:=round(geosphere::distGeo(cbind(get(lon.field), get(lat.field)))),by=get(objField)]
-  vmsdf[,elapsedTime_min:=difftime(get(timeField), data.table::shift(get(timeField), fill = get(timeField)[1L]), units = "min"),by=get(objField)]
-  vmsdf <- as.data.frame(vmsdf)
-  vmsdf$elapsedTime_min<-as.numeric(vmsdf$elapsedTime_min)
-  vmsdf['elapsedDist_m'] <- c(NA, utils::head(vmsdf['elapsedDist_m'], dim(vmsdf)[1] - 1)[[1]])
-  vmsdf$time_min<-NULL
-  vmsdf$distCalc <- NULL
+  #calculate the instantaneous speed for each position (i.e. the distance from the previous position
+  #in the amount of time it took)
+  df$KNOTS_CALC <- 0
+  df$KNOTS_CALC <- (df$distCalc/df$time_min)*0.0323974
+  if(!is.null(minKnots))df<-df[df$KNOTS_CALC>=minKnots,]
+  if(!is.null(maxKnots))df<-df[df$KNOTS_CALC<=maxKnots,]
   
   #try to find treks (i.e. groups of positions for a vessel that are not interrupted
   #for more than the maximum allowable break (e.g. 10* the ping rate) at any 
   #point).  For example, if a vessel with a ping rate of 60 stops for 10 hrs, a 
   #new trek is started. The first appearance of a vessel will start with a case 
   #of elapsedDist_m of NA.  
-  vmsdf$trek<-NA
-  vmsdf[is.na(vmsdf$elapsedDist_m) | vmsdf$elapsedTime_min > maxBreak_mins,"trek"] <- seq.int(nrow(vmsdf[is.na(vmsdf$elapsedDist_m) | vmsdf$elapsedTime_min > maxBreak_mins,]))
+  df$trek<-NA
+  df[is.na(df$elapsedDist_m) | df$elapsedTime_min > maxBreak_mins,"trek"] <- seq.int(nrow(df[is.na(df$elapsedDist_m) | df$elapsedTime_min > maxBreak_mins,]))
   #Carry over the identified changes in trek to subsequent points until new trek
   na.locf <- function(x) {
     v <- !is.na(x)
     c(NA, x[v])[cumsum(v)+1]
   }
-  vmsdf$trek <- na.locf(vmsdf$trek)
+  df$trek <- na.locf(df$trek)
   trekpts <- stats::aggregate(
-    x = list(cnt = vmsdf[,objField]),
-    by = list(grp = vmsdf$trek
+    x = list(cnt = df$objField__),
+    by = list(grp = df$trek
     ),
     length
   )
-  vmsdf <- vmsdf[vmsdf$trek %in% trekpts[trekpts$cnt>1,"grp"],]
-  # cat("post-single point trek removal:",nrow(vmsdf),"\n")
-  # cat("Final no:", nrow(vmsdf),"\n")
-  # cat( n1- nrow(vmsdf),"total records removed (", (nrow(vmsdf)/n1)*100,"%)\n" )
-  # cat("assumed ping rate of",pingRate,"min\n") 
-  return(vmsdf)
+  df <- df[df$trek %in% trekpts[trekpts$cnt>1,"grp"],]
+
+  colnames(df)[colnames(df)=="LATITUDE__"] <- lat.field
+  colnames(df)[colnames(df)=="LONGITUDE__"] <- lon.field
+  colnames(df)[colnames(df)=="objField__"] <- objField
+  colnames(df)[colnames(df)=="timeField__"] <- timeField
+  
+  return(df)
 }
