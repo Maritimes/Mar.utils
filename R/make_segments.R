@@ -54,7 +54,8 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     name = gsub('\\.','',name)
     name = paste(name,"_",ts,sep="" )
   }
-  df = df[order(df[objField],df[seqField]),]
+
+  df <- dplyr::arrange(df, objField, seqField)
   # #check for trips that only have one point
   
   check = plyr::count(df, objField)

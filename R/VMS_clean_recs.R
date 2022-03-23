@@ -42,7 +42,6 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE",
                           minDist_m = 50, maxBreak_mins = 1440,
                           minKnots = NULL, maxKnots = NULL){
-  
   LATITUDE__ <- LONGITUDE__ <- objField__ <- timeField__ <- NA
   
   colnames(df)[colnames(df)==lat.field] <- "LATITUDE__"
@@ -106,7 +105,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   while (e$loopagain == TRUE) {
     df<- addDistTime(df)
   }
-  
+
   #calculate the instantaneous speed for each position (i.e. the distance from the previous position
   #in the amount of time it took)
   df$KNOTS_CALC <- 0
@@ -118,9 +117,9 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   #for more than the maximum allowable break (e.g. 10* the ping rate) at any 
   #point).  For example, if a vessel with a ping rate of 60 stops for 10 hrs, a 
   #new trek is started. The first appearance of a vessel will start with a case 
-  #of elapsedDist_m of NA.  
+  #of distCalc of NA.  
   df$trek<-NA
-  df[is.na(df$elapsedDist_m) | df$elapsedTime_min > maxBreak_mins,"trek"] <- seq.int(nrow(df[is.na(df$elapsedDist_m) | df$elapsedTime_min > maxBreak_mins,]))
+  df[is.na(df$distCalc) | df$distCalc < 0 | df$time_min > maxBreak_mins,"trek"] <- seq.int(nrow(df[is.na(df$distCalc) | df$distCalc < 0 | df$time_min > maxBreak_mins,]))
   #Carry over the identified changes in trek to subsequent points until new trek
   na.locf <- function(x) {
     v <- !is.na(x)
