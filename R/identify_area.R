@@ -48,6 +48,7 @@ identify_area <- function(df = NULL,
     df <-df[!((df[,lat.field] > 90 | df[,lat.field] < -90) |(df[,lon.field] > 180 | df[,lon.field] < -180)), ]
   }
   #default to determining the NAFO_BEST column of the NAFO areas if no polygon and/or field is chosen
+
   if (is.null(agg.poly.shp)){
     if (flag.land){
       agg.poly= Mar.data::NAFOSubunitsLnd_sf
@@ -72,7 +73,9 @@ identify_area <- function(df = NULL,
     agg.poly <- sf::st_transform(agg.poly, 4326)
   }
   df_sf <- sf::st_as_sf(x = df,  coords = c(lon.field, lat.field), crs = "EPSG:4326")
+  sink <- utils::capture.output(sf::sf_use_s2(FALSE))
   res <- suppressMessages(sf::st_join(df_sf, agg.poly))
+  sink <- utils::capture.output(sf::sf_use_s2(TRUE))
   res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<outside known areas>"
   res[!is.na(res$tmp),agg.poly.field]<-sf::st_drop_geometry(res[!is.na(res$tmp),"tmp"])
   res$tmp <- res$geometry <- NULL
