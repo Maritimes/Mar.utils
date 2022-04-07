@@ -11,6 +11,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 clean_dfo_fields<- function(df = NULL, customCrap = NULL){
+  #Hi Sam!
   knownCrap = c('CUSER','CDATE','UUSER','UDATE','LAST_UPDATE','LAST_UPDATE_BY',
                 'LAST_UPDATE_DATE','CREATED_BY','CREATED_DATE','OWNER_GROUP','MON_DOC_CUSER')
   df = df[,!names(df) %in% knownCrap]
