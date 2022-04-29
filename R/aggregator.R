@@ -76,7 +76,7 @@ aggregator = function(df = NULL,
       by = df[c(facet.field, "LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
       function(x) analyticChooser(x, calculate)
     )))
-    #i mayu have broken the ability to agg by multiple fields below
+    #i may have broken the ability to agg by multiple fields below
     if (!"MEAN" %in% calculate) df.agg <- reshape2::dcast(df.agg , LATITUDE_BOOYUCKASHA+LONGITUDE_BOOYUCKASHA  ~ get(facet.field) , value.var = agg.fields, fun.aggregate = sum)
   }
   
