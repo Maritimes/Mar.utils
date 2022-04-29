@@ -75,8 +75,9 @@ aggregator = function(df = NULL,
       df[agg.fields],
       by = df[c(facet.field, "LATITUDE_BOOYUCKASHA", "LONGITUDE_BOOYUCKASHA")],
       function(x) analyticChooser(x, calculate)
-    )))  
-    if (!"MEAN" %in% calculate) df.agg <- reshape2::dcast(df.agg , LATITUDE_BOOYUCKASHA+LONGITUDE_BOOYUCKASHA  ~ get(facet.field) , value.var = "CNT", fun.aggregate = sum)
+    )))
+    #i mayu have broken the ability to agg by multiple fields below
+    if (!"MEAN" %in% calculate) df.agg <- reshape2::dcast(df.agg , LATITUDE_BOOYUCKASHA+LONGITUDE_BOOYUCKASHA  ~ get(facet.field) , value.var = agg.fields, fun.aggregate = sum)
   }
   
   usedAnal <- intersect(c( "COUNT", "SUM"), calculate) # this returns the ones that were run
