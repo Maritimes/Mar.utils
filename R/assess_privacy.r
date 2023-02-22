@@ -77,10 +77,15 @@
 #' @param agg.poly.field default is \code{NULL}.  This identifies the field within 
 #' the shapefile provided to agg.poly.shp that should be used to check for 
 #' sufficient unique values of the sens.fields.
+
 #' @param ignore.col.limit default is \code{FALSE} ESRI's ArcGIS doesn't like when 
 #' a shapefile has more than 255 columns.  By default, this function will halt with a warning 
 #' if it detects that it is producing too many columns.  To ignore the warning, and produce the 
 #' shapefile anyways, set it to TRUE.
+ 
+#' @param custom.grid  default is \code{NULL}.  If there is a need to use a custom grid to apply to 
+#' the data, 
+
 #' @import data.table
 
 #' @return a SpatialPolygonsDataFrame, and generates a shapefile
@@ -115,12 +120,19 @@ assess_privacy <- function(
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL, 
-  ignore.col.limit = FALSE
+  ignore.col.limit = FALSE, 
+  custom.grid = NULL
 ){
   #set up
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   `:=` <- function (x, value) value
   
+  if (!is.null(custom.grid)){
+    ogrPath = dirname(custom.grid)
+    ogrLayer = sub('\\.shp$', '', basename(custom.grid))
+    sp_this <- rgdal::readOGR(dsn = ogrPath, layer = ogrLayer, verbose = FALSE)
+    if (class(sp_this)!="SpatialPolygonsDataFrame")stop("custom.grid could not be loaded")
+  }
   analyticChooser <- function(x, calculate){
     #this function is called by the aggregate functions to allow use to select which analytics are calculated for all agg.fields
     res <- NA
@@ -270,7 +282,10 @@ assess_privacy <- function(
   allowed.areas = POLY.agg@data[!is.na(POLY.agg$CAN_SHOW) & POLY.agg$CAN_SHOW=='YES',agg.poly.field]
   allowed.areas.sp = agg.poly[agg.poly@data[[agg.poly.field]] %in% allowed.areas,]
   df$ORD_df = seq.int(nrow(df))
-  if (grid.shape =="hex"){
+  
+  if(!is.null(custom.grid)){
+    grid2Min<- sp_this
+  }else if (grid.shape =="hex"){
     grid2Min<-Mar.data::hex
   } else{
     grid2Min<-Mar.data::grid2Min

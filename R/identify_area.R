@@ -48,7 +48,6 @@ identify_area <- function(df = NULL,
     df <-df[!((df[,lat.field] > 90 | df[,lat.field] < -90) |(df[,lon.field] > 180 | df[,lon.field] < -180)), ]
   }
   #default to determining the NAFO_BEST column of the NAFO areas if no polygon and/or field is chosen
-
   if (is.null(agg.poly.shp)){
     if (flag.land){
       agg.poly= Mar.data::NAFOSubunitsLnd_sf
@@ -61,9 +60,9 @@ identify_area <- function(df = NULL,
     }
   }else if (is.character(agg.poly.shp)){
     agg.poly <- sf::st_read(dsn = agg.poly.shp)
-  }else if (class(agg.poly.shp)=="SpatialPolygons" || class(agg.poly.shp)=="SpatialPolygonsDataFrame"){
+  }else if ("SpatialPolygons" %in% class(agg.poly.shp) || "SpatialPolygonsDataFrame" %in% class(agg.poly.shp)){
     agg.poly = methods::as(agg.poly.shp, "sf")
-  }else if (any(class(agg.poly.shp)=="sf")){
+  }else if ("sf" %in% class(agg.poly.shp)){
     agg.poly = agg.poly.shp
   }
   if (is.na(sf::st_crs(agg.poly))) {
