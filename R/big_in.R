@@ -35,7 +35,7 @@
 #' @export
 big_in <- function(vec = NULL, vec.field = NULL, isStrings = FALSE){
   vec <- vec[!is.na(vec)]
-  if (any(is.null(vec) || is.na(vec) || length(vec)<1 || all(length(vec)==1 && vec==""))){
+  if (any(is.null(vec) || sum(is.na(vec))>0 || length(vec)<1 || all(length(vec)==1 && vec==""))){
     message("Your vec value doesn't have any values")
     return("1=1")
   }

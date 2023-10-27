@@ -30,7 +30,6 @@ identify_area <- function(df = NULL,
                           agg.poly.shp = NULL,
                           agg.poly.field = NULL,
                           flag.land = FALSE){  
-  
   #flag NA coords for future id
   df_Orig <- df
   df[,"tmp"]<-NA
@@ -56,7 +55,7 @@ identify_area <- function(df = NULL,
     }
     
     if (is.null(agg.poly.field)){
-      agg.poly.field = 'NAFO_BEST'
+      agg.poly.field = 'NAFO'
     }
   }else if (is.character(agg.poly.shp)){
     agg.poly <- sf::st_read(dsn = agg.poly.shp)

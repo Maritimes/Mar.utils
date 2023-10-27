@@ -113,6 +113,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
   }
 
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
+
   if (nrow(allRecs)<1){
     if (!quietly) cat(paste0("\n","No records returned"))
     return(NULL)
@@ -131,7 +132,9 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
     }
     #maybe this is where we detect old segmid that we need to append to?
     allVess<-unique(areaRecs$VR_NUMBER)
+
     for (i in 1:length(allVess)){
+
       cat("\n","working on",allVess[i])
       # if (i==1)browser()
       thisVessRecs = areaRecs[areaRecs$VR_NUMBER == allVess[i],]
