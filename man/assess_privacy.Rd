@@ -21,7 +21,8 @@ assess_privacy(
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL,
-  ignore.col.limit = FALSE
+  ignore.col.limit = FALSE,
+  custom.grid = NULL
 )
 }
 \arguments{
@@ -103,6 +104,9 @@ sufficient unique values of the sens.fields.}
 a shapefile has more than 255 columns.  By default, this function will halt with a warning 
 if it detects that it is producing too many columns.  To ignore the warning, and produce the 
 shapefile anyways, set it to TRUE.}
+
+\item{custom.grid}{default is \code{NULL}.  If there is a need to use a custom grid to apply to 
+the data,}
 }
 \value{
 a SpatialPolygonsDataFrame, and generates a shapefile

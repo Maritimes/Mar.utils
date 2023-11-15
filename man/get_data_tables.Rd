@@ -14,6 +14,7 @@ get_data_tables(
   fn.oracle.password = "_none_",
   fn.oracle.dsn = "_none_",
   checkOnly = FALSE,
+  force.extract = FALSE,
   env = .GlobalEnv,
   fuzzyMatch = TRUE,
   quietly = TRUE
@@ -51,6 +52,9 @@ identifier for accessing oracle objects.}
 
 \item{checkOnly}{default is \code{FALSE}  This flag allows the function to be 
 run such that it checks for the existence of the files, but doesn't load them.}
+
+\item{force.extract}{default is \code{FALSE}  This flag forces a re-extraction of all of the 
+tables (rather than loading previously extracted versions from data.dir)}
 
 \item{env}{This the the environment you want this function to work in.  The 
 default value is \code{.GlobalEnv}.}

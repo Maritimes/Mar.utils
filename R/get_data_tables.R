@@ -24,6 +24,8 @@
 #' identifier for accessing oracle objects. 
 #' @param checkOnly default is \code{FALSE}  This flag allows the function to be 
 #' run such that it checks for the existence of the files, but doesn't load them.
+#' @param force.extract default is \code{FALSE}  This flag forces a re-extraction of all of the 
+#' tables (rather than loading previously extracted versions from data.dir)
 #' @param env This the the environment you want this function to work in.  The 
 #' default value is \code{.GlobalEnv}.
 #' @param fuzzyMatch default is \code{TRUE}.  This allows source data tables to match with
@@ -42,6 +44,7 @@ get_data_tables<-function(schema=NULL,
                           fn.oracle.password="_none_",
                           fn.oracle.dsn="_none_",
                           checkOnly = FALSE,
+                          force.extract = FALSE,
                           env=.GlobalEnv,
                           fuzzyMatch = TRUE,
                           quietly=TRUE){
@@ -98,7 +101,6 @@ get_data_tables<-function(schema=NULL,
   }
   
   reqd = toupper(paste0(schema, ".", tables))
-  
   res <- NA
   for (r in 1:length(reqd)){
     loadsuccess = tryCatch(
@@ -115,7 +117,7 @@ get_data_tables<-function(schema=NULL,
     res <- c(res, loadsuccess)
   }
   res<- res[!is.na(res)]
-  if (all(res %in% 1)){
+  if (all(res %in% 1) & !force.extract){
     t = timer.start - proc.time()
     if (!quietly){
       t = round(t[3], 0) * -1
@@ -132,7 +134,11 @@ get_data_tables<-function(schema=NULL,
       cat("\nCan't get the data without a DB connection.  Aborting.\n")
       return(NULL)
     }
-    missingtables = tables[which(res==-1)]
+    if (force.extract){
+      missingtables = tables
+    }else{
+      missingtables = tables[which(res==-1)]
+    }
     for (i in 1:length(missingtables)){
       if (!quietly) cat(paste0("\n","Verifying access to ",missingtables[i]," ..."))
       qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
