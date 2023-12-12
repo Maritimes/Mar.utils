@@ -31,9 +31,12 @@ identify_area <- function(df = NULL,
                           agg.poly.field = NULL,
                           flag.land = FALSE){  
   #flag NA coords for future id
+  df$ID_ <-  seq.int(nrow(df))
   df_Orig <- df
   df[,"tmp"]<-NA
   handled <- df[F,]
+  badNames <- names(df)[!names(df) %in% c(lat.field, lon.field, "ID_", "tmp")]
+  
   if(nrow(df[is.na(df[,lat.field])|is.na(df[,lon.field]),])>0){
     coordMissing <- df[is.na(df[,lat.field])|is.na(df[,lon.field]),]
     coordMissing$tmp <- "<missing coord>"
@@ -75,10 +78,13 @@ identify_area <- function(df = NULL,
   res <- suppressMessages(sf::st_join(df_sf, agg.poly))
   sink <- utils::capture.output(sf::sf_use_s2(TRUE))
   res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<outside known areas>"
+  
   res[!is.na(res$tmp),agg.poly.field]<-sf::st_drop_geometry(res[!is.na(res$tmp),"tmp"])
   res$tmp <- res$geometry <- NULL
   res <- res[,c(names(res[names(res) %in% names(df_Orig)]),agg.poly.field)]
-  res <- merge(df_Orig, res)
+  res <- res[,!names(res) %in% badNames]
+  # if (agg.poly.field %in% c("NAME_E", "ZONE_E", "URL_E", "REGULATION")) 
+  res <- merge(df_Orig, res, by="ID_")
 
   bbox<-as.vector(sf::st_bbox(agg.poly))
   res[which(res[,lat.field]>bbox[4] |res[,lat.field] < bbox[2]| res[,lon.field]>bbox[3] |res[,lon.field] < bbox[1]) ,agg.poly.field] <- "<outside known areas>"
@@ -86,6 +92,6 @@ identify_area <- function(df = NULL,
     colnames(handled)[colnames(handled)=="tmp"] <- agg.poly.field
     res <- rbind.data.frame(res, handled)
   }
-  
+  res$ID_ <- NULL
   return(invisible(res))
 }

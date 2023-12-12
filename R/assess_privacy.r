@@ -10,14 +10,14 @@
 #' you want to aggregate your data into.  The options are "hex" or "square"
 
 #' @param lat.field the default is \code{"LATITUDE"}. This is the name of the 
-#' field holding latitude values (in decimal degrees)
+#' field in \code{df} holding latitude values (in decimal degrees)
 
 #' @param lon.field the default is \code{"LONGITUDE"}.  This is the name of the 
-#' field holding longitudevalues (in decimal degrees)
+#' field in \code{df} holding longitudevalues (in decimal degrees)
 
 #' @param calculate the default is \code{c("MEAN", "COUNT", "SUM")}. These are the 
 #' analytics which should be performed for every field identified in \code{agg.field}.
-#' For example, if KEPT_WT and DISCAD_WT are both identified in \code{agg.field},
+#' For example, if KEPT_WT and DISCARD_WT are both identified in \code{agg.field},
 #' then for every resultant aggregated polygon (e.g. hexagon), the mean, count 
 #' and sum of both of these fields is calculated for every polygon.
 
@@ -26,7 +26,7 @@
 #' for certain sensitive fields.  This parameter sets that threshold.
 
 #' @param agg.fields the default is \code{"KEPT_WT"}.  These are the fields in the data that contain 
-#' the values you want to aggregate (e.g. calulate the mean, sum or count of.  This field needs to be
+#' the values you want to aggregate (e.g. calculate the mean, sum or count of.  This field needs to be
 #' numeric.
 
 #' @param sens.fields the defaults are \code{NULL}  These are fields
@@ -54,19 +54,20 @@
 #' the calculated valued value for areas that cannot be shown will be wiped prior to generating the 
 #' output files. 
 #' 
-#' @param create.shps default is \code{TRUE}.  This indicates whether or not 
-#' shapefiles should be created for 1) the polygon file (with aggregated values 
+#' @param create.spatial default is \code{TRUE}.  This indicates whether or not to create a gpkg file
+#' containing spatial files for 1) the polygon file (with aggregated values 
 #' for each polygon and an indication of whether or not each polygon meets the 
 #' privacy constraints), and 2) the 2 min gridded data (only for within those 
-#' polygons that meet the privacy constraints).
+#' polygons that meet the privacy constraints).  
 
 #' @param create.centroid.csv default is \code{FALSE}.  This indicates whether or not a csv  should 
 #' be created for the 2 min gridded data (only for within those polygons that meet the privacy 
-#' constraints).  This is a more portable option than the shapefiles or SpatialPolygonsDataFrame 
-#' (i.e. it is a dramatically smaller file, usable without a GIS).
-#' 
+#' constraints).  This is a more portable option than the gpkg file created by the \code{create.spatial}
+#' parameter, and is usable without a GIS.  If this is \code{TRUE} AND \code{create.spatial} is 
+#' \code{TRUE}, then the centroid file will also be added to the generated gpkg file.
+#'  
 #' @param file.id default is \code{NULL} Whatever is entered here will be used 
-#' to name the output shapefiles and/or plots.  If nothing is enetered, the 
+#' to name the output shapefiles and/or plots.  If nothing is entered, the 
 #' output files will just be named using timestamps.
 
 #' @param agg.poly.shp default is \code{NULL}.  This is the shapefile that has 
@@ -78,17 +79,15 @@
 #' the shapefile provided to agg.poly.shp that should be used to check for 
 #' sufficient unique values of the sens.fields.
 
-#' @param ignore.col.limit default is \code{FALSE} ESRI's ArcGIS doesn't like when 
-#' a shapefile has more than 255 columns.  By default, this function will halt with a warning 
-#' if it detects that it is producing too many columns.  To ignore the warning, and produce the 
-#' shapefile anyways, set it to TRUE.
- 
 #' @param custom.grid  default is \code{NULL}.  If there is a need to use a custom grid to apply to 
 #' the data, 
 
 #' @import data.table
 
-#' @return a SpatialPolygonsDataFrame, and generates a shapefile
+#' @return a list containing an sf grid layer, an sf overlay later, and if \code{create.spatial==T},
+#' a gpkg spatial file containing these same objects. Additionally, if \code{create.centroid.csv =T},
+#' it can also produce a csv of the centroids of the grid layer (which willl also be loaded into the 
+#' gpkg file).
 #' @family privacy
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -96,47 +95,44 @@
 #' they will not be detected, or included in the checks.  Please make very sure you correctly 
 #' identify such fields.
 #' 
-#' It should be also noted that shapefiles can only have 255 columns, which can 
-#' be exceeded by this function relatively easily when a \code{facet.field} is 
-#' provided (e.g. for bycatch species).  For example, if all 3 default \code{calculate} 
-#' fields are requested on 3 different \code{agg.fields}, and there are 30 
-#' unique values in the \code{facet.field}, this will result in (3*3*30 =) 270 
-#' fields plus 3 or 4 additional housekeeping fields. In this event, a warning 
-#' will be provided, but no shapefiles will be output. 
+#' It should be also noted that this function can result in spatial files with 100s of columns 
+#' relatively easily when a \code{facet.field} is provided (e.g. for bycatch species).  For example, 
+#' if all 3 default \code{calculate} fields are requested on 3 different \code{agg.fields}, and 
+#' there are 30 unique values in the \code{facet.field}, this will result in (3*3*30 =) 270 
+#' fields plus 3 or 4 additional housekeeping fields.
 assess_privacy <- function(
-  df= NULL, 
-  grid.shape = 'hex',
-  lat.field = 'LATITUDE',
-  lon.field = 'LONGITUDE',
-  rule.of = 5,
-  agg.fields = "KEPT_WT",
-  calculate = c("MEAN", "COUNT", "SUM"),
-  sens.fields = NULL,
-  facet.field = NULL,
-  key.fields = NULL,
-  for.public = TRUE,
-  create.shps = TRUE,
-  create.centroid.csv = FALSE,
-  file.id = NULL,
-  agg.poly.shp = NULL,
-  agg.poly.field = NULL, 
-  ignore.col.limit = FALSE, 
-  custom.grid = NULL
+    df= NULL, 
+    grid.shape = 'hex',
+    lat.field = 'LATITUDE',
+    lon.field = 'LONGITUDE',
+    rule.of = 5,
+    agg.fields = "KEPT_WT",
+    calculate = c("MEAN", "COUNT", "SUM"),
+    sens.fields = NULL,
+    facet.field = NULL,
+    key.fields = NULL,
+    for.public = TRUE,
+    create.spatial = TRUE,
+    create.centroid.csv = FALSE,
+    file.id = NULL,
+    agg.poly.shp = NULL,
+    agg.poly.field = NULL, 
+    custom.grid = NULL
 ){
   #set up
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   `:=` <- function (x, value) value
-  
+
   if (!is.null(custom.grid)){
     ogrPath = dirname(custom.grid)
     ogrLayer = sub('\\.shp$', '', basename(custom.grid))
-    sp_this <- rgdal::readOGR(dsn = ogrPath, layer = ogrLayer, verbose = FALSE)
-    if (class(sp_this)!="SpatialPolygonsDataFrame")stop("custom.grid could not be loaded")
+    sp_this <- sf::st_read(dsn = ogrPath, layer = ogrLayer, quiet=T)
+    if (!inherits(sp_this,"sf"))stop("custom.grid could not be loaded")
   }
   analyticChooser <- function(x, calculate){
     #this function is called by the aggregate functions to allow use to select which analytics are calculated for all agg.fields
     res <- NA
-    if ("CNT" %in% calculate)  res= c(res, round(length(x[x!=0]), 0))
+    if ("COUNT" %in% calculate)  res= c(res, round(length(x[x!=0]), 0))
     if ("SUM" %in% calculate)  res= c(res, round(sum(x), 4))
     if ("MEAN" %in% calculate)  res= c(res, round(mean(x), 4))
     res = res[!is.na(res)]
@@ -145,16 +141,21 @@ assess_privacy <- function(
   
   mkCentroidDf <- function(grid = NULL){
     # the default polygons are large.  This can convert them to csvs 
-    this <- as.data.frame(geosphere::centroid(grid))
-    colnames(this) <- c("lon", "lat") 
-    this <- data.frame("ID" = 1:nrow(this), this)
-    sp::coordinates(this) <- c("lon", "lat") 
-    sp::proj4string(this) <- sp::proj4string(grid) # assign projection
-    
-    this@data <- sp::over(x = this, y = grid, returnList = FALSE)
-    this@data[,c("LON","LAT")] <- sp::coordinates(this)
-    this_csv <- this@data
-    return(this_csv)
+    this <- sf::st_centroid(grid)
+    this_coords<-   as.data.frame(sf::st_coordinates(this))
+    #coords with 7 digits are accurate to cms 
+    this_coords[c("X","Y")] <-  round(this_coords[c("X","Y")], 7)
+    this <- cbind(this, this_coords)
+    this <- sf:::st_drop_geometry(this)
+    colnames(this)[colnames(this)=="X"] <- "LONGITUDE"
+    colnames(this)[colnames(this)=="Y"] <- "LATITUDE"
+    return(this)
+  }
+
+  noCoords <- df[!complete.cases(df[,c(lat.field, lon.field)]),]
+  if(nrow(noCoords>0)){
+    message(nrow(noCoords)," records had one or more missing coordinates and were dropped")
+    df <- df[complete.cases(df[,c(lat.field, lon.field)]),]
   }
   
   #deal with cases where differing rows may refer to different species in the same sets
@@ -171,10 +172,16 @@ assess_privacy <- function(
       res = data.table::setDF(res)
       return(res)
     }
+    
+    noKey <- df[!complete.cases(df[,c(key.fields)]),]
+    if(nrow(noKey>0)){
+      message(nrow(noKey)," records had one or more missing valuess within the key.fields and were dropped")
+      df <- df[complete.cases(df[,c(key.fields)]),]
+    }
     dfLong <- df[,c(key.fields,c(facet.field, agg.fields))]
     dfLong <- dfLong[!is.na(dfLong[facet.field]),]
-
-    dfRest= df[,!names(df) %in% c(facet.field, agg.fields)]
+    
+    dfRest  <- df[,!names(df) %in% c(facet.field, agg.fields)]
     dfRestU <- unique(dfRest)
     if (nrow(dfRest)==nrow(dfRestU)){
       stop(cat("facet.field must identify a single identifier field that causes repeated sets - e.g. species code/name","\n",
@@ -182,85 +189,68 @@ assess_privacy <- function(
                "key.fields must identify enough fields required to identify unique fishing sets - e.g. trip & set","\n"))
     }else{
       dfWide <- foo(dfLong, id=key.fields, measure = facet.field,val = agg.fields)
+      
+
+      # 
       # dfWide$ALL_TOT<-NA
       # dfWide$ALL_TOT <- rowSums(dfWide[,!names(dfWide) %in% key.fields],na.rm = T)
       agg.fields <- names(dfWide[,!names(dfWide) %in% key.fields])
-      # cat("Updated agg.fields to reflect new, faceted data structure","\n")
-      df<-dfRestU
+      # df<-merge(dfRestU, dfWide, by = key.fields)
+      df <- dfRestU
     }
-  }
-  df = df_to_sp(df, lat.field, lon.field)
-  # df = Mar.utils::df_qc_spatial(df, lat.field, lon.field, FALSE)
-  # sp::coordinates(df) = c(lon.field, lat.field)
-  # sp::proj4string(df) = sp::CRS(SRS_string="EPSG:4326")
-  if (is.null(agg.poly.shp)){
-    agg.poly=  Mar.data::NAFOSubunits
-    defFields <- c("NAFO_1", "NAFO_2", "NAFO_3","NAFO_BEST")
-    # know that the CRS of agg.poly obj is WGS84, but perhaps saved with 
-    #slight variations in the text
-      sp::proj4string(agg.poly) <- sp::CRS(as.character(NA))
-      sp::proj4string(agg.poly) = sp::CRS(SRS_string="EPSG:4326")
     
+    dfLong <- dfRest <- dfRestU <- NULL
+  }
+  # df[agg.fields][is.na(df[agg.fields])] <- 0
+  df = df_to_sf(df, lat.field = lat.field, lon.field = lon.field, typ="points")
+  if (is.null(agg.poly.shp)){
+    agg.poly=  Mar.data::NAFOSubunits_sf
+    defFields <- c("NAFO_1", "NAFO_2", "NAFO_3","NAFO")
     if (is.null(agg.poly.field)){
-      agg.poly.field = 'NAFO_BEST'
+      agg.poly.field = 'NAFO'
     }
     defFields = defFields[!defFields %in% agg.poly.field]
-    agg.poly@data[ ,defFields] <- list(NULL)
   }else{
-    agg.poly <- rgdal::readOGR(dsn = agg.poly.shp, verbose = FALSE)
-    if (is.na(sp::proj4string(agg.poly))) {
+    agg.poly     <- sf::st_read (agg.poly.shp, quiet=T)
+    if (is.na(sf::st_crs(agg.poly))){
       cat('\nNo projection found for input shapefile - assuming geographic.')
-      sp::proj4string(agg.poly) = sp::CRS(SRS_string="EPSG:4326")
+      sf::st_crs(agg.poly) <- 4326
+    }else{
+      #convert the shape to geographic
+      agg.poly <- sf::st_transform(agg.poly, crs = 4326)
     }
-    #convert the shape to geographic
-    agg.poly <- suppressWarnings(sp::spTransform(agg.poly,sp::CRS(SRS_string="EPSG:4326")))
   }
-  pip <- sp::over( df, agg.poly , fn = NULL)
-  df@data = cbind(df@data, pip)
+  df <- sf::st_join(df, agg.poly[,agg.poly.field], join = sf::st_intersects)
  
-  if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) df <- sp::merge(df, dfWide, by=key.fields, all.x=T)
-  df@data[agg.fields][is.na(df@data[agg.fields])] <- 0
-  df@data[agg.fields] <- lapply(df@data[agg.fields], as.numeric)
-  
-  calc= NA
-  if ("MEAN" %in% calculate) calc = c(calc, "MEAN = round(mean(x), 4)")
-  if ("CNT" %in% calculate) calc =  c(calc, "CNT = round(length(x[x!=0]), 0)")
-  if ("SUM" %in% calculate) calc = c(calc, "SUM = round(sum(x), 4)")
-  calc = calc[!is.na(calc)]
-  # 
-  # 
-  # POLY.agg <- as.data.frame(as.list(stats::aggregate(
-  #   df@data[agg.fields],
-  #   by = df@data[c(agg.poly.field)],
-  #   FUN = function(x)
-  #     c(
-  #       MEAN = round(mean(x), 4),
-  #       CNT = round(length(x[x!=0]), 0),
-  #       SUM = round(sum(x), 4)
-  #     )
-  # )))
-
+  if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) {
+    dfWide[,agg.fields] <- lapply(dfWide[,agg.fields], as.numeric)
+    df <- merge(df, dfWide, by=key.fields, all.x=T)
+  }else{
+    df[,agg.fields] <- lapply(df[,agg.fields], as.numeric)
+  }
+  POLY.agg <- as.data.frame(df[,c(agg.fields, agg.poly.field)])
   POLY.agg <- as.data.frame(as.list(stats::aggregate(
-    df@data[agg.fields],
-    by = df@data[c(agg.poly.field)],
+    POLY.agg[,agg.fields],
+    by = list(POLY.agg[,c(agg.poly.field)]),
     FUN = function(x) analyticChooser(x, calculate)
   )))
+  colnames(POLY.agg)[colnames(POLY.agg)=="Group.1"] <- agg.poly.field
   
-
-  POLY.agg[,2:ncol(POLY.agg)] <- sapply(POLY.agg[,2:ncol(POLY.agg)], as.numeric)
   if (!is.null(sens.fields)){
-    POLY.agg.sens = as.data.frame(as.list(stats::aggregate(
-      df@data[intersect(sens.fields, colnames(df@data))],
-      by = df@data[c(agg.poly.field)],
+
+    plainDF <- as.data.frame(sf::st_drop_geometry(df))
+    POLY.agg.sens = as.data.frame(stats::aggregate(
+      plainDF[intersect(sens.fields, colnames(plainDF))],
+      by = plainDF[c(agg.poly.field)],
       FUN = function(x)
         c(
-          CNT = round(length(unique(x)), 0)
+          COUNT = round(length(unique(x)), 0)
         )
-    )))
+    ))
 
-   
     POLY.agg.sens$TOTUNIQUE = apply(as.data.frame(POLY.agg.sens[,2:ncol(POLY.agg.sens)]), 1, min)
     POLY.agg.sens$CAN_SHOW <- 'NA'
+
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,]$CAN_SHOW <- 'YES'
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE<rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE< rule.of,]$CAN_SHOW <- 'NO'
     POLY.agg = merge(POLY.agg, POLY.agg.sens)
@@ -273,99 +263,85 @@ assess_privacy <- function(
       #should be dropped
       POLY.agg[ ,c(sens.fields,"TOTUNIQUE")] <- list(NULL)
     }
-    POLY.agg = sp::merge(agg.poly,POLY.agg)
+   
+    POLY.agg = merge(agg.poly,POLY.agg)
     rm(POLY.agg.sens) 
   }else{
     POLY.agg$CAN_SHOW = 'YES'
-    POLY.agg = sp::merge(agg.poly,POLY.agg)
+    POLY.agg = merge(agg.poly,POLY.agg)
   }
-  allowed.areas = POLY.agg@data[!is.na(POLY.agg$CAN_SHOW) & POLY.agg$CAN_SHOW=='YES',agg.poly.field]
-  allowed.areas.sp = agg.poly[agg.poly@data[[agg.poly.field]] %in% allowed.areas,]
-  df$ORD_df = seq.int(nrow(df))
+  allowed.areas = as.vector(sf::st_drop_geometry(POLY.agg[!is.na(POLY.agg$CAN_SHOW) & POLY.agg$CAN_SHOW=='YES',agg.poly.field]))[[1]]
   
+  allowed.areas.sp = agg.poly[agg.poly[,agg.poly.field][[1]] %in% allowed.areas,]
+  df$ORD_df = seq.int(nrow(df))
   if(!is.null(custom.grid)){
     grid2Min<- sp_this
   }else if (grid.shape =="hex"){
-    grid2Min<-Mar.data::hex
+    grid2Min<-Mar.data::hex_sf
   } else{
+    message("need to make a grid2min_sf")
     grid2Min<-Mar.data::grid2Min
   }
   # know that the CRS of both grid2Min obj is WGS84, but perhaps saved with 
   #slight variations in the text
-  sp::proj4string(grid2Min) <- sp::CRS(as.character(NA))
-  sp::proj4string(grid2Min) = sp::CRS(SRS_string="EPSG:4326")
-
+  grid2Min <- sf::st_set_crs(grid2Min,4326)
   grid2Min$ORD_gr <-  seq.int(nrow(grid2Min)) 
   if (length(allowed.areas)>0){
     #clip the data to those overlaying acceptable NAFO
     df <- df[allowed.areas.sp, ]
     grid2Min <- grid2Min[allowed.areas.sp,]
     #step 1 -- figure out which grid each point is in.
-    join <- sp::over(df, grid2Min)  
+    
+    join <- sf::st_join(df, grid2Min, join = sf::st_intersects)
     join$ORD_df <- seq.int(nrow(join)) 
-    df@data = cbind(df@data,join)
+    join_df <- sf::st_drop_geometry(join)
     grid.agg = as.data.frame(as.list(stats::aggregate(
-      df@data[agg.fields],
-      by = df@data[c('ORD_gr')],
-      # FUN = function(x)
-      #   c(
-      #     MEAN = round(mean(x), 4),
-      #     CNT = round(length(x[x!=0]), 0),
-      #     SUM = round(sum(x), 4)
-      #   )
+      join_df[agg.fields],
+      by = join_df[c('ORD_gr')],
       FUN = function(x) analyticChooser(x, calculate)
     )))
     #step 3 -- append the aggregated data back onto the grid 
-    grid2Min=sp::merge(grid2Min, grid.agg)
+    grid2Min=merge(grid2Min, grid.agg, all.x=T)
     #populate all empty cells with 0
-    grid2Min@data[!names(grid2Min@data) %in% c("HEXID", "ORD_gr")][is.na(grid2Min@data[!names(grid2Min@data) %in% c("HEXID", "ORD_gr")])] <- 0 
+    #not sure we want to change NA to zero??
+    grid2Min[!names(grid2Min) %in% c("HEXID", "ORD_gr")][is.na(grid2Min[!names(grid2Min) %in% c("HEXID", "ORD_gr")])] <- 0 
+    
     file.id = ifelse(!is.null(file.id),paste0(file.id,"_"),"")
     POLY.agg.name = paste0(file.id,'POLY_AGG_', ts)
     this.df.name = paste0(file.id,'Grid2Min_', ts)
     this.csv.name = paste0(file.id,'Grid2MinCentroid_', ts)
     
-    # there are 3 analytics possible within the agg function via (analyticChooser) - CNT, SUM and MEAN
+    # there are 3 analytics possible within the agg function via (analyticChooser) - COUNT, SUM and MEAN
     # the resultant column get added to the data with the original names with "*.1", "*.2", or "*.3"
     # appended, depending on which analytic the values correspond with
     # the next bit will help establish which appended number corresponds with which analytic
     # possible analytics
-    usedAnal <- intersect(c("CNT", "SUM", "MEAN"), calculate) # this returns the ones that were run
+    usedAnal <- intersect(c("COUNT", "SUM", "MEAN"), calculate) # this returns the ones that were run
     nums <- match(calculate,usedAnal)   
     for (i in 1:length(nums)){
       thisSearch = nums[i]
       thisrep = usedAnal[thisSearch]
-      colnames(POLY.agg@data) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(POLY.agg@data))
-      colnames(grid2Min@data) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(grid2Min@data))
+      colnames(POLY.agg) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(POLY.agg))
+      colnames(grid2Min) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(grid2Min))
     }
-results <- list()
+
+    results <- list()
     if (create.centroid.csv) {
       this <- mkCentroidDf(grid2Min)
-      results$centroidCsv <- this
       utils::write.csv(this, paste0(this.csv.name,".csv"))
+      df_sf_to_gpkg(this, layerName = this.csv.name, gpkgName = "assess_privacy.gpkg")
+      results$centroidCsv <- this
       message(paste0("\nCreated csv ", getwd(), .Platform$file.sep, this.csv.name,".csv\n"))
     }
-    if (create.shps){
-      if (!ignore.col.limit && max(ncol(POLY.agg@data), ncol(grid2Min@data))>255){
-        warning("\nCan not create shapefiles.  Shapefiles are limited to 255 fields, and your data will have more than that.
-The number of fields is determined by:
-1) the number of unique values found in your facet.field (if present, e.g. bycatch species);
-2) the number of specified agg.fields (e.g. kept_weight, discarded weight); 
-3) for each combination above, a sum, count and mean is calculated;
-4) several housekeeping fields are also created")
-      }else{
-      POLY.agg = prepare_shape_fields(POLY.agg) 
-      rgdal::writeOGR(obj = POLY.agg, dsn= getwd(), layer = POLY.agg.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
-      message(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, POLY.agg.name,".shp\n"))
-      grid2Min = prepare_shape_fields(grid2Min)
-      rgdal::writeOGR(obj = grid2Min, dsn=getwd(), layer = this.df.name, driver="ESRI Shapefile", overwrite_layer=TRUE)
-      message(paste0("\nCreated shapefile ", getwd(), .Platform$file.sep, this.df.name,".shp\n"))
-      }
+    if (create.spatial){
+      df_sf_to_gpkg(POLY.agg, layerName = POLY.agg.name, gpkgName = "assess_privacy.gpkg")
+      df_sf_to_gpkg(grid2Min, layerName = this.df.name, gpkgName = "assess_privacy.gpkg")
     }
     results$Grid2Min <- grid2Min
     results$POLY_AGG <- POLY.agg
   }else{
-    print("No polygon has enough unique values to allow aggregated data to be shown")
+    message("No polygon has enough unique values to allow aggregated data to be shown")
     results= list("Grid2Min" = NULL, "POLY_AGG" = NULL)
   }
   return(invisible(results))
-}
+  }

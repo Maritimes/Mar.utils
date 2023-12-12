@@ -17,11 +17,10 @@ combine_lists <- function(primary = NULL, ancilliary = NULL, quietly=FALSE){
     cat("Ambiguous parameter(s) detected","\n")
     for(c in 1:length(discarded)){
       this = names(discarded)[c]
-      
       wantthis <- kept[[this]]
-      if (class(wantthis)=="data.frame") wantthis <-"<the data.frame>"
+      if (inherits(wantthis,"data.frame")) wantthis <-"<the data.frame>"
       that <- discarded[[this]] 
-      if (class(that)=="data.frame") that <-"<the data.frame>"
+      if (inherits(that,"data.frame")) that <-"<the data.frame>"
       cat(paste0('The parameter "',this,'" will use the value(s) of "', paste0(wantthis, collapse=","),'", not "',paste0(that, collapse=','),'"'),"\n")
     }
   }

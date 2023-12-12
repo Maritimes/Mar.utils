@@ -186,7 +186,7 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
                  "SUM_DOC_ENTR_DETS" = doSUM_DOC_ENTR_DETS(df=df)
   )
   
-  dets[] <- lapply(dets, function(x) type.convert(as.character(x), as.is = TRUE))
+  dets[] <- lapply(dets, function(x) utils::type.convert(as.character(x), as.is = TRUE))
   dets[grep("DATE", colnames(dets))] <- lapply(dets[grep("DATE", colnames(dets))], function(x) as.Date(x, format="%Y-%b-%d", origin = "1970-01-01"))
   dets[grep("DATE", colnames(dets))] <- lapply(dets[grep("DATE", colnames(dets))], function(x) as.POSIXct.Date(x, format="%Y-%b-%d", origin = "1970-01-01"))
   

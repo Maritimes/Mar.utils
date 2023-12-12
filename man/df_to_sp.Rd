@@ -38,15 +38,17 @@ This function takes a dataframe and converts in to a spatialpointsdataframe
 }
 \seealso{
 Other general_use: 
+\code{\link{DDMMSS_to_DD}()},
 \code{\link{aggregator}()},
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
 \code{\link{convert2poly}()},
 \code{\link{df2sf}()},
 \code{\link{df_qc_spatial}()},
+\code{\link{df_sf_to_gpkg}()},
+\code{\link{df_to_sf}()},
 \code{\link{df_to_shp}()},
 \code{\link{drop_cols}()},
-\code{\link{pbs2sp_poly}()},
 \code{\link{prepare_shape_fields}()},
 \code{\link{subset_by_time}()},
 \code{\link{updateCheck}()}

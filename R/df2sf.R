@@ -32,6 +32,7 @@ df2sf <- function(input = NULL, lat.field="latitude", lon.field="longitude",
                   line.IDs = NULL,
                   poly.IDs =NULL
 ){
+  .Deprecated("Mar.utils::df2sf", msg="Mar.utils::df2sf() is now deprecated - please use Mar.utils::df_to_sf instead.")
   # count how many positions exist for each PID, and merge that info onto the data
   ptCount <- stats::aggregate(
     x = list(npoints = input[,PID]),

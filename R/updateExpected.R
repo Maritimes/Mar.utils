@@ -74,7 +74,7 @@ updateExpected<-function(df = NULL, expected = NULL, known = NULL, expectedID = 
   lost <- NA
   allLost <- FALSE  
   if (is.null(expectedID))expectedID<- "undescribed"
-  if((is.null(df) || class(df) != "data.frame")) {
+  if(is.null(df) || !inherits(df,"data.frame")) {
     presentThis <- (expected %in% known)*1
     res <-cbind.data.frame(expected, presentThis)
     if (is.null(stepDesc)){
@@ -89,7 +89,7 @@ updateExpected<-function(df = NULL, expected = NULL, known = NULL, expectedID = 
     allLost <- length(lost) == length(expected)
   }else{
   
-    if (is.null(expected) || class(expected)=="data.frame") expected <- df[,1]
+    if (is.null(expected) || inherits(expected,"data.frame")) expected <- df[,1]
     presentThis <- (expected %in% known)*1
     res <-cbind.data.frame(expected, presentThis)
 

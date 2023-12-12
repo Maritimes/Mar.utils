@@ -51,7 +51,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
         message(cond)
       }
     )
-    if (class(oracle_cxn)[1]=="OraConnection") {
+    if (inherits(oracle_cxn[1],"OraConnection")) {
       if (!quietly) cat("\nSuccessfully connected to Oracle via ROracle\n")
       results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
       Sys.setenv(TZ = orig_TZ)
@@ -73,7 +73,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
         message(cond)
       }
     )
-    if (class(oracle_cxn)[1]=="RODBC") {
+    if (inherits(class(oracle_cxn)[1],"RODBC")) {
       if (!quietly) cat("\nSuccessfully connected to Oracle via RODBC\n")
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       Sys.setenv(TZ = orig_TZ)

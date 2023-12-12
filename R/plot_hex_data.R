@@ -22,9 +22,8 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmptyCells = TRUE){
-  
-  if (!class(data_sf)[1]=="sf"){
-    if(class(data_sf)=="list" && class(data_sf[[1]])=="SpatialPolygonsDataFrame" && names(data_sf[1])=="Grid2Min"){
+  if (!inherits(data_sf[1],"sf")){
+    if(inherits(data_sf,"list") && inherits(data_sf[[1]],"SpatialPolygonsDataFrame") && names(data_sf[1])=="Grid2Min"){
       message("converting your sp into an sf object via \n\tMar.utils::convert2poly(input = data_sf[[1]], out = 'sf')\nIt would be faster to do this prior to running this script")
       data_sf <- Mar.utils::convert2poly(input = data_sf[[1]], out = "sf" )
     }else{
@@ -64,7 +63,7 @@ plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmpt
   }
   
   # determine desired map extent, using extent parameter
-  if (class(extent) == "numeric"){
+  if (inherits(extent, "numeric")){
     thisbbox <- as.list(stats::setNames(extent , c("xmin", "xmax","ymin","ymax")))
   } else if (extent == "data"){ 
     # default is extent on non-zero data

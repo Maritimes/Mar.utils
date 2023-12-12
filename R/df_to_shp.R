@@ -14,8 +14,9 @@
 #' @export
 #' @note This function is set to overwrite existing shapefiles with the same name. 
 df_to_shp <- function(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE", filename = NULL){
+  .Deprecated("Mar.utils::df_to_gpkg", msg="Mar.utils::df_to_shp() is now deprecated - please use Mar.utils::df_to_gpkg instead. Note that instead of shapefiles, gpkg files are created instead")
   df= Mar.utils::df_to_sp(df=df, lat.field = lat.field, lon.field = lon.field)
-  df= prepare_shape_fields(shape = df)
+  df= Mar.utils::prepare_shape_fields(shape = df)
   nm = ifelse(is.null(filename),"newShape", filename)
   rgdal::writeOGR(df, dsn= getwd(),layer = nm, driver="ESRI Shapefile",overwrite_layer = TRUE)
   cat("\nFile written to ",getwd(),"/",nm,".shp\n")

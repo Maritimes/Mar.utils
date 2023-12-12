@@ -35,12 +35,12 @@ clip_by_poly_generic <- function(df=NULL,
     data = df,
     proj4string = sp::CRS(SRS_string="EPSG:4326")
   )
-  if (class(clip.poly)=="character"){
+  if (inherits(clip.poly,"character")){
     #extract the full path and name of the shapefile 
     ogrPath = dirname(clip.poly)
     ogrLayer = sub('\\.shp$', '', basename(clip.poly))
     clip.poly_this <- rgdal::readOGR(dsn = ogrPath, layer = ogrLayer, verbose = FALSE)
-  }else if(class(clip.poly)=="SpatialPolygonsDataFrame"){
+  }else if(inherits(clip.poly,"SpatialPolygonsDataFrame")){
     clip.poly_this = clip.poly
   }
 

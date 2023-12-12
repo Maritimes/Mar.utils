@@ -130,7 +130,7 @@ get_data_tables<-function(schema=NULL,
     return(invisible(NULL))
   } else {
     oracle_cxn_custom = Mar.utils::make_oracle_cxn(usepkg, fn.oracle.username, fn.oracle.password, fn.oracle.dsn)  
-    if (!class(oracle_cxn_custom) =="list"){
+    if (!inherits(oracle_cxn_custom,"list")){
       cat("\nCan't get the data without a DB connection.  Aborting.\n")
       return(NULL)
     }

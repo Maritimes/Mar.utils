@@ -30,7 +30,9 @@ convert2poly <- function(input=NULL,
                          lat.field = 'X', lon.field = 'Y',
                          PID = "PID", SID = "SID", POS= "POS",
                          shp.path = NULL){
-  if (class(input)=="sf" && out =="shp"){
+  .Deprecated("Mar.utils::convert2poly", msg="Mar.utils::convert2poly() is now deprecated - please use Mar.utils::df_to_sf instead.")
+  
+  if (inherits(input,"sf") && out =="shp"){
  
     nm <- deparse(substitute(input))
     thePath <- ifelse(is.null(shp.path), getwd(), shp.path)
@@ -58,10 +60,11 @@ convert2poly <- function(input=NULL,
         }
       }
     }
-  }else if (class(input) == "data.frame"){
+  }else if (inherits(input,"data.frame")){
+    
     nm <- deparse(substitute(input))
     theInput <- input
-  }else if (class(input) == "SpatialPolygonsDataFrame"){
+  }else if (inherits(input,"SpatialPolygonsDataFrame")){
     nm <- deparse(substitute(input))
     polySpDf<- input
     skip <- TRUE

@@ -50,15 +50,17 @@ since the use of distances requires projecting the data.
 }
 \seealso{
 Other general_use: 
+\code{\link{DDMMSS_to_DD}()},
 \code{\link{aggregator}()},
 \code{\link{combine_lists}()},
 \code{\link{convert2poly}()},
 \code{\link{df2sf}()},
 \code{\link{df_qc_spatial}()},
+\code{\link{df_sf_to_gpkg}()},
+\code{\link{df_to_sf}()},
 \code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
-\code{\link{pbs2sp_poly}()},
 \code{\link{prepare_shape_fields}()},
 \code{\link{subset_by_time}()},
 \code{\link{updateCheck}()}

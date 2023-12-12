@@ -260,7 +260,7 @@ make_segments_isdb <- function(isdb.df, do.qc = FALSE, return.choice = "lines", 
     if (createShp) {
       all.sets.lines = prepare_shape_fields( all.sets.lines)
       rgdal::writeOGR(obj =  all.sets.lines, layer =paste0(name,"_isdb_lines"), dsn=getwd(), driver="ESRI Shapefile", overwrite_layer=TRUE)
-      if (!quietly) message(paste0("\nA shapefile ('isdb_lines') was written to  ",paste0(getwd(),"/",nm,".shp")))
+      if (!quietly) message(paste0("\nA shapefile ('isdb_lines') was written to  ",paste0(getwd(),"/",paste0(name,"_isdb_lines.shp"))))
     }
   }
   if (return.choice != "lines" & do.qc){

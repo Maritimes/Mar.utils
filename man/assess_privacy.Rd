@@ -16,12 +16,11 @@ assess_privacy(
   facet.field = NULL,
   key.fields = NULL,
   for.public = TRUE,
-  create.shps = TRUE,
+  create.spatial = TRUE,
   create.centroid.csv = FALSE,
   file.id = NULL,
   agg.poly.shp = NULL,
   agg.poly.field = NULL,
-  ignore.col.limit = FALSE,
   custom.grid = NULL
 )
 }
@@ -32,22 +31,22 @@ assess_privacy(
 you want to aggregate your data into.  The options are "hex" or "square"}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. This is the name of the 
-field holding latitude values (in decimal degrees)}
+field in \code{df} holding latitude values (in decimal degrees)}
 
 \item{lon.field}{the default is \code{"LONGITUDE"}.  This is the name of the 
-field holding longitudevalues (in decimal degrees)}
+field in \code{df} holding longitudevalues (in decimal degrees)}
 
 \item{rule.of}{default is \code{5} Whether or not data can be shown (even 
 aggregated) depends on the presence of a threshold number of unique values 
 for certain sensitive fields.  This parameter sets that threshold.}
 
 \item{agg.fields}{the default is \code{"KEPT_WT"}.  These are the fields in the data that contain 
-the values you want to aggregate (e.g. calulate the mean, sum or count of.  This field needs to be
+the values you want to aggregate (e.g. calculate the mean, sum or count of.  This field needs to be
 numeric.}
 
 \item{calculate}{the default is \code{c("MEAN", "COUNT", "SUM")}. These are the 
 analytics which should be performed for every field identified in \code{agg.field}.
-For example, if KEPT_WT and DISCAD_WT are both identified in \code{agg.field},
+For example, if KEPT_WT and DISCARD_WT are both identified in \code{agg.field},
 then for every resultant aggregated polygon (e.g. hexagon), the mean, count 
 and sum of both of these fields is calculated for every polygon.}
 
@@ -76,19 +75,20 @@ values of sensitive fields to be allowed to show any data at all.  If this param
 the calculated valued value for areas that cannot be shown will be wiped prior to generating the 
 output files.}
 
-\item{create.shps}{default is \code{TRUE}.  This indicates whether or not 
-shapefiles should be created for 1) the polygon file (with aggregated values 
+\item{create.spatial}{default is \code{TRUE}.  This indicates whether or not to create a gpkg file
+containing spatial files for 1) the polygon file (with aggregated values 
 for each polygon and an indication of whether or not each polygon meets the 
 privacy constraints), and 2) the 2 min gridded data (only for within those 
 polygons that meet the privacy constraints).}
 
 \item{create.centroid.csv}{default is \code{FALSE}.  This indicates whether or not a csv  should 
 be created for the 2 min gridded data (only for within those polygons that meet the privacy 
-constraints).  This is a more portable option than the shapefiles or SpatialPolygonsDataFrame 
-(i.e. it is a dramatically smaller file, usable without a GIS).}
+constraints).  This is a more portable option than the gpkg file created by the \code{create.spatial}
+parameter, and is usable without a GIS.  If this is \code{TRUE} AND \code{create.spatial} is 
+\code{TRUE}, then the centroid file will also be added to the generated gpkg file.}
 
 \item{file.id}{default is \code{NULL} Whatever is entered here will be used 
-to name the output shapefiles and/or plots.  If nothing is enetered, the 
+to name the output shapefiles and/or plots.  If nothing is entered, the 
 output files will just be named using timestamps.}
 
 \item{agg.poly.shp}{default is \code{NULL}.  This is the shapefile that has 
@@ -100,16 +100,14 @@ polygon shapefile can be provided.}
 the shapefile provided to agg.poly.shp that should be used to check for 
 sufficient unique values of the sens.fields.}
 
-\item{ignore.col.limit}{default is \code{FALSE} ESRI's ArcGIS doesn't like when 
-a shapefile has more than 255 columns.  By default, this function will halt with a warning 
-if it detects that it is producing too many columns.  To ignore the warning, and produce the 
-shapefile anyways, set it to TRUE.}
-
 \item{custom.grid}{default is \code{NULL}.  If there is a need to use a custom grid to apply to 
 the data,}
 }
 \value{
-a SpatialPolygonsDataFrame, and generates a shapefile
+a list containing an sf grid layer, an sf overlay later, and if \code{create.spatial==T},
+a gpkg spatial file containing these same objects. Additionally, if \code{create.centroid.csv =T},
+it can also produce a csv of the centroids of the grid layer (which willl also be loaded into the 
+gpkg file).
 }
 \description{
 At this time, data with privacy considerations must be aggregated such that each 
@@ -123,13 +121,11 @@ If sensitive fields have names that are different than what is provided in the \
 they will not be detected, or included in the checks.  Please make very sure you correctly 
 identify such fields.
 
-It should be also noted that shapefiles can only have 255 columns, which can 
-be exceeded by this function relatively easily when a \code{facet.field} is 
-provided (e.g. for bycatch species).  For example, if all 3 default \code{calculate} 
-fields are requested on 3 different \code{agg.fields}, and there are 30 
-unique values in the \code{facet.field}, this will result in (3*3*30 =) 270 
-fields plus 3 or 4 additional housekeeping fields. In this event, a warning 
-will be provided, but no shapefiles will be output.
+It should be also noted that this function can result in spatial files with 100s of columns 
+relatively easily when a \code{facet.field} is provided (e.g. for bycatch species).  For example, 
+if all 3 default \code{calculate} fields are requested on 3 different \code{agg.fields}, and 
+there are 30 unique values in the \code{facet.field}, this will result in (3*3*30 =) 270 
+fields plus 3 or 4 additional housekeeping fields.
 }
 \seealso{
 Other privacy: 
