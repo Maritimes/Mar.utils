@@ -48,6 +48,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   colnames(df)[colnames(df)==lon.field] <- "LONGITUDE__"
   colnames(df)[colnames(df)==objField] <- "objField__"
   colnames(df)[colnames(df)==timeField] <- "timeField__"
+  df<- df[!(df$LATITUDE__== -90|df$LONGITUDE__== -180),]
   e <- new.env()
   e$loopagain <- TRUE
   
@@ -67,6 +68,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     df[df$distCalc >= minDist_m ,"KEEP"] <- TRUE
     df[df$time_min <= maxBreak_mins,"KEEP"] <- TRUE
     df[df$distCalc == -1 & df$time_min ==0, "KEEP"] <- TRUE
+    df[df$distCalc == 0, "KEEP"] <- FALSE
     df <- df[which(df$KEEP==TRUE),]
     df$KEEP<-NULL
     dfn_1 <- nrow(df)
