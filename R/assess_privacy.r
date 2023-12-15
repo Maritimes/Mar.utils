@@ -146,16 +146,16 @@ assess_privacy <- function(
     #coords with 7 digits are accurate to cms 
     this_coords[c("X","Y")] <-  round(this_coords[c("X","Y")], 7)
     this <- cbind(this, this_coords)
-    this <- sf:::st_drop_geometry(this)
+    this <- sf::st_drop_geometry(this)
     colnames(this)[colnames(this)=="X"] <- "LONGITUDE"
     colnames(this)[colnames(this)=="Y"] <- "LATITUDE"
     return(this)
   }
 
-  noCoords <- df[!complete.cases(df[,c(lat.field, lon.field)]),]
+  noCoords <- df[!stats::complete.cases(df[,c(lat.field, lon.field)]),]
   if(nrow(noCoords>0)){
     message(nrow(noCoords)," records had one or more missing coordinates and were dropped")
-    df <- df[complete.cases(df[,c(lat.field, lon.field)]),]
+    df <- df[stats::complete.cases(df[,c(lat.field, lon.field)]),]
   }
   
   #deal with cases where differing rows may refer to different species in the same sets
@@ -173,10 +173,10 @@ assess_privacy <- function(
       return(res)
     }
     
-    noKey <- df[!complete.cases(df[,c(key.fields)]),]
+    noKey <- df[!stats::complete.cases(df[,c(key.fields)]),]
     if(nrow(noKey>0)){
       message(nrow(noKey)," records had one or more missing valuess within the key.fields and were dropped")
-      df <- df[complete.cases(df[,c(key.fields)]),]
+      df <- df[stats::complete.cases(df[,c(key.fields)]),]
     }
     dfLong <- df[,c(key.fields,c(facet.field, agg.fields))]
     dfLong <- dfLong[!is.na(dfLong[facet.field]),]
@@ -202,7 +202,7 @@ assess_privacy <- function(
     dfLong <- dfRest <- dfRestU <- NULL
   }
   # df[agg.fields][is.na(df[agg.fields])] <- 0
-  df = df_to_sf(df, lat.field = lat.field, lon.field = lon.field, typ="points")
+  df = df_to_sf(df, lat.field = lat.field, lon.field = lon.field, type = "points")
   if (is.null(agg.poly.shp)){
     agg.poly=  Mar.data::NAFOSubunits_sf
     defFields <- c("NAFO_1", "NAFO_2", "NAFO_3","NAFO")
@@ -223,10 +223,15 @@ assess_privacy <- function(
   df <- sf::st_join(df, agg.poly[,agg.poly.field], join = sf::st_intersects)
  
   if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) {
-    dfWide[,agg.fields] <- lapply(dfWide[,agg.fields], as.numeric)
+    for (a in 1:length(agg.fields)){
+      dfWide[[agg.fields[a]]] <- as.numeric(dfWide[[agg.fields[a]]])
+    }
+    
     df <- merge(df, dfWide, by=key.fields, all.x=T)
   }else{
-    df[,agg.fields] <- lapply(df[,agg.fields], as.numeric)
+    for (a in 1:length(agg.fields)){
+      df[[agg.fields[a]]] <- as.numeric(df[[agg.fields[a]]])
+    }
   }
   POLY.agg <- as.data.frame(df[,c(agg.fields, agg.poly.field)])
   POLY.agg <- as.data.frame(as.list(stats::aggregate(

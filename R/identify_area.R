@@ -61,7 +61,7 @@ identify_area <- function(df = NULL,
       agg.poly.field = 'NAFO'
     }
   }else if (is.character(agg.poly.shp)){
-    agg.poly <- sf::st_read(dsn = agg.poly.shp)
+    agg.poly <- sf::st_read(dsn = agg.poly.shp, quiet=T)
   }else if ("SpatialPolygons" %in% class(agg.poly.shp) || "SpatialPolygonsDataFrame" %in% class(agg.poly.shp)){
     agg.poly = methods::as(agg.poly.shp, "sf")
   }else if ("sf" %in% class(agg.poly.shp)){

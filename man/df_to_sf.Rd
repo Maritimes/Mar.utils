@@ -6,22 +6,22 @@
 \usage{
 df_to_sf(
   df = NULL,
-  lat.field = "Y",
-  lon.field = "X",
+  lat.field = "LATITUDE",
+  lon.field = "LONGITUDE",
   primary.object.field = "PID",
   secondary.object.field = "SID",
   order.field = "POS",
-  type = "poly"
+  type = "polys"
 )
 }
 \arguments{
 \item{df}{the default is \code{NULL}.  This is a dataframe that has coordinates holding latitudes
 and longtitudes in decimal degrees.}
 
-\item{lat.field}{the default is \code{"X"}. the name of the field holding latitude values
+\item{lat.field}{the default is \code{"LATITUDE"}. the name of the field holding latitude values
 (in decimal degrees)}
 
-\item{lon.field}{the default is \code{"Y"}.  the name of the field holding longitude
+\item{lon.field}{the default is \code{"LONGITUDE"}.  the name of the field holding longitude
 values (in decimal degrees)}
 
 \item{primary.object.field}{the default is \code{"PID"}.  If polygons or lines are specified,
@@ -34,7 +34,7 @@ identifier in order to create objects such as polygons with holes.}
 the order points should be joined.  In order to specifiy a "hole", the order field for the c
 oordinates specifying the hole should be descending (rather than ascending).}
 
-\item{type}{the default is \code{"poly"}, but it can also be \code{"line"} or \code{"points"}}
+\item{type}{the default is \code{"polys"}, but it can also be \code{"lines"} or \code{"points"}}
 }
 \value{
 an sf object
@@ -54,11 +54,9 @@ Other general_use:
 \code{\link{aggregator}()},
 \code{\link{clip_by_poly_generic}()},
 \code{\link{combine_lists}()},
-\code{\link{convert2poly}()},
 \code{\link{df2sf}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_shp}()},
 \code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{prepare_shape_fields}()},

@@ -4,9 +4,9 @@
 #' structured dataframe.
 #' @param df the default is \code{NULL}.  This is a dataframe that has coordinates holding latitudes
 #' and longtitudes in decimal degrees.
-#' @param lat.field the default is \code{"X"}. the name of the field holding latitude values
+#' @param lat.field the default is \code{"LATITUDE"}. the name of the field holding latitude values
 #' (in decimal degrees)
-#' @param lon.field the default is \code{"Y"}.  the name of the field holding longitude
+#' @param lon.field the default is \code{"LONGITUDE"}.  the name of the field holding longitude
 #' values (in decimal degrees)
 #' @param primary.object.field the default is \code{"PID"}.  If polygons or lines are specified,
 #' this field is used to identify discrete objects.
@@ -15,7 +15,7 @@
 #' @param order.field the default is \code{"POS"}. This parameter specifies the field that controls 
 #' the order points should be joined.  In order to specifiy a "hole", the order field for the c
 #' oordinates specifying the hole should be descending (rather than ascending).
-#' @param type the default is \code{"poly"}, but it can also be \code{"line"} or \code{"points"}
+#' @param type the default is \code{"polys"}, but it can also be \code{"lines"} or \code{"points"}
 #' @return an sf object
 #' @note this function was modified from 
 #' https://github.com/Mar-scal/Assessment_fns/blob/master/Maps/pbs_2_sf.R 
@@ -24,16 +24,17 @@
 #' @author  Dave Keith \email{Dave.Keith@@dfo-mpo.gc.ca}, Freya Keyser \email{Freya.Keyser@@dfo-mpo.gc.ca} and adapted by Mike McMahon \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 df_to_sf <- function(df = NULL, 
-                     lat.field = "Y", 
-                     lon.field = "X",
+                     lat.field = "LATITUDE", 
+                     lon.field = "LONGITUDE",
                      primary.object.field = "PID",
                      secondary.object.field = "SID",
                      order.field = "POS",
-                     type = "poly") {
-  if(nrow(df[!complete.cases(df[ , c(lat.field, lon.field)]), ])>0){
-    ndrop <- nrow(df[!complete.cases(df[ , c(lat.field, lon.field)]), ])
+                     type = "polys") {
+  hole <- NA
+  if(nrow(df[!stats::complete.cases(df[ , c(lat.field, lon.field)]), ])>0){
+    ndrop <- nrow(df[!stats::complete.cases(df[ , c(lat.field, lon.field)]), ])
     message("Dropping ",ndrop, " records that are missing latitude, longitude, or both")
-    df <- df[complete.cases(df[ , c(lat.field, lon.field)]), ]
+    df <- df[stats::complete.cases(df[ , c(lat.field, lon.field)]), ]
   }
 
   if (!(all(df[,lon.field] >= -180) & all(df[,lon.field] <= 180) & all(df[,lat.field] >= -90)& all(df[,lat.field] <= 90))){
@@ -51,25 +52,20 @@ df_to_sf <- function(df = NULL,
     secondary.object.field = "SID"
   }
   
-  #secondary field gets dropped since it's not visible as part of the resultant lines/polygons
-  dfData <- unique(df[,!names(df)%in% c(lat.field, lon.field, secondary.object.field, order.field, "hole"), drop = FALSE])
-  
   pids <- NULL
+  pb <- utils::txtProgressBar(style = 3)
   
-  pb <- txtProgressBar(style = 3)
-  for(i in 1:length(unique(df[,primary.object.field]))){
-    thisData <- dfData[dfData[,primary.object.field]==unique(df[,primary.object.field])[i],, drop = FALSE]
-    pid <- df %>%
-      filter(PID == unique(df[,primary.object.field])[i])
+  allPrims <- unique(df[,primary.object.field])
+  for(i in 1:length(allPrims)){
+    pid <- df[df[[primary.object.field]]== allPrims[i],]
     sids <- NULL  
     for(j in 1:length(unique(pid[,secondary.object.field]))){
-      sid <- pid %>%
-        dplyr::filter(SID==unique(pid[,secondary.object.field])[j])
-      if(type=="poly"){
+      sid <- pid[pid[[secondary.object.field]]==unique(pid[,secondary.object.field])[j],]
+      if(type=="polys"){
         sid$hole <- ifelse(sid[,order.field][1]<sid[,order.field][2],"N","Y")
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(.data[[primary.object.field]], .data[[secondary.object.field]], hole) %>%
+          dplyr::group_by(dplyr::.data[[primary.object.field]], dplyr::.data[[secondary.object.field]], hole) %>%
           dplyr::summarize(do_union=F, .groups = 'keep') %>%
           sf::st_cast("POLYGON")
         if(j==1) {
@@ -77,7 +73,7 @@ df_to_sf <- function(df = NULL,
         }else{
           if(unique(sid$hole)=="Y"){
             sids <- suppressMessages(suppressWarnings(sf::st_difference(sids, sid))) %>%
-              dplyr::select(all_of(c(primary.object.field, secondary.object.field, "hole")))
+              dplyr::select(dplyr::all_of(c(primary.object.field, secondary.object.field, "hole")))
           }else if (unique(sid$hole)=="N"){
             sid <- dplyr::select(sid, all_of(c(primary.object.field, secondary.object.field, "hole")))
             sids <- rbind(sids, sid)
@@ -88,24 +84,25 @@ df_to_sf <- function(df = NULL,
       }else{
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(.data[[primary.object.field]], .data[[secondary.object.field]]) %>%
+          dplyr::group_by(dplyr::.data[[primary.object.field]], dplyr::.data[[secondary.object.field]]) %>%
           dplyr::summarize(do_union=F, .groups = 'keep') %>%
           sf::st_cast("LINESTRING")
         if(j==1) {
           sids <- rbind(sids, sid)
         }else{
-          sid <- dplyr::select(sid, PID, SID)
+          sid <- dplyr::select(sid, all_of(c(primary.object.field, secondary.object.field)))
           sids <- rbind(sids, sid)
         }
       }
     }
     pid <- sf::st_combine(sids) %>% sf::st_sf()
-    # bind non-geometry info onto the geometry
-    if(!all(names(thisData) %in% names(pid))) pid = cbind(pid, thisData)
+    # bind primary identifier onto the geometry
+    pid = cbind(pid, allPrims[i])
     pids <- rbind(pids, pid)
-    setTxtProgressBar(txtProgressBar(min = 0, max = length(unique(df[,primary.object.field])), style = 3), i)
+    utils::setTxtProgressBar(utils::txtProgressBar(min = 0, max = length(unique(df[,primary.object.field])), style = 3), i)
   }
   close(pb)
+  colnames(pids)[colnames(pids)=="allPrims.i."] <- primary.object.field
   #set sf_use_s2 back to it's original state, if it existed at all
   if (is.null(initState)){
     .Options$sf_use_s2 <- NULL

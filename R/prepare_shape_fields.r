@@ -72,7 +72,7 @@ prepare_shape_fields <- function(shape){
   
   if (max(range(allNames$CNT))>10){
     # allNames[allNames$CNT>10,"NEW"]<-substr(allNames[allNames$CNT>10,"NEW"], 1, 10) 
-    message("\n!!Despite efforts to shorten them, rgdal will impose some aggressive measures to reduce the field names to the 10 chars allowed by ArcGIS","\n")
+    message("\nSome field names are still more than 10 chars long.  This can cause issues in programs like ArcGIS","\n")
     #cat(allNames$NEW)
     #allNames <-updateCnt(allNames)
   }

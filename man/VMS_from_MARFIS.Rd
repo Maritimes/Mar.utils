@@ -19,7 +19,7 @@ VMS_from_MARFIS(
   lat.field = NULL,
   lon.field = NULL,
   make_segments = TRUE,
-  make_segments_shp = FALSE
+  make_segments_spatial = FALSE
 )
 }
 \arguments{
@@ -62,7 +62,7 @@ values (in decimal degrees)}
 \item{make_segments}{the default is \code{TRUE}. This indicates whether or not the results should
 include an sp object of all of the VMS data as lines (in addition to a data frame)}
 
-\item{make_segments_shp}{the default is \code{FALSE}. This indicates whether or not a shapefile
+\item{make_segments_spatial}{the default is \code{FALSE}. This indicates whether or not a shapefile
 should be created of all of the VMS data as lines (in addition to a data frame). 
 \code{make_segments} must be TRUE for shapefiles to be generated.}
 }
@@ -74,12 +74,7 @@ directory.
 }
 \description{
 This function takes a dataframe (with coordinate fields in decimal
-degrees), (optionally) a spatial object (either a shapefile, an
-sp::SpatialPolygonsDataframe, or an sf::polygon), and a field name from the 
-polygon object.  It then overlays the df with the polygon, and determines which
-discrete polygon contains each point from the df, and appends a new field 
-containing this value.  
-If no polygon is provided, the df will be assessed against NAFO subdivisions.
+degrees), and extracts asssociated VMS data
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

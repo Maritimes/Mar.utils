@@ -7,7 +7,6 @@ Description: This package contains a number of utility function used by several 
 Depends:
     R (>= 2.10)
 Imports:
-    curl,
     data.table,
     dplyr,
     geosphere,
@@ -19,7 +18,6 @@ Imports:
     reshape2,
     sf,
     sfheaders,
-    sp,
     sqldf
 Enhances: 
     DBI,

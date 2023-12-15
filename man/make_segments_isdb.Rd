@@ -4,65 +4,50 @@
 \alias{make_segments_isdb}
 \title{make_segments_isdb}
 \usage{
-make_segments_isdb(
-  isdb.df,
-  do.qc = FALSE,
-  return.choice = "lines",
-  filename = NULL,
-  createShp = TRUE,
-  quietly = FALSE
-)
+make_segments_isdb(isdb.df, filename = NULL, create.spatial = TRUE)
 }
 \arguments{
 \item{isdb.df}{This is the dataframe you want to plot.  isdb dataframes are
-characterized by the existence of the following fields:
+characterized by the existence of one of the following sets of fields:
+ISSETPROFILE_WIDE - based:
 \itemize{
  \item \code{FISHSET_ID}
- \item \code{LAT1} and \code{LONG1}
- \item \code{LAT2} and \code{LONG2}
- \item \code{LAT3} and \code{LONG3}
- \item \code{LAT4} and \code{LONG4}
+ \item \code{SET_NO}
+ \item \code{LAT1}, \code{LONG1} and \code{DATE_TIME1}
+ \item \code{LAT2}, \code{LONG2} and \code{DATE_TIME2}
+ \item \code{LAT3}, \code{LONG3} and \code{DATE_TIME3}
+ \item \code{LAT4}, \code{LONG4} and \code{DATE_TIME4}
+}
+or
+ISSETPROFILE - based
+\itemize{
+\item \code{FISHSET_ID}
+ \item \code{SET_NO}
+ \item \code{LATITUDE}, \code{LONGITUDE}, \code{DATETIME} and \code{PNTCD_ID}
 }}
-
-\item{do.qc}{default is \code{FALSE}}
-
-\item{return.choice}{This determines what the function returns.  The default
-value of \code{"lines"} returns a SpatialLinesDataFrame, where the dataframe 
-contains the generated QC information.  Any other value for 
-\code{return.choice} will instead return of data frame of all of the 
-FISHSET_IDs, the QC determination of each line, the length of each line (in 
-km), and the number of valid vertices. 
-The QC data checks the positions of each FISHSET for NAs, Zeroes, or 
-otherwise data.  Additionally, if the line has a length of zero, that is 
-noted as well.}
 
 \item{filename}{default is \code{NULL}.  If you are outputting shapefiles, 
 you can specify a name for them here.  They will also get a timestamp.}
 
-\item{createShp}{default is \code{TRUE}. This determines whether or not 
-shapefiles will be generated in your working directory.}
-
-\item{quietly}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
+\item{create.spatial}{default is \code{TRUE}.  This indicates whether or not to create a gpkg 
+file in your working directory.}
 }
 \description{
-This function takes a df of the isdb data (including fields
-\code{FISHSET_ID} and LAT1:LAT4 and LONG1:LONG4) and makes a 
-spatialLinesDataFrame which can be plotted.If selected, it can also QC them.
+This function takes a df of the isdb data, and creates line segments for each 
+distinct FISHSET_ID. If specified, it will generate spatial layers within a gpkg file.
 Each line will have the following columns in the resulting data frame:
 \itemize{
  \item \code{FISHSET_ID} This uniquely identifies a set
- \item \code{QCPOS} This field identifies potential issues with the line - 
- including NA positions, positions that are "0", incorrect hemisphere, or 
- impossible coordinates
- \item \code{QCTIME} This field identifies potential issues with the timing 
- of the vertices making up the line.  For example,  P2 should occur after 
- P1, and 2 vertices cannot occur simultaneously.  Sets less than 5 min or 
- greater than 24 hr are also noted
  \item \code{LEN_KM} This field shows the calculated distance of the 
  resultant line in kms
+ \item \code{SET_NO} This uniquely identifies a set
  \item \code{N_VALID_VERT} This field shows how many vertices appear 
- correct after NAs, 0s and othe problematic values have been dropped
-}
+ correct after NAs, 0s and other problematic values have been dropped
+ \item \code{SETSTART} This is the earliest time associated with a set
+ \item \code{SETEND}  This is the last time associated with a set
+ \item \code{SET_DUR} This is the difference in time (in hours) between the first and last 
+ position of a set
+ }
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -23,49 +23,67 @@
 #' WGS84. FYI, during buffering, the polygon is briefly converted to UTMZone20, and back again, 
 #' since the use of distances requires projecting the data.
 clip_by_poly_generic <- function(df=NULL,
-                         lat.field = "LATITUDE", 
-                         lon.field = "LONGITUDE", 
-                         clip.poly = NULL,
-                         buffer.m = NULL,
-                         return.spatial = FALSE,
-                         env=.GlobalEnv){
+                                 lat.field = "LATITUDE", 
+                                 lon.field = "LONGITUDE", 
+                                 clip.poly = NULL,
+                                 buffer.m = NULL,
+                                 return.spatial = FALSE,
+                                 env=.GlobalEnv){
   df=df_qc_spatial(df)
-  df.sp = sp::SpatialPointsDataFrame(
-    coords = df[, c(lon.field, lat.field)],
-    data = df,
-    proj4string = sp::CRS(SRS_string="EPSG:4326")
-  )
+  df <- sf::st_as_sf(df, coords = c(lon.field, lat.field), crs = 4326, agr = "constant")
+  # df.sp = sp::SpatialPointsDataFrame(
+  #   coords = df[, c(lon.field, lat.field)],
+  #   data = df,
+  #   proj4string = sp::CRS(SRS_string="EPSG:4326")
+  # )
   if (inherits(clip.poly,"character")){
-    #extract the full path and name of the shapefile 
-    ogrPath = dirname(clip.poly)
-    ogrLayer = sub('\\.shp$', '', basename(clip.poly))
-    clip.poly_this <- rgdal::readOGR(dsn = ogrPath, layer = ogrLayer, verbose = FALSE)
-  }else if(inherits(clip.poly,"SpatialPolygonsDataFrame")){
-    clip.poly_this = clip.poly
+    #   #extract the full path and name of the shapefile 
+    #   ogrPath = dirname(clip.poly)
+    #   ogrLayer = sub('\\.shp$', '', basename(clip.poly))
+    #   clip.poly_this <- rgdal::readOGR(dsn = ogrPath, layer = ogrLayer, verbose = FALSE)
+    # }else if(inherits(clip.poly,"SpatialPolygonsDataFrame")){
+    #   clip.poly_this = clip.poly
+    clip.poly_this     <- sf::st_read(clip.poly, quiet=T)
+  } else if(inherits(clip.poly,"SpatialPolygonsDataFrame")){
+    clip.poly_this <- sf::st_as_sf(clip.poly)
   }
-
-  if (is.na(sp::proj4string(clip.poly_this))) {
+  if (is.na(sf::st_crs(clip.poly_this))){
     cat('\nNo projection found for input shapefile - assuming geographic.')
-    sp::proj4string(clip.poly_this) = sp::CRS(SRS_string="EPSG:4326")
-  } else if (sp::proj4string(clip.poly_this)!="EPSG:4326") {
-    clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS(SRS_string="EPSG:4326")))
-  }
-  
-  if (!is.null(buffer.m)){
-    #if a buffer is specified, convert poly to UTM20N, apply buffer, and convert back
-    clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS(SRS_string="EPSG:2220")))
-    clip.poly_this = rgeos::gBuffer(clip.poly_this, width=buffer.m)
-    clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS(SRS_string="EPSG:4326")))
-  }
-  if (NROW(df.sp[clip.poly_this, ]) ==0) {
-    stop("\nNo data lies inside this polygon, aborting clip.")
-  }
-  df.sp_subset <- df.sp[clip.poly_this, ] 
-  
-  if (!return.spatial){
-    df.sp_subset = df.sp_subset@data
+    sf::st_crs(clip.poly_this) <- 4326
+  }else{
+    #convert the shape to geographic
+    clip.poly_this <- sf::st_transform(clip.poly_this, crs = 4326)
   }
 
-  return(df.sp_subset)
+
+# clip.poly_this <- sf::st_cast(clip.poly_this, "POLYGON")
+# if (is.na(sp::proj4string(clip.poly_this))) {
+#   cat('\nNo projection found for input shapefile - assuming geographic.')
+#   sp::proj4string(clip.poly_this) = sp::CRS(SRS_string="EPSG:4326")
+# } else if (sp::proj4string(clip.poly_this)!="EPSG:4326") {
+#   clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS(SRS_string="EPSG:4326")))
+# }
+
+
+if (!is.null(buffer.m)){
+  clip.poly_this <- sf::st_transform(clip.poly_this, crs = 2220)
+  clip.poly_this <- df::st_buffer( clip.poly_this, buffer.m)
+  clip.poly_this <- sf::st_transform(clip.poly_this, crs = 4326)
+  #if a buffer is specified, convert poly to UTM20N, apply buffer, and convert back
+  # clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS(SRS_string="EPSG:2220")))
+  # clip.poly_this = rgeos::gBuffer(clip.poly_this, width=buffer.m)
+  # clip.poly_this = suppressWarnings(sp::spTransform(clip.poly_this, sp::CRS(SRS_string="EPSG:4326")))
+}
+message("debugging got to here")
+if (NROW(df.sp[clip.poly_this, ]) ==0) {
+  stop("\nNo data lies inside this polygon, aborting clip.")
+}
+df.sp_subset <- df.sp[clip.poly_this, ] 
+
+if (!return.spatial){
+  df.sp_subset = df.sp_subset@data
+}
+
+return(df.sp_subset)
 
 }

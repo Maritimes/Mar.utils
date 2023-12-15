@@ -17,9 +17,6 @@ VMS_get_recs(
   maxLon = NULL,
   minLat = NULL,
   maxLat = NULL,
-  shp = NULL,
-  shp.field = NULL,
-  simpleQC = TRUE,
   rowNum = 50000,
   quietly = F
 )
@@ -72,16 +69,6 @@ at the time.}
 
 \item{maxLat}{default is \code{NULL}. This can be used to set a maximum Latitude}
 
-\item{shp}{default is \code{NULL}.  This is the shapefile that has 
-polygons that should be checked for existence of VMS data.}
-
-\item{shp.field}{default is \code{NULL}.  This is the field in the shapefile
-that should attached to the reurned data.  This will typically be a field 
-that identifies the area(s).}
-
-\item{simpleQC}{default is \code{TRUE}. If True, this drops records where the 
-latitude is 0, 90 or -90 or the longitude is 0, 180 or -180.}
-
 \item{rowNum}{default is \code{50000}.  This is the maximum number of VMS 
 records that can be extracted. It is in place to prevent crashing your 
 application.}
@@ -90,8 +77,7 @@ application.}
 information about the process should be shown.}
 }
 \value{
-a DataFrame with the column \code{agg.poly.field} added (if value for 
-\code{shp} is supplied)
+a dataFrame
 }
 \description{
 This function extracts VMS data for a given timespan and area.  

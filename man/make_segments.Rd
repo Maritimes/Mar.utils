@@ -13,18 +13,16 @@ make_segments(
   points = "orphans",
   the.crs = "EPSG:4326",
   filename = NULL,
-  plot = TRUE,
-  createShp = TRUE
+  create.spatial = TRUE
 )
 }
 \arguments{
 \item{df}{default is \code{NULL}.  This is the dataframe to be processed.  It 
-should have coordinates in decimal degrees and they should be in fields 
-called "LATITUDE" and "LONGITUDE".  It should also have fields for use by 
+should have coordinates in decimal degrees.  It should also have fields for use by 
 \code{objField} and \code{seqField}.}
 
 \item{objField}{default is \code{NULL}. This is a field identifying which 
-points are part of the same track;}
+points are part of the same track.}
 
 \item{seqField}{default is \code{NULL}. This is a field which can be used to 
 correctly order the positions along the track (dates are fine).}
@@ -38,8 +36,8 @@ values (in decimal degrees)}
 \item{points}{default is \code{"orphans"}. While this function generates 
 tracks, it's possible that single records can exist from which no track can 
 be displayed.  Setting it to "orphans" includes these lone positions in the 
-output plots and/or shapefiles.  Setting it to "all" includes all positions
-in the output plots and/or shapefiles. Setting it to "none" ignores points
+results and as a layer within the gpkg.  Setting it to "all" includes all positions
+in the results and in the gpkg. Setting it to "none" ignores points
 and doesn't output any.}
 
 \item{the.crs}{default is \code{"EPSG:4326"}. This is the projection 
@@ -47,24 +45,19 @@ you want any generated data to be output in.  Input data is assumed to be
 from a GPS and should be WGS84 (which is what the default value corresponds 
 with).}
 
-\item{filename}{default is \code{NULL}.  If you are outputting shapefiles, 
+\item{filename}{default is \code{NULL}.  If you are outputting sspatiall objects, 
 you can specify a name for them here.  They will also get a timestamp.}
 
-\item{plot}{default is \code{TRUE}. This determines whether or not generated 
-tracks will be plotted.}
-
-\item{createShp}{default is \code{TRUE}. This determines whether or not 
-shapefiles will be generated in your working directory.}
+\item{create.spatial}{default is \code{TRUE}.  This indicates whether or not to create a gpkg 
+file in your working directory.}
 }
 \value{
-a list with 2 items - a SpatialPointsDataFrame, and a 
-SpatialLinesDataFrame.  Additionally, shapefiles can also be generated.
+a list containing sf objects.  Additionally, a gpkg can be generated.
 }
 \description{
 This function takes a dataframe with coordinates in decimal 
 degrees and a track identifier, and creates line segments for each distinct 
-identifier.  If specified, it will plot the results in R and/or create 
-shapefiles.
+identifier.  If specified, it will generate spatial layers within a gpkg file.
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

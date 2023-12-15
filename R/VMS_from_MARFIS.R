@@ -1,11 +1,6 @@
 #' @title VMS_from_MARFIS
 #' @description This function takes a dataframe (with coordinate fields in decimal
-#' degrees), (optionally) a spatial object (either a shapefile, an
-#' sp::SpatialPolygonsDataframe, or an sf::polygon), and a field name from the 
-#' polygon object.  It then overlays the df with the polygon, and determines which
-#' discrete polygon contains each point from the df, and appends a new field 
-#' containing this value.  
-#' If no polygon is provided, the df will be assessed against NAFO subdivisions.
+#' degrees), and extracts asssociated VMS data
 #' @param df a dataframe to be analyzed. 
 #' @param fn.oracle.username default is \code{'_none_'} This is your username for
 #' accessing oracle objects. For this function, it needs SELECT privileges on MFD_OBFMI.VMS_ALL. 
@@ -31,7 +26,7 @@
 #' values (in decimal degrees)
 #' @param make_segments the default is \code{TRUE}. This indicates whether or not the results should
 #' include an sp object of all of the VMS data as lines (in addition to a data frame)
-#' @param make_segments_shp the default is \code{FALSE}. This indicates whether or not a shapefile
+#' @param make_segments_spatial the default is \code{FALSE}. This indicates whether or not a shapefile
 #' should be created of all of the VMS data as lines (in addition to a data frame). 
 #' \code{make_segments} must be TRUE for shapefiles to be generated. 
 #' @import data.table
@@ -55,7 +50,7 @@ VMS_from_MARFIS <- function(df=NULL,
                              lat.field = NULL,
                              lon.field = NULL,
                              make_segments=TRUE,
-                             make_segments_shp = FALSE){
+                             make_segments_spatial = FALSE){
   #data.table doesn't like column name references - ensure the col names are known
   VR_NUMBER <- LANDED_DATE <- pseudo_start<- MARFLEETS_LIC <- LICENCE_ID <- GEAR_CODE <- POSITION_UTC_DATE <- NULL
   colnames(df)[colnames(df)==VR_field] <- "VR_NUMBER"
@@ -145,7 +140,7 @@ VMS_from_MARFIS <- function(df=NULL,
   combined$m.pseudo_start <- NULL
   res$marf_VMS_Segments <- NA
   if(make_segments) {
-    these_segs <- Mar.utils::make_segments(combined, objField = "trek",seqField = "POSITION_UTC_DATE", createShp = make_segments_shp, plot=F, filename = "marf_VMS_segs")
+    these_segs <- Mar.utils::make_segments(combined, objField = "trek",seqField = "POSITION_UTC_DATE", create.spatiall = make_segments_spatial, filename = "marf_VMS_segs")
     res$marf_VMS_Segments <- these_segs$segments
   }
   return(res)
