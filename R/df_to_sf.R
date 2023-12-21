@@ -31,6 +31,7 @@ df_to_sf <- function(df = NULL,
                      order.field = "POS",
                      type = "polys") {
   hole <- NA
+  type <- tolower(type)
   if(nrow(df[!stats::complete.cases(df[ , c(lat.field, lon.field)]), ])>0){
     ndrop <- nrow(df[!stats::complete.cases(df[ , c(lat.field, lon.field)]), ])
     message("Dropping ",ndrop, " records that are missing latitude, longitude, or both")
@@ -44,7 +45,11 @@ df_to_sf <- function(df = NULL,
   initState <- getOption("sf_use_s2")
   sf::sf_use_s2(FALSE)
   if (type =="points" | "EID" %in% names(df)){
-    return(sf::st_as_sf(df, coords = c(lon.field, lat.field), crs = 4326, agr = "constant"))
+    df_sf <- sf::st_as_sf(df, coords = c(lon.field, lat.field), crs = 4326, agr = "constant")
+    df_sf<- cbind(df_sf, sf::st_coordinates(df_sf$geometry))
+    colnames(df_sf)[colnames(df_sf)=="X"] <- lon.field
+    colnames(df_sf)[colnames(df_sf)=="Y"] <- lat.field
+    return(df_sf)
   }
   #If no secondary ID field exists, just create a fake one with a single value to simplify ensuing code
   if(!secondary.object.field %in% names(df)) {
@@ -59,6 +64,8 @@ df_to_sf <- function(df = NULL,
   for(i in 1:length(allPrims)){
     pid <- df[df[[primary.object.field]]== allPrims[i],]
     sids <- NULL  
+    if(type=="polys" & nrow(pid)<3)next
+    if(type=="lines" & nrow(pid)<2)next
     for(j in 1:length(unique(pid[,secondary.object.field]))){
       sid <- pid[pid[[secondary.object.field]]==unique(pid[,secondary.object.field])[j],]
       if(type=="polys"){
@@ -75,22 +82,24 @@ df_to_sf <- function(df = NULL,
             sids <- suppressMessages(suppressWarnings(sf::st_difference(sids, sid))) %>%
               dplyr::select(dplyr::all_of(c(primary.object.field, secondary.object.field, "hole")))
           }else if (unique(sid$hole)=="N"){
-            sid <- dplyr::select(sid, all_of(c(primary.object.field, secondary.object.field, "hole")))
+            sid <- dplyr::select(sid, dplyr::all_of(c(primary.object.field, secondary.object.field, "hole")))
             sids <- rbind(sids, sid)
           }else{
             message("This should never happen")
           }
         }
       }else{
+        sid <- sid[with(sid,order(sid[[order.field]])),]
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(dplyr::.data[[primary.object.field]], dplyr::.data[[secondary.object.field]]) %>%
+          # dplyr::group_by(dplyr::.data[[primary.object.field]], dplyr::.data[[secondary.object.field]]) %>%
+          dplyr::group_by_at(c(primary.object.field, secondary.object.field))%>%
           dplyr::summarize(do_union=F, .groups = 'keep') %>%
           sf::st_cast("LINESTRING")
         if(j==1) {
           sids <- rbind(sids, sid)
         }else{
-          sid <- dplyr::select(sid, all_of(c(primary.object.field, secondary.object.field)))
+          sid <- dplyr::select(sid, dplyr::all_of(c(primary.object.field, secondary.object.field)))
           sids <- rbind(sids, sid)
         }
       }

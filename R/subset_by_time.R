@@ -24,7 +24,7 @@ subset_by_time <- function(df =  NULL, min_minutes = 15, time_field = "POSITION_
   min_mins_secs <- min_minutes*60
   df$grp_fld__ <- df[,group_field]
   df$tim_fld__ <- df[,time_field]
-  library(data.table)
+  requireNamespace("data.table")
   df_dt <- data.table::setDT(df)
   
   #sort data by VR_NUMBER, POSITION_UTC_DATE

@@ -22,14 +22,6 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmptyCells = TRUE){
-  if (!inherits(data_sf[1],"sf")){
-    if(inherits(data_sf,"list") && inherits(data_sf[[1]],"SpatialPolygonsDataFrame") && names(data_sf[1])=="Grid2Min"){
-      message("converting your sp into an sf object via \n\tMar.utils::convert2poly(input = data_sf[[1]], out = 'sf')\nIt would be faster to do this prior to running this script")
-      data_sf <- Mar.utils::convert2poly(input = data_sf[[1]], out = "sf" )
-    }else{
-      stop("Please convert your input into an sf object.")
-    }
-  }
   # establish which are data vs system fields
   flds_sf <- c("ORD_gr",  "HEXID", "geometry")
   flds_choice <- colnames(data_sf)
@@ -74,7 +66,7 @@ plot_hex_data <- function(data_sf = NULL, plotfld=NULL, extent ="data", hideEmpt
     thisbbox <- sf::st_bbox(data_sf)
   }
   
-  coastline <-rnaturalearth::ne_coastline(scale=10,returnclass = "sf")
+  coastline <- Mar.data::coast_lores_sf
   p <- ggplot2::ggplot() +
     ggplot2::geom_sf(data = coastline, ggplot2::aes(colour=NA)) +
     ggplot2::geom_sf(data = thisData, ggplot2::aes(colour="#E6D5DBDB",fill = get(fld))) +

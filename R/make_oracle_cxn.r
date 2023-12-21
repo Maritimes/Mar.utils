@@ -58,7 +58,23 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
     } else {
-      if (!quietly) cat("\nROracle attempt failed\n")
+      message("\n!!! An ROracle connection could not be established with Oracle. !!!  
+              
+This has nothing to do with any of the Mar.* packages, but with the configuration of ROracle on your computer.
+Until you can successfully create a connection via the following line (inserting your own Oracle credentials), this function will continue to fail:
+
+\ttestConnection <- ROracle::dbConnect(DBI::dbDriver('Oracle'), 'yourOracleUsername', 'yourOraclePassword', 'PTRAN')
+
+Things to check:
+- Have you installed 'MAR BIO ODBC Configuration' from the Software Centre?
+- Have you installed RTools from the software centre?  It will need to be the right version for the R you're running (e.g. RTools 42 for R 4.2.x)
+- Do you have environmental variables set up for 'OCI_INC', 'OCI_LIB64' and 'TNS_ADMIN'? The correct values for each are:  
+\tOCI_INC = C:\\Oracle\\12.2.0_x64\\cli\\oci\\include
+\tOCI_LIB64 = C:\\Oracle\\12.2.0_x64\\cli\\BIN
+\tTNS_ADMIN = C:\\Oracle\\12.2.0_x64\\cli\\network\\admin
+You can check what you have by opening a command window and typing 'set'. 
+
+")
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(-1)
@@ -80,7 +96,20 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
     } else {
-      if (!quietly) cat("\nRODBC attempt failed\n")
+      message("\n!!! An RODBC connection could not be established with Oracle. !!!
+              
+This has nothing to do with any of the Mar.* packages, but with the configuration of RODBC on your computer.
+Until you can successfully create a connection via the following line (inserting your own Oracle credentials), this function will continue to fail:
+
+\ttestConnection <- RODBC::odbcConnect('PTRAN', uid = 'yourOracleUsername', pwd = 'yourOraclePassword', believeNRows = F)
+
+Things to check:
+- Have you installed 'MAR BIO ODBC Configuration' from the Software Centre?
+- Within your ODBC Administrator panels, can you see a connection called 'PTRAN'?
+- Is your ODBC connection the same architecture as the R you're running?  Both must be either 32 bit or 64 bit.
+Have a look at Tools>Global Options>General>R Version to see which R you're using
+
+")
       # results = list(usepkg='rodbc', channel = -1, thecmd=NA)
       # return(results)
       Sys.setenv(TZ = orig_TZ)

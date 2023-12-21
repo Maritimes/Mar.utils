@@ -52,12 +52,10 @@ https://github.com/Mar-scal/Assessment_fns/blob/master/Maps/pbs_2_sf.R
 Other general_use: 
 \code{\link{DDMMSS_to_DD}()},
 \code{\link{aggregator}()},
-\code{\link{clip_by_poly_generic}()},
+\code{\link{clip_by_poly}()},
 \code{\link{combine_lists}()},
-\code{\link{df2sf}()},
 \code{\link{df_qc_spatial}()},
 \code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sp}()},
 \code{\link{drop_cols}()},
 \code{\link{prepare_shape_fields}()},
 \code{\link{subset_by_time}()},

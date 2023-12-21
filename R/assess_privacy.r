@@ -201,8 +201,7 @@ assess_privacy <- function(
     
     dfLong <- dfRest <- dfRestU <- NULL
   }
-  # df[agg.fields][is.na(df[agg.fields])] <- 0
-  df = df_to_sf(df, lat.field = lat.field, lon.field = lon.field, type = "points")
+  df <- df_to_sf(df, lat.field = lat.field, lon.field = lon.field, type = "points")
   if (is.null(agg.poly.shp)){
     agg.poly=  Mar.data::NAFOSubunits_sf
     defFields <- c("NAFO_1", "NAFO_2", "NAFO_3","NAFO")
