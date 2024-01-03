@@ -24,6 +24,8 @@
 #' }
 #' However, if \code{invert} is set to \code{TRUE}, than any points/lines/polygons that intersect/
 #' are contained by the \code{clip.poly} will be removed.
+#' @param return.sf default is \code{TRUE}.  By default, the returned object will be an sf object.  
+#' Set to FALSE to return a dataframe only. 
 #' @return sf object
 #' @family general_use
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
@@ -36,7 +38,8 @@ clip_by_poly <- function(df=NULL,
                                  lon.field = "LONGITUDE", 
                                  clip.poly = NULL,
                                  buffer.m = NULL,
-                                 invert=F){
+                                 invert=F,
+                                 return.sf = T){
   orig_crs_df <- NA 
   if (!inherits(df,"sf")){
     if (inherits(df,"data.frame")){
@@ -78,9 +81,6 @@ clip_by_poly <- function(df=NULL,
   if (!invert){
     df.sf_subset <- df.sf[clip.poly_this, ] 
   }else{
-
-    # df.sf_subset<- sf::st_intersects(df.sf, clip.poly_this, sparse = T) %>%   
-    #   as.numeric() 
     df.sf_subset<- sf::st_intersects(df.sf, clip.poly_this, sparse = T)
     is.na(df.sf_subset) <- lengths(df.sf_subset) == 0
     df.sf_subset <- suppressWarnings(as.numeric(unlist(lapply(df.sf_subset, paste0, collapse = ''))))
@@ -94,6 +94,6 @@ clip_by_poly <- function(df=NULL,
     colnames(df.sf_subset)[colnames(df.sf_subset)=="X"] <- lon.field
     colnames(df.sf_subset)[colnames(df.sf_subset)=="Y"] <- lat.field
   }
-
+  if (!return.sf) df.sf_subset<- sf::st_drop_geometry(df.sf_subset)
   return(df.sf_subset)
 }
