@@ -27,7 +27,6 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 dets_defuddler <- function(marfName = NULL, df = NULL){
-  DETS_COL_LOOKUP <- COLUMN_DEFN_ID <- SUM_DOC_DEFN_COL_ID <- NA
   dfNm <- toupper(marfName)
   getCols <- function(df = NULL, type= NULL){
     if (type == "COL"){
