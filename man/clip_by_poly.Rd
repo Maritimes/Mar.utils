@@ -5,7 +5,7 @@
 \title{clip_by_poly}
 \usage{
 clip_by_poly(
-  input = NULL,
+  df = NULL,
   lat.field = "LATITUDE",
   lon.field = "LONGITUDE",
   clip.poly = NULL,
@@ -14,7 +14,7 @@ clip_by_poly(
 )
 }
 \arguments{
-\item{input}{default is \code{NULL}.  This is the dataframe/sf object that will be altered.  It 
+\item{df}{default is \code{NULL}.  This is the dataframe/sf object that will be altered.  It 
 can be a dataframe,  sp::spatial* object or an sf object (point, line or polygon).}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. This is the name of the field holding latitude 

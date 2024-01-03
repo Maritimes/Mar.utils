@@ -2,7 +2,7 @@
 #' @description This function takes a dataframe and a polygon, and clips the dataframe using the
 #' the extent of the polygon.  The polygon can be buffered as required to select nearby 
 #' data as well.  
-#' @param input default is \code{NULL}.  This is the dataframe/sf object that will be altered.  It 
+#' @param df default is \code{NULL}.  This is the dataframe/sf object that will be altered.  It 
 #' can be a dataframe,  sp::spatial* object or an sf object (point, line or polygon).
 #' @param clip.poly default is \code{NULL}. This is either an sf polygon, an sp:spatialPolygons
 #' object, or the full path to a shapefile (including the '.shp' extension).  This is the polygon 
@@ -31,7 +31,7 @@
 #' @note If the input polygon has no projection assigned, it will be assumed to be in Geographic, 
 #' WGS84. FYI, during buffering, the polygon is briefly converted to UTMZone20 since the use of 
 #' distances requires projecting the data.
-clip_by_poly <- function(input=NULL,
+clip_by_poly <- function(df=NULL,
                                  lat.field = "LATITUDE", 
                                  lon.field = "LONGITUDE", 
                                  clip.poly = NULL,
