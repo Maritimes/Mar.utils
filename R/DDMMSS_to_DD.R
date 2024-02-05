@@ -13,13 +13,13 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 DDMMSS_to_DD <- function(df = NULL, lat.field = "LATITUDE", lon.field="LONGITUDE", WestHemisphere = T){
-  
+  deprecate_warn("2023.12.2", "DDMMSS_to_DD()", "DDMMx_to_DD()")
   df[,lat.field][!is.na(df[,lat.field])] = round(as.numeric(substr(df[,lat.field][!is.na(df[,lat.field])], 1, 2)) + 
                                                  as.numeric(substr(df[,lat.field][!is.na(df[,lat.field])], 3, 4))/60 + 
                                                  as.numeric(substr(df[,lat.field][!is.na(df[,lat.field])], 5, 6))/3600,7)
   
   df[,lon.field][!is.na(df[,lon.field])] = round(as.numeric(substr(df[,lon.field][!is.na(df[,lon.field])], 1, 2)) + 
-                                                     as.numeric(substr(df[,lon.field][!is.na(df[,lon.field])], 3, 4))/60 + 
+                                                 as.numeric(substr(df[,lon.field][!is.na(df[,lon.field])], 3, 4))/60 + 
                                                      as.numeric(substr(df[,lon.field][!is.na(df[,lon.field])], 5, 6))/3600 ,7)
   if (WestHemisphere) df[,lon.field][!is.na(df[,lon.field])] = -1 * abs(df[,lon.field][!is.na(df[,lon.field])])
   return(df)
