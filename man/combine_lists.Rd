@@ -24,6 +24,7 @@ will be retained.
 \seealso{
 Other general_use: 
 \code{\link{DDMMSS_to_DD}()},
+\code{\link{DDMMx_to_DD}()},
 \code{\link{aggregator}()},
 \code{\link{clip_by_poly}()},
 \code{\link{df_qc_spatial}()},

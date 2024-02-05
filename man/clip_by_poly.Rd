@@ -10,7 +10,8 @@ clip_by_poly(
   lon.field = "LONGITUDE",
   clip.poly = NULL,
   buffer.m = NULL,
-  invert = F
+  invert = F,
+  return.sf = T
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ returned
 }
 However, if \code{invert} is set to \code{TRUE}, than any points/lines/polygons that intersect/
 are contained by the \code{clip.poly} will be removed.}
+
+\item{return.sf}{default is \code{TRUE}.  By default, the returned object will be an sf object.
+Set to FALSE to return a dataframe only.}
 }
 \value{
 sf object
@@ -58,6 +62,7 @@ distances requires projecting the data.
 \seealso{
 Other general_use: 
 \code{\link{DDMMSS_to_DD}()},
+\code{\link{DDMMx_to_DD}()},
 \code{\link{aggregator}()},
 \code{\link{combine_lists}()},
 \code{\link{df_qc_spatial}()},

@@ -54,6 +54,7 @@ and/or COUNTs
 \seealso{
 Other general_use: 
 \code{\link{DDMMSS_to_DD}()},
+\code{\link{DDMMx_to_DD}()},
 \code{\link{clip_by_poly}()},
 \code{\link{combine_lists}()},
 \code{\link{df_qc_spatial}()},
