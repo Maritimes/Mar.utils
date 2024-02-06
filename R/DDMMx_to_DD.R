@@ -2,8 +2,8 @@
 #' @description This utility will convert coordinates from various DDMM formats to Decimal degrees.
 #' The new decimal degrees fields will be added as new columns called "LAT_DD" and "LON_DD". 
 #' @param format the default is \code{"DDMMMM"}, but \code{"DDMMSS"} is also valid.  \code{'DDMMMM'} 
-#' values are typically cases where the degrees are followed by decimal minutes (without the decimal), 
-#' such as 44°4.7' is written as "44047" or "440470".  \code{"DDMMSS"} values can look identical, 
+#' values are typically cases where the degrees are followed by decimal minutes (with or without the decimal), 
+#' such as 44°4.7' is written as "44047", "4404.7", "440470", or "4404.70".  \code{"DDMMSS"} values can look identical, 
 #' but the last four digits represent minutes and seconds.  For example, the value of 44°4'42" 
 #' would be written as "440442". 
 #' @param df a dataframe to be analyzed. If left \code{NULL}, a value for \code{db} should be provided
@@ -26,6 +26,7 @@ DDMMx_to_DD <- function(df=NULL, format="DDMMMM", lat.field=NULL, lon.field=NULL
     osigns<-substr(DDMM, 1, 1)=="-"
     osigns[is.na(osigns)]<- FALSE
     DDMM <- as.numeric(gsub("^-", "", DDMM))
+    DDMM <- as.numeric(gsub("\\.", "", DDMM))
     
     #get value to 6 digits long (without turning to character)
     n <- 6 - nchar(DDMM)

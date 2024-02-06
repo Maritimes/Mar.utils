@@ -16,8 +16,8 @@ DDMMx_to_DD(
 \item{df}{a dataframe to be analyzed. If left \code{NULL}, a value for \code{db} should be provided}
 
 \item{format}{the default is \code{"DDMMMM"}, but \code{"DDMMSS"} is also valid.  \code{'DDMMMM'} 
-values are typically cases where the degrees are followed by decimal minutes (without the decimal), 
-such as 44°4.7' is written as "44047" or "440470".  \code{"DDMMSS"} values can look identical, 
+values are typically cases where the degrees are followed by decimal minutes (with or without the decimal), 
+such as 44°4.7' is written as "44047", "4404.7", "440470", or "4404.70".  \code{"DDMMSS"} values can look identical, 
 but the last four digits represent minutes and seconds.  For example, the value of 44°4'42" 
 would be written as "440442".}
 
