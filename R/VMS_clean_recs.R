@@ -48,7 +48,6 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   colnames(df)[colnames(df)==lon.field] <- "LONGITUDE__"
   colnames(df)[colnames(df)==objField] <- "objField__"
   colnames(df)[colnames(df)==timeField] <- "timeField__"
-  df<- df[!(df$LATITUDE__== -90|df$LONGITUDE__== -180),]
   e <- new.env()
   e$loopagain <- TRUE
   
@@ -77,7 +76,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     }
     return(df)
   }
-  
+
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
   `:=` <- function (x, value) value
@@ -89,6 +88,10 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   #2) time to nearest 5 minutes
   df$LATITUDE__<-round( df$LATITUDE__,4)
   df$LONGITUDE__<-round( df$LONGITUDE__,4)
+  
+  df<- df[!(df$LATITUDE__== -90|df$LONGITUDE__== -180),]
+  df<- df[!(df$LATITUDE__== 0&df$LONGITUDE__== 0),]
+
   df$timeField__ <- as.POSIXct(round(as.numeric(df$timeField__)/(300))*(300),origin='1970-01-01')
   #remove the recs that our rounding has turned into duplicates
   df= unique(df)

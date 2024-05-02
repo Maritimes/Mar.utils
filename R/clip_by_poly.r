@@ -59,6 +59,8 @@ clip_by_poly <- function(df=NULL,
     clip.poly_this     <- sf::st_read(clip.poly, quiet=T)
   } else if(inherits(clip.poly,"SpatialPolygonsDataFrame")){
     clip.poly_this <- sf::st_as_sf(clip.poly)
+  }else if(inherits(clip.poly,"sf")){
+    clip.poly_this <-clip.poly
   }
   if (is.na(sf::st_crs(clip.poly_this))){
     cat('\nNo projection found for input shapefile - assuming geographic.')

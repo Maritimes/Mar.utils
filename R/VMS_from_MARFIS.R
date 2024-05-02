@@ -71,7 +71,7 @@ VMS_from_MARFIS <- function(df=NULL,
  
   df <- data.table::setDT(df) 
   df <- data.table::setorder(df, VR_NUMBER, LANDED_DATE) 
-  df <-df[, pseudo_start := shift(LANDED_DATE, type= "lag"), by= VR_NUMBER ]
+  df <-df[, pseudo_start := data.table::shift(LANDED_DATE, type= "lag"), by= VR_NUMBER ]
   df <- data.table::setDF(df) 
   df[is.na(df$pseudo_start),"pseudo_start"] <- df[is.na(df$pseudo_start),"LANDED_DATE"] - as.difftime(look_ahead_days, units="days")
   dateRange <- as.Date(c(min(df$pseudo_start), max(df$LANDED_DATE)))
@@ -101,7 +101,7 @@ VMS_from_MARFIS <- function(df=NULL,
                            quietly = T)
   }
   if (nrow(theVMS)==1000000)warning("Hit extraction row limit")
-  theVMS <- Mar.utils::VMS_clean_recs(df=theVMS)
+  theVMS2 <- VMS_clean_recs(df=theVMS)
   theVMS$VR_NUMBER <- as.numeric(theVMS$VR_NUMBER)
   theVMS$elapsedDist_m <- theVMS$elapsedTime_min  <- NULL
   
@@ -140,7 +140,7 @@ VMS_from_MARFIS <- function(df=NULL,
   combined$m.pseudo_start <- NULL
   res$marf_VMS_Segments <- NA
   if(make_segments) {
-    these_segs <- Mar.utils::make_segments(combined, objField = "trek",seqField = "POSITION_UTC_DATE", create.spatiall = make_segments_spatial, filename = "marf_VMS_segs")
+    these_segs <- Mar.utils::make_segments(combined, objField = "trek",seqField = "POSITION_UTC_DATE", create.spatial = make_segments_spatial, filename = "marf_VMS_segs")
     res$marf_VMS_Segments <- these_segs$segments
   }
   return(res)
