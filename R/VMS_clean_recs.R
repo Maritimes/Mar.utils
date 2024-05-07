@@ -43,7 +43,6 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           minDist_m = 50, maxBreak_mins = 1440,
                           minKnots = NULL, maxKnots = NULL){
   LATITUDE__ <- LONGITUDE__ <- objField__ <- timeField__ <- NA
-  
   colnames(df)[colnames(df)==lat.field] <- "LATITUDE__"
   colnames(df)[colnames(df)==lon.field] <- "LONGITUDE__"
   colnames(df)[colnames(df)==objField] <- "objField__"
@@ -88,10 +87,8 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   #2) time to nearest 5 minutes
   df$LATITUDE__<-round( df$LATITUDE__,4)
   df$LONGITUDE__<-round( df$LONGITUDE__,4)
-  
-  df<- df[!(df$LATITUDE__== -90|df$LONGITUDE__== -180),]
-  df<- df[!(df$LATITUDE__== 0&df$LONGITUDE__== 0),]
 
+  df <- df[!(df$LONGITUDE__ == 0 & df$LATITUDE__ == 0) & df$LONGITUDE__ >= -180 & df$LONGITUDE__ <= 180 & df$LATITUDE__ >= -90 & df$LATITUDE__ <= 90, ]
   df$timeField__ <- as.POSIXct(round(as.numeric(df$timeField__)/(300))*(300),origin='1970-01-01')
   #remove the recs that our rounding has turned into duplicates
   df= unique(df)

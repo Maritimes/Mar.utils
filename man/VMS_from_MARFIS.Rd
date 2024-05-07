@@ -69,7 +69,7 @@ should be created of all of the VMS data as lines (in addition to a data frame).
 \value{
 a list containing a data.frame called "marf_VMS" of the joined marfis/VMS data, and, 
 if \code{make_segments} is TRUE, an sp object called "marf_VMS_segments". Additionally, if 
-make_segments and make_segments_shp are bothe TRUE, a shapefile will be created in the working 
+make_segments and make_segments_shp are both TRUE, a shapefile will be created in the working 
 directory.
 }
 \description{

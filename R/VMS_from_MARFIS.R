@@ -32,7 +32,7 @@
 #' @import data.table
 #' @return a list containing a data.frame called "marf_VMS" of the joined marfis/VMS data, and, 
 #' if \code{make_segments} is TRUE, an sp object called "marf_VMS_segments". Additionally, if 
-#' make_segments and make_segments_shp are bothe TRUE, a shapefile will be created in the working 
+#' make_segments and make_segments_shp are both TRUE, a shapefile will be created in the working 
 #' directory.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -57,7 +57,6 @@ VMS_from_MARFIS <- function(df=NULL,
   colnames(df)[colnames(df)==LIC_field] <- "LICENCE_ID"
   colnames(df)[colnames(df)==GC_field] <- "GEAR_CODE"
   colnames(df)[colnames(df)==LANDED_field] <- "LANDED_DATE"
-  
   df<-df[!is.na(df$VR_NUMBER) & !is.na(df$LICENCE_ID) & !is.na(df$GEAR_CODE), ]
   
   bbox <- NA
@@ -101,7 +100,7 @@ VMS_from_MARFIS <- function(df=NULL,
                            quietly = T)
   }
   if (nrow(theVMS)==1000000)warning("Hit extraction row limit")
-  theVMS2 <- VMS_clean_recs(df=theVMS)
+  theVMS <- VMS_clean_recs(df=theVMS)
   theVMS$VR_NUMBER <- as.numeric(theVMS$VR_NUMBER)
   theVMS$elapsedDist_m <- theVMS$elapsedTime_min  <- NULL
   

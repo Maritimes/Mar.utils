@@ -77,6 +77,7 @@ identify_area <- function(df = NULL,
   sink <- utils::capture.output(sf::sf_use_s2(FALSE))
   res <- suppressMessages(sf::st_join(df_sf, agg.poly))
   sink <- utils::capture.output(sf::sf_use_s2(TRUE))
+
   res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<outside known areas>"
   
   res[!is.na(res$tmp),agg.poly.field]<-sf::st_drop_geometry(res[!is.na(res$tmp),"tmp"])
