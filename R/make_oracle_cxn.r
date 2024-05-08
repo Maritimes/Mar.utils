@@ -89,7 +89,7 @@ You can check what you have by opening a command window and typing 'set'.
         message(cond)
       }
     )
-    if (inherits(class(oracle_cxn),"RODBC")) {
+    if (inherits(oracle_cxn,"RODBC")) {
       if (!quietly) cat("\nSuccessfully connected to Oracle via RODBC\n")
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       Sys.setenv(TZ = orig_TZ)
@@ -119,12 +119,12 @@ Have a look at Tools>Global Options>General>R Version to see which R you're usin
   }
   
   if (!is.null(oracle_cxn)){
-    if (inherits(class(oracle_cxn),"RODBC")){
+    if (inherits(oracle_cxn,"RODBC")){
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
       return(results)
-    }else if (inherits(class(oracle_cxn),"OraConnection")) {
+    }else if (inherits(oracle_cxn,"OraConnection")) {
       results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
