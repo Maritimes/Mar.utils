@@ -61,12 +61,11 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     #next record.
     df['distCalc'] <- c(-1, utils::head(df['distCalc'], dim(df)[1] - 1)[[1]])
     df[is.na(df$distCalc),"distCalc"] <- -1
-    
     df$KEEP<-FALSE
-    df[df$distCalc >= minDist_m ,"KEEP"] <- TRUE
+    df[df$distCalc == -1, "KEEP"] <- TRUE
     df[df$time_min <= maxBreak_mins,"KEEP"] <- TRUE
-    df[df$distCalc == -1 & df$time_min ==0, "KEEP"] <- TRUE
-    df[df$distCalc == 0, "KEEP"] <- FALSE
+    df[df$distCalc >= minDist_m ,"KEEP"] <- TRUE
+    # df[df$distCalc == 0, "KEEP"] <- FALSE
     df <- df[which(df$KEEP==TRUE),]
     df$KEEP<-NULL
     dfn_1 <- nrow(df)
@@ -75,35 +74,27 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     }
     return(df)
   }
-
+  
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
   `:=` <- function (x, value) value
   distCalc <- time_min <- elapsedDist_m <- elapsedTime_min <- .SD <- UPDATE_DATE <- NULL
   n1 = nrow(df)
-  # cat("initial no:",n1,"\n")
   #round values to remove near-duplicates:
   #1) dd coords to 4 decimals (~10m resolution);
   #2) time to nearest 5 minutes
   df$LATITUDE__<-round( df$LATITUDE__,4)
   df$LONGITUDE__<-round( df$LONGITUDE__,4)
-
   df <- df[!(df$LONGITUDE__ == 0 & df$LATITUDE__ == 0) & df$LONGITUDE__ >= -180 & df$LONGITUDE__ <= 180 & df$LATITUDE__ >= -90 & df$LATITUDE__ <= 90, ]
   df$timeField__ <- as.POSIXct(round(as.numeric(df$timeField__)/(300))*(300),origin='1970-01-01')
   #remove the recs that our rounding has turned into duplicates
   df= unique(df)
   if ("UPDATE_DATE" %in% names(df)){
-    #For cases where a vessel has multiple positions at a single time, I use 
-    #UPDATE_DATE to get only the most recently updated position
-    # df = dplyr::arrange(df, df[objField], df[timeField], UPDATE_DATE)
     df = data.table::setorder(df, objField__, timeField__, UPDATE_DATE)
-    
-    # df = df[order(xtfrm(df[objField]),xtfrm(df[timeField]),df$UPDATE_DATE),] 
     df = data.table::setDT(df)
-    
     df = df[,utils::tail(.SD,1),by=list("objField__" = objField__,"timeField__" = timeField__)]
   }
-
+  
   while (e$loopagain == TRUE) {
     df<- addDistTime(df)
   }
@@ -135,7 +126,7 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     length
   )
   df <- df[df$trek %in% trekpts[trekpts$cnt>1,"grp"],]
-
+  
   colnames(df)[colnames(df)=="LATITUDE__"] <- lat.field
   colnames(df)[colnames(df)=="LONGITUDE__"] <- lon.field
   colnames(df)[colnames(df)=="objField__"] <- objField
