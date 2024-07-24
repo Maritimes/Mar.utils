@@ -42,6 +42,8 @@ VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
                           objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE",
                           minDist_m = 50, maxBreak_mins = 1440,
                           minKnots = NULL, maxKnots = NULL){
+  warning("The 'VMS_clean_recs()' function is deprecated; use 'VMS_clean_recs2()' instead.", 
+          immediate. = TRUE, call. = FALSE)
   LATITUDE__ <- LONGITUDE__ <- objField__ <- timeField__ <- NA
   colnames(df)[colnames(df)==lat.field] <- "LATITUDE__"
   colnames(df)[colnames(df)==lon.field] <- "LONGITUDE__"
