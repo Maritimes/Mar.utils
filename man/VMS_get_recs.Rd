@@ -86,6 +86,7 @@ of interest, but give context to the path.
 }
 \seealso{
 Other vms: 
+\code{\link{VMS_clean_recs2}()},
 \code{\link{VMS_clean_recs}()}
 }
 \author{

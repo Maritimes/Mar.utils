@@ -13,7 +13,8 @@ make_segments(
   points = "orphans",
   the.crs = "EPSG:4326",
   filename = NULL,
-  create.spatial = TRUE
+  create.spatial = TRUE,
+  gpkgName = "make_segments.gpkg"
 )
 }
 \arguments{
@@ -33,23 +34,25 @@ correctly order the positions along the track (dates are fine).}
 \item{lon.field}{the default is \code{"LONGITUDE"}.  the name of the field holding longitude 
 values (in decimal degrees)}
 
-\item{points}{default is \code{"orphans"}. While this function generates 
-tracks, it's possible that single records can exist from which no track can 
-be displayed.  Setting it to "orphans" includes these lone positions in the 
-results and as a layer within the gpkg.  Setting it to "all" includes all positions
-in the results and in the gpkg. Setting it to "none" ignores points
-and doesn't output any.}
+\item{points}{default is \code{"orphans"}. Valid options include "orphans", "all" and "none". 
+While this function primarily generates linestrings/tracks, it can also include the same data as 
+points/vertices.  "none" will not include any vertices, "all" will include all vertices, and 
+"orphans" will only include lone vertices, which are not part of any segment.}
 
 \item{the.crs}{default is \code{"EPSG:4326"}. This is the projection 
 you want any generated data to be output in.  Input data is assumed to be 
 from a GPS and should be WGS84 (which is what the default value corresponds 
 with).}
 
-\item{filename}{default is \code{NULL}.  If you are outputting sspatiall objects, 
-you can specify a name for them here.  They will also get a timestamp.}
+\item{filename}{default is \code{NULL}.  If you are outputting spatial objects, 
+you can specify a name for them here.  This used to correspond with the output shapefile name,
+but now is used to identify the layers within a gpkg file. They will also get a timestamp.}
 
 \item{create.spatial}{default is \code{TRUE}.  This indicates whether or not to create a gpkg 
 file in your working directory.}
+
+\item{gpkgName}{default is \code{"make_segments.gpkg"}.  If \code{create.spatial = TRUE}, a gpkg 
+file will be created, and the name here will control what it is called.}
 }
 \value{
 a list containing sf objects.  Additionally, a gpkg can be generated.

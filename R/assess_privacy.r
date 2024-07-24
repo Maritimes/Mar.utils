@@ -157,7 +157,6 @@ assess_privacy <- function(
     message(nrow(noCoords)," records had one or more missing coordinates and were dropped")
     df <- df[stats::complete.cases(df[,c(lat.field, lon.field)]),]
   }
-  
   #deal with cases where differing rows may refer to different species in the same sets
   #in short:
   #1)pull key.fields, facet.field and agg.fields into dfLong
@@ -180,7 +179,6 @@ assess_privacy <- function(
     }
     dfLong <- df[,c(key.fields,c(facet.field, agg.fields))]
     dfLong <- dfLong[!is.na(dfLong[facet.field]),]
-    
     dfRest  <- df[,!names(df) %in% c(facet.field, agg.fields)]
     dfRestU <- unique(dfRest)
     if (nrow(dfRest)==nrow(dfRestU)){

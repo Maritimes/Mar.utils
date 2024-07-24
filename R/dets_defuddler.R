@@ -27,6 +27,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 dets_defuddler <- function(marfName = NULL, df = NULL){
+  DETS_COL_LOOKUP <- COLUMN_DEFN_ID <- SUM_DOC_DEFN_COL_ID <- SUM_DOC_DEFN_COL_ID <- NA
   dfNm <- toupper(marfName)
   getCols <- function(df = NULL, type= NULL){
     if (type == "COL"){
@@ -151,7 +152,7 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
     
     wide <- reshape2::dcast(df, paste(paste(idEm, collapse = " + "), "~", paste(measureEm, collapse = " + ")), value.var = "DATA_VALUE")
     
-    cat("\nwhat's with the >1000 'COLUMN_DEFN_IDs'?")
+    # cat("\nwhat's with the >1000 'COLUMN_DEFN_IDs'?")
     wide <- getCols(wide, type = "COL")
     return(wide)
   }

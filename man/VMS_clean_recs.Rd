@@ -69,6 +69,7 @@ for a vessel exceeds \code{maxBreak_mins}.  If no value is provided, 24 hours
 }
 \seealso{
 Other vms: 
+\code{\link{VMS_clean_recs2}()},
 \code{\link{VMS_get_recs}()}
 }
 \author{
