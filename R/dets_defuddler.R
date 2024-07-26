@@ -35,8 +35,7 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
     }else if (type == "SUM"){
       col = "SUM_DOC_DEFN_COL_ID"
     }
-    
-    theseDets <-  unique(DETS_COL_LOOKUP[DETS_COL_LOOKUP[,col] %in% names(df),c(col, "DESC_ENG")])
+    theseDets <-  unique(Mar.utils::DETS_COL_LOOKUP[Mar.utils::DETS_COL_LOOKUP[,col] %in% names(df),c(col, "DESC_ENG")])
     codedColsPresent <- as.character(sort(as.numeric(names(df)[names(df) %in% theseDets[,col]])))
     otherColsPresent <- sort(names(df)[!names(df) %in% theseDets[,col]])
     
