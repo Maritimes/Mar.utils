@@ -131,6 +131,9 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
   }
   doLOG_EFRT_ENTRD_DETS <- function(df = NULL){
     idEm <- c("LOG_EFRT_STD_INFO_ID", "TRIP_DMP_COMPANY_ID")
+    idEm_ <- names(df)[names(df) %in% idEm]
+    if (length(idEm)>length(idEm_)) warning("One or more default fields may be missing from your df")
+    idEm<-idEm_
     measureEm<- "COLUMN_DEFN_ID"
     
     wide <- reshape2::dcast(df, paste(paste(idEm, collapse = " + "), "~", paste(measureEm, collapse = " + ")), value.var = "DATA_VALUE")
@@ -139,6 +142,9 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
   }
   doLOG_SPC_ENTRD_DETS  <- function(df = NULL){
     idEm <- c("LOG_SPC_STD_INFO_ID", "TRIP_DMP_COMPANY_ID")
+    idEm_ <- names(df)[names(df) %in% idEm]
+    if (length(idEm)>length(idEm_)) warning("One or more default fields may be missing from your df")
+    idEm<-idEm_
     measureEm <- "COLUMN_DEFN_ID"
     
     wide <- reshape2::dcast(df, paste(paste(idEm, collapse = " + "), "~", paste(measureEm, collapse = " + ")), value.var = "DATA_VALUE")
@@ -147,6 +153,9 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
   }
   doMON_DOC_ENTRD_DETS  <- function(df = NULL){
     idEm <- c("MON_DOC_ID", "TRIP_DMP_COMPANY_ID")
+    idEm_ <- names(df)[names(df) %in% idEm]
+    if (length(idEm)>length(idEm_)) warning("One or more default fields may be missing from your df")
+    idEm<-idEm_
     measureEm <- "COLUMN_DEFN_ID"
     
     wide <- reshape2::dcast(df, paste(paste(idEm, collapse = " + "), "~", paste(measureEm, collapse = " + ")), value.var = "DATA_VALUE")
@@ -157,6 +166,9 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
   }
   doSLIP_SPC_ENTRD_DETS  <- function(df = NULL){
     idEm <- c("SLIP_SPC_STD_INFO_ID", "TRIP_DMP_COMPANY_ID")
+    idEm_ <- names(df)[names(df) %in% idEm]
+    if (length(idEm)>length(idEm_)) warning("One or more default fields may be missing from your df")
+    idEm<-idEm_
     measureEm <- "COLUMN_DEFN_ID"
     
     wide <- reshape2::dcast(df, paste(paste(idEm, collapse = " + "), "~", paste(measureEm, collapse = " + ")), value.var = "DATA_VALUE")
@@ -167,6 +179,9 @@ dets_defuddler <- function(marfName = NULL, df = NULL){
     df$SUM_DOC_ENTR_DET_ID <- NULL
     df <- unique(df)
     idEm <- c("SUM_DOC_ID")
+    idEm_ <- names(df)[names(df) %in% idEm]
+    if (length(idEm)>length(idEm_)) warning("One or more default fields may be missing from your df")
+    idEm<-idEm_
     measureEm <- "SUM_DOC_DEFN_COL_ID"
     
     wide <- reshape2::dcast(df, paste(paste(idEm, collapse = " + "), "~", 
