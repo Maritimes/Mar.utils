@@ -30,6 +30,7 @@ df_to_sf <- function(df = NULL,
                      secondary.object.field = "SID",
                      order.field = "POS",
                      type = "polys") {
+
   hole <- NA
   type <- tolower(type)
   if(nrow(df[!stats::complete.cases(df[ , c(lat.field, lon.field)]), ])>0){
@@ -64,15 +65,16 @@ df_to_sf <- function(df = NULL,
   for(i in 1:length(allPrims)){
     pid <- df[df[[primary.object.field]]== allPrims[i],]
     sids <- NULL  
-    if(type=="polys" & nrow(pid)<3)next
+    if(type=="polys" & nrow(pid)<4)next
     if(type=="lines" & nrow(pid)<2)next
     for(j in 1:length(unique(pid[,secondary.object.field]))){
       sid <- pid[pid[[secondary.object.field]]==unique(pid[,secondary.object.field])[j],]
       if(type=="polys"){
+        if(nrow(sid)<4) next
         sid$hole <- ifelse(sid[,order.field][1]<sid[,order.field][2],"N","Y")
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(dplyr::.data[[primary.object.field]], dplyr::.data[[secondary.object.field]], hole) %>%
+          dplyr::group_by(PID, SID, hole) %>%
           dplyr::summarize(do_union=F, .groups = 'keep') %>%
           sf::st_cast("POLYGON")
         if(j==1) {
@@ -89,6 +91,7 @@ df_to_sf <- function(df = NULL,
           }
         }
       }else{
+        if(nrow(sid)<2) next
         sid <- sid[with(sid,order(sid[[order.field]])),]
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
