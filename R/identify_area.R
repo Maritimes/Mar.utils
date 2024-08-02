@@ -36,7 +36,6 @@ identify_area <- function(df = NULL,
   df[,"tmp"]<-NA
   handled <- df[F,]
   badNames <- names(df)[!names(df) %in% c(lat.field, lon.field, "ID_", "tmp")]
-  
   if(nrow(df[is.na(df[,lat.field])|is.na(df[,lon.field]),])>0){
     coordMissing <- df[is.na(df[,lat.field])|is.na(df[,lon.field]),]
     coordMissing$tmp <- "<missing coord>"
@@ -60,6 +59,8 @@ identify_area <- function(df = NULL,
     if (is.null(agg.poly.field)){
       agg.poly.field = 'NAFO'
     }
+
+    
   }else if (is.character(agg.poly.shp)){
     agg.poly <- sf::st_read(dsn = agg.poly.shp, quiet=T)
   }else if ("SpatialPolygons" %in% class(agg.poly.shp) || "SpatialPolygonsDataFrame" %in% class(agg.poly.shp)){
@@ -67,6 +68,14 @@ identify_area <- function(df = NULL,
   }else if ("sf" %in% class(agg.poly.shp)){
     agg.poly = agg.poly.shp
   }
+  
+  # Check if agg.poly.field exists in df and rename it in agg.poly
+  if (agg.poly.field %in% names(df)) {
+    names(agg.poly)[names(agg.poly) == agg.poly.field] <- paste0(agg.poly.field, "_1")
+    agg.poly.field <- paste0(agg.poly.field, "_1")
+    warning("The value for agg.poly.field already exists in df.  The output will append '_1' to the field coming from agg_poly_shp")
+  }
+  
   if (is.na(sf::st_crs(agg.poly))) {
     message('No projection found for input - assuming geographic.')
     attributes(agg.poly)$crs <- sf::st_crs(4326)
@@ -77,14 +86,13 @@ identify_area <- function(df = NULL,
   sink <- utils::capture.output(sf::sf_use_s2(FALSE))
   res <- suppressMessages(sf::st_join(df_sf, agg.poly))
   sink <- utils::capture.output(sf::sf_use_s2(TRUE))
-
+=
   res[which(is.na(res[,agg.poly.field])),agg.poly.field] <- "<outside known areas>"
   
   res[!is.na(res$tmp),agg.poly.field]<-sf::st_drop_geometry(res[!is.na(res$tmp),"tmp"])
   res$tmp <- res$geometry <- NULL
   res <- res[,c(names(res[names(res) %in% names(df_Orig)]),agg.poly.field)]
   res <- res[,!names(res) %in% badNames]
-  # if (agg.poly.field %in% c("NAME_E", "ZONE_E", "URL_E", "REGULATION")) 
   res <- merge(df_Orig, res, by="ID_")
 
   bbox<-as.vector(sf::st_bbox(agg.poly))
