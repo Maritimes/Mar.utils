@@ -74,7 +74,7 @@ df_to_sf <- function(df = NULL,
         sid$hole <- ifelse(sid[,order.field][1]<sid[,order.field][2],"N","Y")
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(PID, SID, hole) %>%
+          dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field), hole) %>%
           dplyr::summarize(do_union=F, .groups = 'keep') %>%
           sf::st_cast("POLYGON")
         if(j==1) {
@@ -95,8 +95,7 @@ df_to_sf <- function(df = NULL,
         sid <- sid[with(sid,order(sid[[order.field]])),]
         sid <- sid %>%
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          # dplyr::group_by(dplyr::.data[[primary.object.field]], dplyr::.data[[secondary.object.field]]) %>%
-          dplyr::group_by_at(c(primary.object.field, secondary.object.field))%>%
+          dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field)) %>%
           dplyr::summarize(do_union=F, .groups = 'keep') %>%
           sf::st_cast("LINESTRING")
         if(j==1) {
