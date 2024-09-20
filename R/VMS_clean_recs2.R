@@ -139,7 +139,7 @@ VMS_clean_recs2 <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   initialTidy <- function(df){
     #drop invalid coords
     df <- df %>%
-      dplyr::filter(!(df[[lon.field]] == 0 & df[[lat.field]] == 0),
+      dplyr::filter(!(abs(df[[lon.field]]) < 1 & abs(df[[lat.field]]) < 1),
              df[[lon.field]] >= -180, df[[lon.field]] <= 180,
              df[[lat.field]] >= -90, df[[lat.field]] <= 90)
     
