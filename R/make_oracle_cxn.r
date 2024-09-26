@@ -52,7 +52,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       }
     )
     if (inherits(oracle_cxn,"OraConnection")) {
-      if (!quietly) cat("\nSuccessfully connected to Oracle via ROracle\n")
+      if (!quietly) message("\nSuccessfully connected to Oracle via ROracle\n")
       results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
@@ -60,7 +60,7 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
     } else {
       message("\n!!! An ROracle connection could not be established with Oracle. !!!  
               
-This has nothing to do with any of the Mar.* packages, but with the configuration of ROracle on your computer.
+This likely has nothing to do with any of the Mar.* packages, but with the configuration of ROracle on your computer.
 Until you can successfully create a connection via the following line (inserting your own Oracle credentials), this function will continue to fail:
 
 \ttestConnection <- ROracle::dbConnect(DBI::dbDriver('Oracle'), 'yourOracleUsername', 'yourOraclePassword', 'PTRAN')
@@ -72,6 +72,7 @@ Things to check:
 \tOCI_INC = C:\\Oracle\\12.2.0_x64\\cli\\oci\\include
 \tOCI_LIB64 = C:\\Oracle\\12.2.0_x64\\cli\\BIN
 \tTNS_ADMIN = C:\\Oracle\\12.2.0_x64\\cli\\network\\admin
+- Is C:\\Oracle\\12.2.0_x64\\cli\\BIN in your PATH?
 You can check what you have by opening a command window and typing 'set'. 
 
 ")
@@ -90,7 +91,7 @@ You can check what you have by opening a command window and typing 'set'.
       }
     )
     if (inherits(oracle_cxn,"RODBC")) {
-      if (!quietly) cat("\nSuccessfully connected to Oracle via RODBC\n")
+      if (!quietly) message("\nSuccessfully connected to Oracle via RODBC\n")
       results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
@@ -98,7 +99,7 @@ You can check what you have by opening a command window and typing 'set'.
     } else {
       message("\n!!! An RODBC connection could not be established with Oracle. !!!
               
-This has nothing to do with any of the Mar.* packages, but with the configuration of RODBC on your computer.
+This likely has nothing to do with any of the Mar.* packages, but with the configuration of RODBC on your computer.
 Until you can successfully create a connection via the following line (inserting your own Oracle credentials), this function will continue to fail:
 
 \ttestConnection <- RODBC::odbcConnect('PTRAN', uid = 'yourOracleUsername', pwd = 'yourOraclePassword', believeNRows = F)
@@ -136,7 +137,7 @@ Have a look at Tools>Global Options>General>R Version to see which R you're usin
       oracle.username= fn.oracle.username
     } else if (exists('oracle.username')){
       oracle.username <- oracle.username
-      if (!quietly) cat("\nUsing stored 'oracle.username'")
+      if (!quietly) message("\nUsing stored 'oracle.username'")
     }else{
       oracle.username <- readline(prompt = "Oracle Username: ")
       print(oracle.username)
@@ -145,7 +146,7 @@ Have a look at Tools>Global Options>General>R Version to see which R you're usin
          oracle.password= fn.oracle.password
     }else if (exists('oracle.password')){
       oracle.password <- oracle.password
-      if (!quietly) cat("\nUsing stored 'oracle.password'")
+      if (!quietly) message("\nUsing stored 'oracle.password'")
     } else {
       oracle.password <- readline(prompt = "Oracle Password: ")
       print(oracle.password)
@@ -154,7 +155,7 @@ Have a look at Tools>Global Options>General>R Version to see which R you're usin
          oracle.dsn= fn.oracle.dsn
     }else if (exists('oracle.dsn')){
       oracle.dsn <- oracle.dsn
-      if (!quietly) cat("\nUsing stored 'oracle.dsn'")
+      if (!quietly) message("\nUsing stored 'oracle.dsn'")
     }else{
       oracle.dsn <- readline(prompt = "Oracle DSN (e.g. PTRAN): ")
       print(oracle.dsn)

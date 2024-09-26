@@ -13,7 +13,7 @@
 #' @export 
 rename_fields <- function(df = NULL, oldFields = NULL, newFields = NULL){
   if ((length(oldFields) != length(newFields)) | (length(oldFields) + length(newFields)<2) ){
-    cat("oldFields and newFields vectors need to be the same length")
+    message("oldFields and newFields vectors need to be the same length")
     return(df)
   }else{
     for (i in 1:length(oldFields)){

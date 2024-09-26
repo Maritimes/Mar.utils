@@ -97,7 +97,7 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                                fn.oracle.dsn = fn.oracle.dsn,
                                usepkg = usepkg, quietly = quietly)
   if (!is.list(oracle_cxn)) {
-    cat("\nCan't do this without a DB connection.  Aborting.\n")
+    message("\nCan't do this without a DB connection.  Aborting.\n")
     return(NULL)
   }
   allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)

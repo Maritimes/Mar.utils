@@ -53,9 +53,9 @@ get_data_tables<-function(schema=NULL,
   tables = toupper(tables)
   if (!quietly){
     if(!checkOnly) {
-      cat("\nLoading data...")
+      message("\nLoading data...")
     }else{
-      cat("\nVerifying existence of data...")
+      message("\nVerifying existence of data...")
     }
   } 
   timer.start = proc.time()
@@ -82,18 +82,18 @@ get_data_tables<-function(schema=NULL,
       
       if(checkOnly) {
         if(file.exists(thisP)){
-          if (!quietly) cat(paste0("\nVerified ", x, "... "))
+          if (!quietly) message(paste0("\nVerified ", x, "... "))
         }else{
-          if (!quietly) cat(paste0("\nMissing ", x, " (download will be attempted)... "))
+          if (!quietly) message(paste0("\nMissing ", x, " (download will be attempted)... "))
           stop()
         }
       }else{
         load(file = thisP,envir = env)
-        if (!quietly) cat(paste0("\nLoaded ", x, "... "))
+        if (!quietly) message(paste0("\nLoaded ", x, "... "))
       }
       fileAge = file.info(thisP)$mtime
       fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
-      if (!quietly) cat(paste0(" (Data modified ", fileAge, " days ago.)"))
+      if (!quietly) message(paste0(" (Data modified ", fileAge, " days ago.)"))
     }
     sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)  
     if (!quietly) 
@@ -122,16 +122,16 @@ get_data_tables<-function(schema=NULL,
     if (!quietly){
       t = round(t[3], 0) * -1
       if(!checkOnly) {
-        cat(paste0("\n\n", t, " seconds to load..."))
+        message(paste0("\n\n", t, " seconds to load..."))
       }else{ 
-        cat(paste0("\n\n", t, " seconds to check..."))
+        message(paste0("\n\n", t, " seconds to check..."))
       }
     } 
     return(invisible(NULL))
   } else {
     oracle_cxn_custom = Mar.utils::make_oracle_cxn(usepkg, fn.oracle.username, fn.oracle.password, fn.oracle.dsn)  
     if (!inherits(oracle_cxn_custom,"list")){
-      cat("\nCan't get the data without a DB connection.  Aborting.\n")
+      message("\nCan't get the data without a DB connection.  Aborting.\n")
       return(NULL)
     }
     if (force.extract){
@@ -140,7 +140,7 @@ get_data_tables<-function(schema=NULL,
       missingtables = tables[which(res==-1)]
     }
     for (i in 1:length(missingtables)){
-      if (!quietly) cat(paste0("\n","Verifying access to ",missingtables[i]," ..."))
+      if (!quietly) message(paste0("\n","Verifying access to ",missingtables[i]," ..."))
       qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
       
       m = tryCatch(
@@ -152,15 +152,15 @@ get_data_tables<-function(schema=NULL,
         }
       )
       if (is.numeric(m) && m==-1){
-        cat("\nCan't find or access the specified table")
-        cat(qry)
+        message("\nCan't find or access the specified table")
+        message(qry)
         next
       }else if (is.data.frame(m) && nrow(m) == 0){
-        cat("\nTable exists but contains no data")
+        message("\nTable exists but contains no data")
         next
       }
       if(!checkOnly) {
-        cat(paste0("\n","Extracting ",missingtables[i],"..."))
+        message(paste0("\n","Extracting ",missingtables[i],"..."))
         table_naked = gsub(paste0(schema,"."),"",missingtables[i])
         if (is.null(rownum)){
           where_N = ""
@@ -171,21 +171,21 @@ get_data_tables<-function(schema=NULL,
         result= oracle_cxn_custom$thecmd(oracle_cxn_custom$channel, qry, rows_at_time = 1)
         assign(table_naked, result)
         save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
-        if (!quietly) cat(paste("\n","Got", missingtables[i]))
+        if (!quietly) message(paste("\n","Got", missingtables[i]))
         assign(x = missingtables[i],value = get(table_naked), envir = env)
-        if (!quietly) cat(paste0("\n","Loaded ",missingtables[i]))
+        if (!quietly) message(paste0("\n","Loaded ",missingtables[i]))
       }
     } 
     t = timer.start - proc.time()
     if (!quietly){
       t = round(t[3], 0) * -1
       if(!checkOnly) {
-        cat(paste0("\n\n", t, " seconds to load..."))
+        message(paste0("\n\n", t, " seconds to load..."))
       }else{ 
         if (all(res == 1)){
-          cat(paste0("\n\n", t, " seconds to check..."))
+          message(paste0("\n\n", t, " seconds to check..."))
         }else{
-          cat(paste0("\n\n", t, " seconds to check and download..."))
+          message(paste0("\n\n", t, " seconds to check and download..."))
         }
       }
     } 

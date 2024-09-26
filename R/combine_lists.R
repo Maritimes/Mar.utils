@@ -14,14 +14,14 @@ combine_lists <- function(primary = NULL, ancilliary = NULL, quietly=FALSE){
   discarded <- ancilliary[intersect(names(ancilliary),names(primary))]
   kept <- c(primary, new)
   if (!quietly & length(discarded)>0){
-    cat("Ambiguous parameter(s) detected","\n")
+    message("Ambiguous parameter(s) detected","\n")
     for(c in 1:length(discarded)){
       this = names(discarded)[c]
       wantthis <- kept[[this]]
       if (inherits(wantthis,"data.frame")) wantthis <-"<the data.frame>"
       that <- discarded[[this]] 
       if (inherits(that,"data.frame")) that <-"<the data.frame>"
-      cat(paste0('The parameter "',this,'" will use the value(s) of "', paste0(wantthis, collapse=","),'", not "',paste0(that, collapse=','),'"'),"\n")
+      message(paste0('The parameter "',this,'" will use the value(s) of "', paste0(wantthis, collapse=","),'", not "',paste0(that, collapse=','),'"'),"\n")
     }
   }
   return(kept)

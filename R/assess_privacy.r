@@ -182,7 +182,7 @@ assess_privacy <- function(
     dfRest  <- df[,!names(df) %in% c(facet.field, agg.fields)]
     dfRestU <- unique(dfRest)
     if (nrow(dfRest)==nrow(dfRestU)){
-      stop(cat("facet.field must identify a single identifier field that causes repeated sets - e.g. species code/name","\n",
+      stop(message("facet.field must identify a single identifier field that causes repeated sets - e.g. species code/name","\n",
                "agg.fields must identify the vaulues you want information for related to the facet.field - e.g. kept_wt, discarded wt, etc","\n",
                "key.fields must identify enough fields required to identify unique fishing sets - e.g. trip & set","\n"))
     }else{
@@ -210,7 +210,7 @@ assess_privacy <- function(
   }else{
     agg.poly     <- sf::st_read (agg.poly.shp, quiet=T)
     if (is.na(sf::st_crs(agg.poly))){
-      cat('\nNo projection found for input shapefile - assuming geographic.')
+      message('\nNo projection found for input shapefile - assuming geographic.')
       sf::st_crs(agg.poly) <- 4326
     }else{
       #convert the shape to geographic

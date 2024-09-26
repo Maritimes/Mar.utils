@@ -63,7 +63,7 @@ clip_by_poly <- function(df=NULL,
     clip.poly_this <-clip.poly
   }
   if (is.na(sf::st_crs(clip.poly_this))){
-    cat('\nNo projection found for input shapefile - assuming geographic.')
+    message('\nNo projection found for input shapefile - assuming geographic.')
     sf::st_crs(clip.poly_this) <- 4326
   }
   

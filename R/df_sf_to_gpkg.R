@@ -40,6 +40,6 @@ df_sf_to_gpkg<- function(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITU
     doAppend = TRUE
     overwriteDSN = TRUE
   }
-  sf::st_write(df, dsn = paste0(path, "/", gpkgName), layerName, append = doAppend, delete.dsn=overwriteDSN)
+  sf::st_write(df, dsn = paste0(path, "/", gpkgName), layerName, append = doAppend, delete.dsn=overwriteDSN, quiet=T)
   return(df)
 }

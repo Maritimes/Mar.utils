@@ -10,7 +10,7 @@
 data.dir_valet <- function(data.dir=NULL){
   conf <- c("(MARFISSCI|MARFIS)","(ISDB|OBSERVER)", "(GROUNDFISH|RV)")
   duplicateDestroyer<-function(data.dir=NULL, conf=NULL){
-    cat("Checking for duplicate files..\n")
+    message("Checking for duplicate files..\n")
     allPairs <- data.frame(fileName = character(), filePath = character(), fileAgeM=as.POSIXct(character()), fileSize=integer(), fileKeep = logical(), prefix = character())
     
     for (c in 1:length(conf)){
@@ -33,22 +33,22 @@ data.dir_valet <- function(data.dir=NULL){
     if (nrow(allPairs)>0){
       deleters = allPairs[allPairs$fileKeep==F,"filePath"]
       if(nrow(allPairs)/length(deleters)!=2){
-        cat("Halting - there is an unexpected number of files flagged for deletion\n")
+        message("Halting - there is an unexpected number of files flagged for deletion\n")
         print(allPairs)
         stop()
       }else{
         # delete old dups
         sapply(deleters, file.remove)
-        cat("These files were deleted.  They were duplicates of files for which you had multiple copies with different prefixes (e.g. MARFIS/MARFISSCI)):\n")
-        cat(paste("\t",deleters, collapse='\n'))
-        cat("\n")
+        message("These files were deleted.  They were duplicates of files for which you had multiple copies with different prefixes (e.g. MARFIS/MARFISSCI)):\n")
+        message(paste("\t",deleters, collapse='\n'))
+        message("\n")
       }
     } else{
-      cat("No duplicates found\n")
+      message("No duplicates found\n")
     }
   }
   prefixFixer <-  function(data.dir=NULL, conf = NULL){
-    cat('Checking for prefix variants (e.g. "RV." vs "GROUNDFISH.", "MARFIS." vs "MARFISSCI.", etc)\n')
+    message('Checking for prefix variants (e.g. "RV." vs "GROUNDFISH.", "MARFIS." vs "MARFISSCI.", etc)\n')
     allRenamed =data.frame(filePath = character(), newPath=character())
     for (c in 1:length(conf)){
       #desired name is written first
@@ -69,10 +69,10 @@ data.dir_valet <- function(data.dir=NULL){
       allRenamed <- rbind(allRenamed, renamers)
     }
     if (nrow(allRenamed)>0){
-      cat("These files were renamed to use a common prefix (e.g. MARFIS/MARFISSCI)):\n")
+      message("These files were renamed to use a common prefix (e.g. MARFIS/MARFISSCI)):\n")
       print(allRenamed)
     }else{
-      cat("No prefix variants found\n")
+      message("No prefix variants found\n")
     }
   }
   

@@ -110,7 +110,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
       df_sf_to_gpkg(plotLines, layerName = paste0(name,"_line"), gpkgName = gpkgName)
     }
   }else{
-    cat("\nNo segments could be made")
+    message("\nNo segments could be made")
   }
   return(invisible(res))
 }
