@@ -28,6 +28,7 @@
 #' file in your working directory.
 #' @param gpkgName default is \code{"make_segments.gpkg"}.  If \code{create.spatial = TRUE}, a gpkg 
 #' file will be created, and the name here will control what it is called.
+#' @param path this is the path to the gpkg file (e.g. "c:/folder/")
 #' @import data.table
 #' @return a list containing sf objects.  Additionally, a gpkg can be generated.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
@@ -36,9 +37,11 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
                           lat.field= "LATITUDE",lon.field="LONGITUDE",
                           points = "orphans", the.crs = "EPSG:4326", 
                           filename = NULL, create.spatial = TRUE,
-                          gpkgName = "make_segments.gpkg"){
+                          gpkgName = "make_segments.gpkg", path=NULL){
   #following are vars that will be created by data.table, and build errors
   #appear if we don't define them
+  if (is.null(path)) path<-getwd()
+  
   trekMax <- trekMin <- cnt <- NULL
   `:=` <- function (x, value) value
   name=""
@@ -78,7 +81,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     plotPoints <- sf::st_transform(plotPoints, crs = the.crs)
     res[[1]]=plotPoints
     if (create.spatial) {
-      df_sf_to_gpkg(plotPoints, layerName = paste0(name,"_pt"), gpkgName = gpkgName)
+      df_sf_to_gpkg(plotPoints, layerName = paste0(name,"_pt"), gpkgName = gpkgName, path=path)
     }
   } else if (points =="none"){
     # plotPoints = NA
@@ -89,7 +92,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
       plotPoints = df_to_sf(dataPoints, type = "points")
       res[["points"]]=plotPoints
       if (create.spatial) {
-        df_sf_to_gpkg(plotPoints, layerName = paste0(name,"_pt"), gpkgName = gpkgName)
+        df_sf_to_gpkg(plotPoints, layerName = paste0(name,"_pt"), gpkgName = gpkgName, path=path)
       }
     }
   } 
@@ -107,7 +110,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     plotLines<-merge(plotLines, lineData)
     res[["segments"]] <- plotLines
     if (create.spatial) {
-      df_sf_to_gpkg(plotLines, layerName = paste0(name,"_line"), gpkgName = gpkgName)
+      df_sf_to_gpkg(plotLines, layerName = paste0(name,"_line"), gpkgName = gpkgName, , path=path)
     }
   }else{
     message("\nNo segments could be made")

@@ -29,4 +29,4 @@ Encoding: UTF-8
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/Maritimes/Mar.utils/
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

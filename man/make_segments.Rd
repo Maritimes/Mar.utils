@@ -14,7 +14,8 @@ make_segments(
   the.crs = "EPSG:4326",
   filename = NULL,
   create.spatial = TRUE,
-  gpkgName = "make_segments.gpkg"
+  gpkgName = "make_segments.gpkg",
+  path = NULL
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ file in your working directory.}
 
 \item{gpkgName}{default is \code{"make_segments.gpkg"}.  If \code{create.spatial = TRUE}, a gpkg 
 file will be created, and the name here will control what it is called.}
+
+\item{path}{this is the path to the gpkg file (e.g. "c:/folder/")}
 }
 \value{
 a list containing sf objects.  Additionally, a gpkg can be generated.

@@ -59,13 +59,14 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
       return(results)
     } else {
       message("\n!!! An ROracle connection could not be established with Oracle. !!!  
-              
+                            
 This likely has nothing to do with any of the Mar.* packages, but with the configuration of ROracle on your computer.
 Until you can successfully create a connection via the following line (inserting your own Oracle credentials), this function will continue to fail:
 
 \ttestConnection <- ROracle::dbConnect(DBI::dbDriver('Oracle'), 'yourOracleUsername', 'yourOraclePassword', 'PTRAN')
 
 Things to check:
+- Are you connected to the DFO network (i.e. in office or using a VPN)?
 - Have you installed 'MAR BIO ODBC Configuration' from the Software Centre?
 - Have you installed RTools from the software centre?  It will need to be the right version for the R you're running (e.g. RTools 42 for R 4.2.x)
 - Do you have environmental variables set up for 'OCI_INC', 'OCI_LIB64' and 'TNS_ADMIN'? The correct values for each are:  
