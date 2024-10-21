@@ -1,6 +1,9 @@
 #' @title VMS_clean_recs
-#' @description This function takes raw VMS data (i.e. a dataframe having 
-#' sequential coordinates and times) and cleans it.  
+#' @description This function takes raw VMS data (i.e. a dataframe having sequential coordinates and 
+#' times) and cleans it.  Data is cleaned by removing records that are no more than \code{minDist_m}
+#' from the previous position.  Additionally, resultant data is grouped into "treks" which can be 
+#' thought of as discrete forays by a vessel.  A new trek occurs when the time between subsequent 
+#' points for a vessel exceeds \code{maxBreak_mins}, which by default is 24 hours (1440 mins).  
 #' @param df default is \code{NULL}.  This is the dataframe to be processed.  It 
 #' should have coordinates in decimal degrees and they should be in fields 
 #' called "LATITUDE" and "LONGITUDE".  It also needs a field with the time 
@@ -13,126 +16,171 @@
 #' (in decimal degrees)
 #' @param lon.field the default is \code{"LONGITUDE"}.  the name of the field holding longitude 
 #' values (in decimal degrees)
-#' @param minDist_m the default is \code{50}. This is the minimum distance (m) a vessel
-#' must move from it's last position in order for the record to be kept.  This 
-#' should be greater than zero to avoid records for vessels sitting in port. 
-#' @param maxBreak_mins the default is \code{1440}.  This is the maximum time (in mins)
-#' that is allowed between positions before a new "trek" is created. 
+#' @param minDist_m the default is \code{50}. This is the minimum distance (m) a vessel must move 
+#' from it's last position in order for the record to be kept.  This should be greater than zero to 
+#' avoid records for vessels sitting in port. 
+#' @param maxBreak_mins the default is \code{1440}(1440 minutes corresponds with 24 hours) .  This 
+#' is the maximum time (in mins) that is allowed between positions before a new "trek" is created. 
 #' @return a dataframe with an additional "trek" column identifying a number of
 #' discrete paths for each unique value of \code{objField}.
 #' @param minKnots  default is \code{NULL}.  This is the minimum vessel speed that should be include 
-#' in the output
+#' in the output(also see \code{speedField})
 #' @param maxKnots default is \code{NULL}.  This is the maximum vessel speed that should be include 
-#' in the output
+#' in the output (also see \code{speedField})
+#' @param speedField default is \code{"calc"}.  Valid values are "calc" or any field that exists 
+#' within your df
+#' @param dropOrphans default is \code{TRUE}.  VMS data is primarily used for tracks, but during the 
+#' filtering process, it's possible to end up with singular positions.  By default, these lone 
+#' positions will be discarded.
 #' @import data.table
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-#' @note The resultant df will likely have less records than the source.
-#' During the cleaning process, values for Latitude and Longitude are rounded 
-#' from 5 decimal places to 4 (~1m --> 11m resolution), and times are rounded
-#' to the nearest 5 minutes.  If a field called  "UPDATE_DATE" exists, it will
-#' be used to "break ties" in the case of duplicate records (i.e. the more recent 
-#' record will is retained.
-#' Additionally,  data is grouped into "treks" which can be thought of as discrete
-#' forays by a vessel.  A new trek occurs when the time between subsequent points 
-#' for a vessel exceeds \code{maxBreak_mins}.  If no value is provided, 24 hours
-#' (i.e. 1440 minutes) will be used.
-VMS_clean_recs <-function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
-                          objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE",
-                          minDist_m = 50, maxBreak_mins = 1440,
-                          minKnots = NULL, maxKnots = NULL){
-  warning("The 'VMS_clean_recs()' function is deprecated; use 'VMS_clean_recs2()' instead.", 
-          immediate. = TRUE, call. = FALSE)
-  LATITUDE__ <- LONGITUDE__ <- objField__ <- timeField__ <- NA
-  colnames(df)[colnames(df)==lat.field] <- "LATITUDE__"
-  colnames(df)[colnames(df)==lon.field] <- "LONGITUDE__"
-  colnames(df)[colnames(df)==objField] <- "objField__"
-  colnames(df)[colnames(df)==timeField] <- "timeField__"
-  e <- new.env()
-  e$loopagain <- TRUE
+#' @note If a field called  "UPDATE_DATE" exists, it will be used to "break ties" in the case of 
+#' duplicate records (i.e. the more recent record will is retained.
+VMS_clean_recs <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
+                            objField = "VR_NUMBER", timeField ="POSITION_UTC_DATE",
+                            minDist_m = 50, maxBreak_mins = 1440,
+                            minKnots = NULL, maxKnots = NULL, speedField= "calc", dropOrphans =T){
+  .data <- lag_lon <- lag_lat <- change <- trek <- distCalc_m<- timeCalc_min<- UPDATE_DATE <- NA
+  if (!inherits(df[[timeField]], "POSIXct")) stop(paste(timeField, "must be of class POSIXct"))
+  if (tolower(speedField)=="calc"){
+    theSpeedField<-"SPEED_CALC_KTS"
+  } else if (speedField %in% names(df)){
+    theSpeedField <- speedField
+  }else{
+    stop("speedField should either be 'calc' or an appropriate field from your data")
+  }
+
   
-  addDistTime <- function(df=NULL){
-    dfn_0 <- nrow(df)
-    df = data.table::setDT(df)
-    df[,distCalc:=round(geosphere::distGeo(cbind(LONGITUDE__, LATITUDE__))),by=objField__]
-    df[,time_min:=as.numeric(difftime(timeField__, data.table::shift(timeField__, fill = timeField__[1L]), units = "min")),by=objField__]
-    df <- data.table::setDF(df)
-    #distCalc above associates distance with the record *before* the movement 
-    #occurred.  The following bumps all of the distance calculations down to the 
-    #next record.
-    df['distCalc'] <- c(-1, utils::head(df['distCalc'], dim(df)[1] - 1)[[1]])
-    df[is.na(df$distCalc),"distCalc"] <- -1
-    df$KEEP<-FALSE
-    df[df$distCalc == -1, "KEEP"] <- TRUE
-    df[df$time_min <= maxBreak_mins,"KEEP"] <- TRUE
-    df[df$distCalc >= minDist_m ,"KEEP"] <- TRUE
-    # df[df$distCalc == 0, "KEEP"] <- FALSE
-    df <- df[which(df$KEEP==TRUE),]
-    df$KEEP<-NULL
-    dfn_1 <- nrow(df)
-    if (dfn_0 ==dfn_1){
-      e$loopagain = FALSE
+  calculate_dist_time <- function(df, lat.field, lon.field, objField, timeField) {
+    # Function to calculate distance and time between successive points
+    df <- df %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
+      dplyr::group_by(.data[[objField]]) %>%
+      dplyr::mutate(
+        lag_lon = dplyr::lag(.data[[lon.field]], default = dplyr::first(.data[[lon.field]])),
+        lag_lat = dplyr::lag(.data[[lat.field]], default = dplyr::first(.data[[lat.field]])),
+        distCalc_m = dplyr::if_else(dplyr::row_number() == 1, 0, round(geosphere::distGeo(cbind(lag_lon, lag_lat), cbind(.data[[lon.field]], .data[[lat.field]])))),
+        timeCalc_min = dplyr::if_else(dplyr::row_number() == 1, 0, round(as.numeric(difftime(.data[[timeField]], dplyr::lag(.data[[timeField]], default = first(.data[[timeField]])), units = "min")),2))
+      ) %>% 
+      dplyr::ungroup() %>%
+      dplyr::select(-lag_lon, -lag_lat) %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]])
+    return(df)
+  }
+  
+  trekFinder <- function(df, final=FALSE){
+    #in this we'll be dropping any records where only a single position was found for a trek 
+    #generate treks - new trek everytime more than maxBreak_mins between positions
+    
+    df <- df %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%  # Ensure the data is sorted
+      dplyr::mutate(change = .data[[objField]] != dplyr::lag(.data[[objField]], default = .data[[objField]][1]) | timeCalc_min > maxBreak_mins) %>%
+      dplyr::mutate(trek = cumsum(change)) %>%
+      dplyr::group_by(trek) 
+    
+    if(dropOrphans) {
+      df <- df %>% dplyr::filter(dplyr::n() > 1)
+    }
+    
+    df <- df %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-change)  %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
+      dplyr::group_by(trek) %>%
+      dplyr::mutate(distCalc_m = dplyr::if_else(dplyr::row_number() == 1, 0, distCalc_m),
+             timeCalc_min = dplyr::if_else(dplyr::row_number() == 1, 0, timeCalc_min)) 
+    
+    if(dropOrphans) {
+      df <- df %>% dplyr::filter(dplyr::n() > 1)
+    }
+    
+    df <- df %>%
+      dplyr::ungroup() %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
+      dplyr::mutate(change = .data[[objField]] != dplyr::lag(.data[[objField]], default = .data[[objField]][1]) | (distCalc_m == 0 & timeCalc_min == 0)) %>%
+      dplyr::mutate(trek = cumsum(change)) %>%
+      dplyr::select(-change)  %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) 
+    return(df)
+  }
+  
+  speedFinder <- function(df){
+    #calculate the speed in knots
+    df <- df %>%
+      dplyr::mutate(SPEED_CALC_KTS = dplyr::if_else(distCalc_m == 0 & timeCalc_min == 0, 0, round((distCalc_m / 1852) / (timeCalc_min / 60),2))) %>% 
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) 
+    
+    if ((!is.null(minKnots)|!is.null(maxKnots))){
+      if (!is.null(minKnots)) df<-df[df[[theSpeedField]]>=minKnots,]
+      if (!is.null(maxKnots)) df<-df[df[[theSpeedField]]<=maxKnots,]
+      df$SPEED_CALC_KTS <- NULL
+      if(dropOrphans){
+        df <- df %>% 
+          dplyr::group_by(trek) %>% 
+          dplyr::filter(dplyr::n() > 1)%>%
+          dplyr::ungroup()
+      }
     }
     return(df)
   }
   
-  #following are vars that will be created by data.table, and build errors
-  #appear if we don't define them
-  `:=` <- function (x, value) value
-  distCalc <- time_min <- elapsedDist_m <- elapsedTime_min <- .SD <- UPDATE_DATE <- NULL
-  n1 = nrow(df)
-  #round values to remove near-duplicates:
-  #1) dd coords to 4 decimals (~10m resolution);
-  #2) time to nearest 5 minutes
-  df$LATITUDE__<-round( df$LATITUDE__,4)
-  df$LONGITUDE__<-round( df$LONGITUDE__,4)
-  df <- df[!(df$LONGITUDE__ == 0 & df$LATITUDE__ == 0) & df$LONGITUDE__ >= -180 & df$LONGITUDE__ <= 180 & df$LATITUDE__ >= -90 & df$LATITUDE__ <= 90, ]
-  df$timeField__ <- as.POSIXct(round(as.numeric(df$timeField__)/(300))*(300),origin='1970-01-01')
-  #remove the recs that our rounding has turned into duplicates
-  df= unique(df)
-  if ("UPDATE_DATE" %in% names(df)){
-    df = data.table::setorder(df, objField__, timeField__, UPDATE_DATE)
-    df = data.table::setDT(df)
-    df = df[,utils::tail(.SD,1),by=list("objField__" = objField__,"timeField__" = timeField__)]
+  filterRecs <- function(df){
+    df <- calculate_dist_time(df, lat.field, lon.field, objField, timeField)
+    #retain records where the distance from the previous position is >= minDist (i.e 50m) AND where
+    #timeCalc_min and distCalc_m are both 0 (i.e. first position of a trek)
+    df <- df %>%
+      dplyr::filter(distCalc_m >= minDist_m | (distCalc_m == 0 & timeCalc_min == 0)) %>%
+      dplyr::select(-distCalc_m, -timeCalc_min)
+    return(df)
   }
   
-  while (e$loopagain == TRUE) {
-    df<- addDistTime(df)
+  initialTidy <- function(df){
+    #drop invalid coords
+    df <- df %>%
+      dplyr::filter(!(abs(df[[lon.field]]) < 1 & abs(df[[lat.field]]) < 1),
+             df[[lon.field]] >= -180, df[[lon.field]] <= 180,
+             df[[lat.field]] >= -90, df[[lat.field]] <= 90)
+    
+    if ("UPDATE_DATE" %in% names(df)) {
+      if (!inherits(df$UPDATE_DATE, "POSIXct")) warning(paste("If 'UPDATE_DATE' exists within the data, it should be of class POSIXct so it can assist with cleaning.  For now, those cleaing steps will be skipped"))
+      df <- df %>%
+        dplyr::arrange(.data[[objField]], .data[[timeField]], UPDATE_DATE) %>%
+        dplyr::group_by(.data[[objField]], .data[[timeField]]) %>%
+        dplyr::slice(dplyr::n()) %>%
+        dplyr::ungroup()  %>%
+        dplyr::arrange(.data[[objField]], .data[[timeField]]) 
+    }  
+    
+    #cases existed in test data where a single time was duplicated for a single VR.  
+    #Keep only 1 of these times.  I'm not aware of a way to identify which would be the better record 
+    #to retain
+    df <- df %>%
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
+      dplyr::distinct(.data[[objField]], .data[[timeField]], .keep_all = TRUE)
+    
+    return(df)
   }
-
-  #calculate the instantaneous speed for each position (i.e. the distance from the previous position
-  #in the amount of time it took)
-  df$KNOTS_CALC <- 0
-  df$KNOTS_CALC <- (df$distCalc/df$time_min)*0.0323974
-  if(!is.null(minKnots))df<-df[df$KNOTS_CALC>=minKnots,]
-  if(!is.null(maxKnots))df<-df[df$KNOTS_CALC<=maxKnots,]
   
-  #try to find treks (i.e. groups of positions for a vessel that are not interrupted
-  #for more than the maximum allowable break (e.g. 10* the ping rate) at any 
-  #point).  For example, if a vessel with a ping rate of 60 stops for 10 hrs, a 
-  #new trek is started. The first appearance of a vessel will start with a case 
-  #of distCalc of NA.  
-  df$trek<-NA
-  df[is.na(df$distCalc) | df$distCalc < 0 | df$time_min > maxBreak_mins,"trek"] <- seq.int(nrow(df[is.na(df$distCalc) | df$distCalc < 0 | df$time_min > maxBreak_mins,]))
-  #Carry over the identified changes in trek to subsequent points until new trek
-  na.locf <- function(x) {
-    v <- !is.na(x)
-    c(NA, x[v])[cumsum(v)+1]
+  df <- initialTidy(df)
+  
+  nrow_ <- nrow(df)
+  while(TRUE) {
+    df <- filterRecs(df)
+    if(nrow(df) == nrow_) break
+    nrow_ <- nrow(df)
   }
-  df$trek <- na.locf(df$trek)
-  trekpts <- stats::aggregate(
-    x = list(cnt = df$objField__),
-    by = list(grp = df$trek
-    ),
-    length
-  )
-  df <- df[df$trek %in% trekpts[trekpts$cnt>1,"grp"],]
   
-  colnames(df)[colnames(df)=="LATITUDE__"] <- lat.field
-  colnames(df)[colnames(df)=="LONGITUDE__"] <- lon.field
-  colnames(df)[colnames(df)=="objField__"] <- objField
-  colnames(df)[colnames(df)=="timeField__"] <- timeField
+  df <- calculate_dist_time(df, lat.field, lon.field, objField, timeField)
   
+  df <- trekFinder(df, final=T)
+  
+  df <- speedFinder(df)
+  
+  df <- df %>% as.data.frame()
   return(df)
+  
+  # if(!is.null(minKnots))df<-df[df$KNOTS_CALC>=minKnots,]
+  # if(!is.null(maxKnots))df<-df[df$KNOTS_CALC<=maxKnots,]
 }
