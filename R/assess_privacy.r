@@ -122,7 +122,7 @@ assess_privacy <- function(
   #set up
   ts = format(Sys.time(), "%Y%m%d_%H%M")
   `:=` <- function (x, value) value
-
+  
   if (!is.null(custom.grid)){
     ogrPath = dirname(custom.grid)
     ogrLayer = sub('\\.shp$', '', basename(custom.grid))
@@ -151,7 +151,7 @@ assess_privacy <- function(
     colnames(this)[colnames(this)=="Y"] <- "LATITUDE"
     return(this)
   }
-
+  
   noCoords <- df[!stats::complete.cases(df[,c(lat.field, lon.field)]),]
   if(nrow(noCoords>0)){
     message(nrow(noCoords)," records had one or more missing coordinates and were dropped")
@@ -183,12 +183,12 @@ assess_privacy <- function(
     dfRestU <- unique(dfRest)
     if (nrow(dfRest)==nrow(dfRestU)){
       stop(message("facet.field must identify a single identifier field that causes repeated sets - e.g. species code/name","\n",
-               "agg.fields must identify the vaulues you want information for related to the facet.field - e.g. kept_wt, discarded wt, etc","\n",
-               "key.fields must identify enough fields required to identify unique fishing sets - e.g. trip & set","\n"))
+                   "agg.fields must identify the vaulues you want information for related to the facet.field - e.g. kept_wt, discarded wt, etc","\n",
+                   "key.fields must identify enough fields required to identify unique fishing sets - e.g. trip & set","\n"))
     }else{
       dfWide <- foo(dfLong, id=key.fields, measure = facet.field,val = agg.fields)
       
-
+      
       # 
       # dfWide$ALL_TOT<-NA
       # dfWide$ALL_TOT <- rowSums(dfWide[,!names(dfWide) %in% key.fields],na.rm = T)
@@ -218,7 +218,7 @@ assess_privacy <- function(
     }
   }
   df <- sf::st_join(df, agg.poly[,agg.poly.field], join = sf::st_intersects)
- 
+  
   if (!is.null(key.fields) && !is.null(facet.field) && !is.null(agg.fields)) {
     for (a in 1:length(agg.fields)){
       dfWide[[agg.fields[a]]] <- as.numeric(dfWide[[agg.fields[a]]])
@@ -239,7 +239,7 @@ assess_privacy <- function(
   colnames(POLY.agg)[colnames(POLY.agg)=="Group.1"] <- agg.poly.field
   
   if (!is.null(sens.fields)){
-
+    
     plainDF <- as.data.frame(sf::st_drop_geometry(df))
     POLY.agg.sens = as.data.frame(stats::aggregate(
       plainDF[intersect(sens.fields, colnames(plainDF))],
@@ -249,10 +249,10 @@ assess_privacy <- function(
           COUNT = round(length(unique(x)), 0)
         )
     ))
-
+    
     POLY.agg.sens$TOTUNIQUE = apply(as.data.frame(POLY.agg.sens[,2:ncol(POLY.agg.sens)]), 1, min)
     POLY.agg.sens$CAN_SHOW <- 'NA'
-
+    
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE>=rule.of,]$CAN_SHOW <- 'YES'
     if (nrow(POLY.agg.sens[POLY.agg.sens$TOTUNIQUE<rule.of,])>0) POLY.agg.sens[POLY.agg.sens$TOTUNIQUE< rule.of,]$CAN_SHOW <- 'NO'
     POLY.agg = merge(POLY.agg, POLY.agg.sens)
@@ -265,7 +265,7 @@ assess_privacy <- function(
       #should be dropped
       POLY.agg[ ,c(sens.fields,"TOTUNIQUE")] <- list(NULL)
     }
-   
+    
     POLY.agg = merge(agg.poly,POLY.agg)
     rm(POLY.agg.sens) 
   }else{
@@ -326,7 +326,7 @@ assess_privacy <- function(
       colnames(POLY.agg) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(POLY.agg))
       colnames(grid2Min) <- sub(paste0("\\.", thisSearch), paste0("_",thisrep), colnames(grid2Min))
     }
-
+    
     results <- list()
     if (create.centroid.csv) {
       this <- mkCentroidDf(grid2Min)
@@ -346,4 +346,4 @@ assess_privacy <- function(
     results= list("Grid2Min" = NULL, "POLY_AGG" = NULL)
   }
   return(invisible(results))
-  }
+}
