@@ -8,6 +8,8 @@ Mode(x)
 }
 \arguments{
 \item{x}{Vector}
+
+\item{na.rm}{The default value is \code{FALSE}.}
 }
 \description{
 This function returns the mode of a vector, preserving data type.

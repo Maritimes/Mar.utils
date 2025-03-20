@@ -4,10 +4,12 @@
 \alias{st_err}
 \title{st_err}
 \usage{
-st_err(x = NULL)
+st_err(x = NULL, na.rm = FALSE)
 }
 \arguments{
 \item{x}{The default value is \code{NULL}.}
+
+\item{na.rm}{The default value is \code{FALSE}.}
 }
 \description{
 Calculates the standard error
