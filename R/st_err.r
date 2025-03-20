@@ -7,7 +7,7 @@
 #' @export
 st_err <- function(x = NULL, na.rm = FALSE) {
   if (na.rm) x <- na.omit(x)
-  if (length(x) == 0) return(NA)
+  if (length(x) < 2) return(NA)
   stats::sd(x)/sqrt(length(x))
 }
 
