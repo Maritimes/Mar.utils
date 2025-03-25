@@ -4,7 +4,7 @@
 \alias{Mode}
 \title{Mode}
 \usage{
-Mode(x)
+Mode(x, na.rm = FALSE)
 }
 \arguments{
 \item{x}{Vector}

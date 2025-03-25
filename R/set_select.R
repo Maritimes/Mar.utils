@@ -80,8 +80,6 @@
 #'                              avoid_sf = this_avoid_sf)
 #'                        }
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
-#' @importFrom dplyr %>%
-#' @importFrom Mar.utils identify_area
 #' @export
 
 set_select <- function(
@@ -105,7 +103,7 @@ set_select <- function(
     stationData_ <- stationData
   }
   stationDataField_ <- stationDataField
-  strata_sf_ <- strata_sf %>% sf::st_transform(crs = localCRS_) 
+  strata_sf_ <- strata_sf |> sf::st_transform(crs = localCRS_) 
   strataField_ <- strataField
   #referencing fields via variables is annoying, so add a field of a known name to each
   stationData_$filterField_ <- stationData_[,stationDataField]
@@ -152,8 +150,8 @@ set_select <- function(
   # st_erase <- function(x, y) sf::st_difference(x, sf::st_union(sf::st_combine(y)))
   st_erase = function(x, y) {
     sf::st_difference(
-      sf::st_geometry(x) %>% sf::st_buffer(0),
-      sf::st_union(sf::st_combine(sf::st_geometry(y))) %>% sf::st_buffer(0)
+      sf::st_geometry(x) |> sf::st_buffer(0),
+      sf::st_union(sf::st_combine(sf::st_geometry(y))) |> sf::st_buffer(0)
     )
   }
   # 
@@ -171,11 +169,11 @@ set_select <- function(
   filtStrata <- sf::st_set_geometry(filtStrata, sf::st_geometry(filtStrata))
 
   if(!is.null(avoid_sf)){
-    avoid_sf <- avoid_sf %>% sf::st_transform(crs = localCRS_)
+    avoid_sf <- avoid_sf |> sf::st_transform(crs = localCRS_)
     avoid_sf <- sf::st_set_geometry(avoid_sf, sf::st_geometry(avoid_sf))
     overlapping_areas <- sf::st_intersection(avoid_sf, filtStrata)
     
-    filtStrata_sp <- as(filtStrata, "Spatial")
+    filtStrata_sp <- methods::as(filtStrata, "Spatial")
     # filtStrata_sp <- sp::Spatial(filtStrata)
     filtStrata_sp <- cleangeo::clgeo_Clean(filtStrata_sp)
     filtStrata <- sf::st_as_sf(filtStrata_sp)
@@ -257,13 +255,13 @@ set_select <- function(
   # primaries     1 - 299
   # secondaries 501 - 699
   # alternates  901 - 1099
-  stations <- stations %>% 
-    dplyr::arrange(TYPE,polygon_) %>% 
-    dplyr::group_by(TYPE) %>% 
-    dplyr::mutate(LABEL = dplyr::row_number()) %>% 
+  stations <- stations |> 
+    dplyr::arrange(TYPE,polygon_) |> 
+    dplyr::group_by(TYPE) |> 
+    dplyr::mutate(LABEL = dplyr::row_number()) |> 
     dplyr::mutate(LABEL = ifelse(TYPE == "SECONDARY", LABEL+500, 
-                                 ifelse(TYPE == "ALTERNATE", LABEL+900, LABEL))) %>% 
-    dplyr::ungroup()%>% 
+                                 ifelse(TYPE == "ALTERNATE", LABEL+900, LABEL))) |> 
+    dplyr::ungroup()|> 
     dplyr::arrange(polygon_,LABEL)
   
   stations <- stations[!is.na(stations$LABEL),]
@@ -272,7 +270,7 @@ set_select <- function(
   if (!is.null(addExtData1_sf)){
     moreAreas1<- sf::st_drop_geometry(stations)
     moreAreas1 <- moreAreas1[,c("LABEL","LAT_DD", "LON_DD")]
-    ext1 <- addExtData1_sf %>% sf::st_transform(crs = localCRS_) 
+    ext1 <- addExtData1_sf |> sf::st_transform(crs = localCRS_) 
     for (i in 1:length(addExtDataFields1)){
       moreAreas1 <- Mar.utils::identify_area(moreAreas1, lat.field = "LAT_DD", lon.field = "LON_DD", agg.poly.shp = ext1, agg.poly.field = addExtDataFields1[i])
     }
@@ -283,7 +281,7 @@ set_select <- function(
   if (!is.null(addExtData2_sf)){
     moreAreas2 <- sf::st_drop_geometry(stations)
     moreAreas2 <- moreAreas2[,c("LABEL","LAT_DD", "LON_DD")]
-    ext2 <- addExtData2_sf %>% sf::st_transform(crs = localCRS_) 
+    ext2 <- addExtData2_sf |> sf::st_transform(crs = localCRS_) 
     for (n in 1:length(addExtDataFields2)){
       moreAreas2 <- Mar.utils::identify_area(moreAreas2, lat.field = "LAT_DD", lon.field = "LON_DD", agg.poly.shp = ext2, agg.poly.field = addExtDataFields2[n] )
     }
@@ -298,7 +296,7 @@ set_select <- function(
   }else{
     outFile<- paste0("setSelect_",timestamp)
   }
-  if (writexls) xlsx::write.xlsx2(as.data.frame(stations %>% sf::st_drop_geometry()) , paste0(outFile,".xlsx"), sheetName = "setSelect", col.names = TRUE, row.names = FALSE, append = FALSE)
+  if (writexls) xlsx::write.xlsx2(as.data.frame(stations |> sf::st_drop_geometry()) , paste0(outFile,".xlsx"), sheetName = "setSelect", col.names = TRUE, row.names = FALSE, append = FALSE)
   if (writegpkg) stations <- sf::st_write(stations, dsn = paste0(getwd(), "/setSelect.gpkg"), outFile, append = F, delete.dsn=T)
   if (writexls | writegpkg) message("wrote excel and/or gpkg files to ", getwd())
   return(stations)

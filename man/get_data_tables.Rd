@@ -9,6 +9,7 @@ get_data_tables(
   data.dir = file.path(getwd(), "data"),
   tables = NULL,
   rownum = NULL,
+  cxn = NULL,
   usepkg = "rodbc",
   fn.oracle.username = "_none_",
   fn.oracle.password = "_none_",
@@ -36,19 +37,34 @@ names you want to extract that exist in identified \code{schema} of the the data
 number  of records retrieved from the specified table(s).  If it is left as \code{NULL}, all records 
 retrieved.  Otherwise, it will return the specified number of rows.}
 
+\item{cxn}{A valid Oracle connection object. This parameter allows you to 
+pass an existing connection, reducing the need to establish a new connection 
+within the function. If provided, it takes precedence over the connection-
+related parameters.}
+
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
 connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
 5x faster.}
 
-\item{fn.oracle.username}{default is \code{'_none_'} This is your username for
-accessing oracle objects.}
+\item{fn.oracle.username}{Default is \code{'_none_'}. This is your username 
+for accessing Oracle objects. If you have a value for \code{oracle.username} 
+stored in your environment (e.g., from an rprofile file), this can be left 
+out and that value will be used. If a value for this is provided, it will 
+take priority over your existing value. Deprecated; use \code{cxn} instead.}
 
-\item{fn.oracle.password}{default is \code{'_none_'} This is your password for
-accessing oracle objects.}
+\item{fn.oracle.password}{Default is \code{'_none_'}. This is your password 
+for accessing Oracle objects. If you have a value for \code{oracle.password} 
+stored in your environment (e.g., from an rprofile file), this can be left 
+out and that value will be used. If a value for this is provided, it will 
+take priority over your existing value. Deprecated; use \code{cxn} instead.}
 
-\item{fn.oracle.dsn}{default is \code{'_none_'} This is your dsn/ODBC
-identifier for accessing oracle objects.}
+\item{fn.oracle.dsn}{Default is \code{'_none_'}. This is your DSN/ODBC 
+identifier for accessing Oracle objects. If you have a value 
+for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
+file), this can be left out and that value will be used. If a value for this 
+is provided, it will take priority over your existing value. Deprecated; use 
+\code{cxn} instead.}
 
 \item{checkOnly}{default is \code{FALSE}  This flag allows the function to be 
 run such that it checks for the existence of the files, but doesn't load them.}

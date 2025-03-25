@@ -1,11 +1,11 @@
 Package: Mar.utils
 Title: A suite of functions used by a variety of Maritimes packages
-Version: 2024.11.18
+Version: 2025.03.25
 Authors@R: c( person("Mike", "McMahon", email="Mike.McMahon@dfo-mpo.gc.ca", role=c("aut", "cre")) )
 Maintainer: Mike McMahon <Mike.McMahon@dfo-mpo.gc.ca>
 Description: This package contains a number of utility function used by several of the Maritimes R packages.
 Depends:
-    R (>= 2.10)
+    R (>= 4.1.0)
 Imports:
     cleangeo,
     data.table,
@@ -13,16 +13,20 @@ Imports:
     geosphere,
     lubridate,
     Mar.data,
+    methods,
     plyr,
     reshape2,
+    rlang,
     sf,
     spatstat.geom, 
     spatstat.random,
+    stats,
     sqldf,
     xlsx
 Enhances: 
     DBI,
     ggplot2,
+    RJDBC,
     RODBC,
     ROracle,
     sp

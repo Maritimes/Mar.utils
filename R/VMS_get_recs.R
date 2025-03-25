@@ -2,21 +2,26 @@
 #' @description This function extracts VMS data for a given timespan and area.  
 #' A time buffer can be added returns other points that are not within the area
 #' of interest, but give context to the path.
-#' @param fn.oracle.username default is \code{'_none_'} This is your username for
-#' accessing oracle objects. If you have a value for \code{oracle.username} 
-#' stored in your environment (e.g. from an rprofile file), this can be left out
-#' and that value will be used.  If a value for this is provided, it will take 
-#' priority over your existing value.
-#' @param fn.oracle.password default is \code{'_none_'} This is your password for
-#' accessing oracle objects. If you have a value for \code{oracle.password}  
-#' stored in your environment (e.g. from an rprofile file), this can be left out
-#' and that value will be used.  If a value for this is provided, it will take 
-#' priority over your existing value.
-#' @param fn.oracle.dsn default is \code{'_none_'} This is your dsn/ODBC
-#' identifier for accessing oracle objects. If you have a value for 
-#' \code{oracle.dsn} stored in your environment (e.g. from an rprofile file), 
-#' this can be left and that value will be used.  If a value for this is 
-#' provided, it will take priority over your existing value.
+#' @param cxn A valid Oracle connection object. This parameter allows you to 
+#' pass an existing connection, reducing the need to establish a new connection 
+#' within the function. If provided, it takes precedence over the connection-
+#' related parameters.
+#' @param fn.oracle.username Default is \code{'_none_'}. This is your username 
+#' for accessing Oracle objects. If you have a value for \code{oracle.username} 
+#' stored in your environment (e.g., from an rprofile file), this can be left 
+#' out and that value will be used. If a value for this is provided, it will 
+#' take priority over your existing value. Deprecated; use \code{cxn} instead.
+#' @param fn.oracle.password Default is \code{'_none_'}. This is your password 
+#' for accessing Oracle objects. If you have a value for \code{oracle.password} 
+#' stored in your environment (e.g., from an rprofile file), this can be left 
+#' out and that value will be used. If a value for this is provided, it will 
+#' take priority over your existing value. Deprecated; use \code{cxn} instead.
+#' @param fn.oracle.dsn Default is \code{'_none_'}. This is your DSN/ODBC 
+#' identifier for accessing Oracle objects. If you have a value 
+#' for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
+#' file), this can be left out and that value will be used. If a value for this 
+#' is provided, it will take priority over your existing value. Deprecated; use 
+#' \code{cxn} instead.
 #' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data 
@@ -46,7 +51,8 @@
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-VMS_get_recs <- function(fn.oracle.username = "_none_", 
+VMS_get_recs <- function(cxn = NULL, 
+                         fn.oracle.username = "_none_", 
                          fn.oracle.password = "_none_", 
                          fn.oracle.dsn = "_none_",
                          usepkg = 'rodbc', dateStart = NULL, dateEnd = NULL, 
@@ -54,6 +60,8 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                          minLon = NULL, maxLon = NULL,
                          minLat = NULL, maxLat = NULL, rowNum = 50000,
                        quietly = F){
+  deprecationCheck(fn.oracle.username, fn.oracle.password, fn.oracle.dsn)
+  
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE <= to_date('",dateEnd,"','YYYY-MM-DD')") 
   
@@ -92,92 +100,26 @@ VMS_get_recs <- function(fn.oracle.username = "_none_",
                           W_maxX, " AND ", 
                           W_minY,  " AND ",
                           W_maxY,") ",whereVRN, sqlLimit)
-  oracle_cxn = make_oracle_cxn(fn.oracle.username =fn.oracle.username, 
-                               fn.oracle.password = fn.oracle.password, 
-                               fn.oracle.dsn = fn.oracle.dsn,
-                               usepkg = usepkg, quietly = quietly)
-  if (!is.list(oracle_cxn)) {
-    message("\nCan't do this without a DB connection.  Aborting.\n")
-    return(NULL)
+  if (is.null(cxn)) {
+    oracle_cxn = make_oracle_cxn(fn.oracle.username = fn.oracle.username, 
+                                 fn.oracle.password = fn.oracle.password, 
+                                 fn.oracle.dsn = fn.oracle.dsn,
+                                 usepkg = usepkg, quietly = quietly)
+    if (!is.list(oracle_cxn)) {
+      message("\nCan't do this without a DB connection. Aborting.\n")
+      return(NULL)
+    }
+    cxn = oracle_cxn$channel
+    thecmd = oracle_cxn$thecmd
+  } else {
+    thecmd = connectionCheck(cxn)
   }
-  allRecs=oracle_cxn$thecmd(oracle_cxn$channel,recSQL)
+  allRecs = thecmd(cxn, recSQL)
 
   if (nrow(allRecs)<1){
     if (!quietly) cat(paste0("\n","No records returned"))
     return(NULL)
   }
-  # if (ptsOnly) return(allRecs)
-  # #set up something to hold the ones we'll keep
-  # if (!is.null(shp)){
-  #   saveRecs = allRecs[FALSE,]
-  #   saveRecs = cbind(saveRecs,data.frame(SEGMID=character(), shp.field=character()))
-  #   names(saveRecs)[names(saveRecs) == "shp.field"] <- shp.field
-  # 
-  #   areaRecs = identify_area(allRecs, agg.poly.shp = shp, agg.poly.field = shp.field)
-  # 
-  #   areaRecs = areaRecs[which(!is.na(areaRecs[shp.field]) & areaRecs[shp.field] != "Bad coordinate"),]
-  #   if (nrow(areaRecs)<1){
-  #     if (!quietly) cat(paste0("\n","No records in area detected"))
-  #     return(NULL)
-  #   }
-  #   #maybe this is where we detect old segmid that we need to append to?
-  #   allVess<-unique(areaRecs$VR_NUMBER)
-  # 
-  #   for (i in 1:length(allVess)){
-  # 
-  #     cat("\n","working on",allVess[i])
-  #     # if (i==1)browser()
-  #     thisVessRecs = areaRecs[areaRecs$VR_NUMBER == allVess[i],]
-  #     thisVessRecs = thisVessRecs[order(thisVessRecs$POSITION_UTC_DATE),]
-  #     if (nrow(thisVessRecs)>1){
-  #       #find the time difference between successive recs
-  #       thisVessRecs$LAG <-c(0,difftime(thisVessRecs[2:nrow(thisVessRecs),"POSITION_UTC_DATE"],thisVessRecs[1:(nrow(thisVessRecs)-1),"POSITION_UTC_DATE"],units = "hours"))     
-  #       
-  #       cnt = 1
-  #       thisVessRecs$cnt <-NA
-  #       for (j in 1:nrow(thisVessRecs)){
-  #         #look at date range - anything with a gap larger than hrBuff will get 
-  #         #broken into multiple "SEGMID"
-  #         if (thisVessRecs[j,"LAG"]>hrBuffer)cnt=cnt+1
-  #         thisVessRecs[j,"cnt"]=cnt
-  #       }
-  #       for (k in 1:cnt){
-  #         #we've figured out how many trips there are so now we can get the non-area
-  #         #records for this trip
-  #         thisTrip = thisVessRecs[thisVessRecs$cnt==k,]
-  #         thisTrip$LAG <- NULL
-  #         thisTrip$SEGMID <- paste0(run_ts,"_",unique(thisVessRecs$VR_NUMBER),"_",k)
-  #         
-  #         minTime = min(range(thisTrip$POSITION_UTC_DATE))
-  #         preContextThisTrip = allRecs[allRecs$VR_NUMBER == allVess[i] & 
-  #                                        allRecs$POSITION_UTC_DATE >= (minTime - (hrBuffer *3600)) &
-  #                                        allRecs$POSITION_UTC_DATE <= minTime,]
-  #         maxTime = max(range(thisTrip$POSITION_UTC_DATE))
-  #         postContextThisTrip = allRecs[allRecs$VR_NUMBER == allVess[i] & 
-  #                                         allRecs$POSITION_UTC_DATE >= maxTime &
-  #                                         allRecs$POSITION_UTC_DATE <= (maxTime + (hrBuffer *3600)),]
-  #         allContextthisTrip = rbind(preContextThisTrip,postContextThisTrip)
-  #         allContextthisTrip[shp.field] = NA
-  #         allContextthisTrip$cnt = k
-  #         allContextthisTrip$SEGMID = unique(thisTrip$SEGMID)
-  #         allContextthisTrip = rbind(allContextthisTrip,thisTrip)
-  #         allContextthisTrip$cnt<-NULL
-  #         saveRecs = rbind(saveRecs,allContextthisTrip)
-  #       }
-  #     }
-  #     cat("\n","finished ",allVess[i])
-  #   }
-  #   saveRecs = saveRecs[with(saveRecs,order(VR_NUMBER, POSITION_UTC_DATE)),]
-  # }else{
-  #   saveRecs = allRecs[with(allRecs,order(VR_NUMBER, POSITION_UTC_DATE)),]
-  # }
-  # 
-  # if (simpleQC){
-  # saveRecs = saveRecs[which(abs(round(saveRecs$LATITUDE,0))!=0 & 
-  #                           abs(round(saveRecs$LONGITUDE,0)) !=0 & 
-  #                           abs(round(saveRecs$LATITUDE,0))!=90 & 
-  #                           abs(round(saveRecs$LONGITUDE,0))!=180),]
-  # }
   
   return(allRecs)
 }

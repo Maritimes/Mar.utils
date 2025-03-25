@@ -3,7 +3,7 @@
 #   packageStartupMessage(paste0("Version: ", localVer))
 # }
 
-.onLoad <- function(libname, pkgname){
-  options(stringsAsFactors = FALSE)
-  updateCheck(gitPkg = 'Maritimes/Mar.utils')
-}
+# .onLoad <- function(libname, pkgname){
+#   options(stringsAsFactors = FALSE)
+#   updateCheck(gitPkg = 'Maritimes/Mar.utils')
+# }

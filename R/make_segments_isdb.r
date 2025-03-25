@@ -85,8 +85,8 @@ make_segments_isdb <- function(isdb.df,
   isdbPos <- isdbPos[order(isdbPos$FISHSET_ID, isdbPos$PNTCD_ID),]
   isdbPos[isdbPos==0] <- NA
   isdbPos <- isdbPos[stats::complete.cases(isdbPos),] 
-  isdbData <- isdbPos %>% 
-    dplyr::group_by(FISHSET_ID, SET_NO) %>% 
+  isdbData <- isdbPos |> 
+    dplyr::group_by(FISHSET_ID, SET_NO) |> 
     dplyr::summarise(
       SETSTART = min(DATETIME),
       SETEND = max(DATETIME),

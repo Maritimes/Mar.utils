@@ -6,7 +6,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 st_err <- function(x = NULL, na.rm = FALSE) {
-  if (na.rm) x <- na.omit(x)
+  if (na.rm) x <- stats::na.omit(x)
   if (length(x) < 2) return(NA)
   stats::sd(x)/sqrt(length(x))
 }

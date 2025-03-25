@@ -7,8 +7,8 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @note stolen from https://stackoverflow.com/questions/2547402/how-to-find-the-statistical-mode
 #' @export
-Mode <- function(x) {
-  if (na.rm) x <- na.omit(x)
+Mode <- function(x, na.rm = FALSE) {
+  if (na.rm) x <- stats::na.omit(x)
   if (length(x) == 0) return(NA)
   ux <- unique(x)
   tab <- tabulate(match(x, ux))

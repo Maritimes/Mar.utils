@@ -55,17 +55,17 @@ VMS_clean_recs <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   
   calculate_dist_time <- function(df, lat.field, lon.field, objField, timeField) {
     # Function to calculate distance and time between successive points
-    df <- df %>%
-      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
-      dplyr::group_by(.data[[objField]]) %>%
+    df <- df |>
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) |>
+      dplyr::group_by(.data[[objField]]) |>
       dplyr::mutate(
         lag_lon = dplyr::lag(.data[[lon.field]], default = dplyr::first(.data[[lon.field]])),
         lag_lat = dplyr::lag(.data[[lat.field]], default = dplyr::first(.data[[lat.field]])),
         distCalc_m = dplyr::if_else(dplyr::row_number() == 1, 0, round(geosphere::distGeo(cbind(lag_lon, lag_lat), cbind(.data[[lon.field]], .data[[lat.field]])))),
         timeCalc_min = dplyr::if_else(dplyr::row_number() == 1, 0, round(as.numeric(difftime(.data[[timeField]], dplyr::lag(.data[[timeField]], default = first(.data[[timeField]])), units = "min")),2))
-      ) %>% 
-      dplyr::ungroup() %>%
-      dplyr::select(-lag_lon, -lag_lat) %>%
+      ) |> 
+      dplyr::ungroup() |>
+      dplyr::select(-lag_lon, -lag_lat) |>
       dplyr::arrange(.data[[objField]], .data[[timeField]])
     return(df)
   }
@@ -74,42 +74,42 @@ VMS_clean_recs <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     #in this we'll be dropping any records where only a single position was found for a trek 
     #generate treks - new trek everytime more than maxBreak_mins between positions
     
-    df <- df %>%
-      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%  # Ensure the data is sorted
-      dplyr::mutate(change = .data[[objField]] != dplyr::lag(.data[[objField]], default = .data[[objField]][1]) | timeCalc_min > maxBreak_mins) %>%
-      dplyr::mutate(trek = cumsum(change)) %>%
+    df <- df |>
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) |>  # Ensure the data is sorted
+      dplyr::mutate(change = .data[[objField]] != dplyr::lag(.data[[objField]], default = .data[[objField]][1]) | timeCalc_min > maxBreak_mins) |>
+      dplyr::mutate(trek = cumsum(change)) |>
       dplyr::group_by(trek) 
     
     if(dropOrphans) {
-      df <- df %>% dplyr::filter(dplyr::n() > 1)
+      df <- df |> dplyr::filter(dplyr::n() > 1)
     }
     
-    df <- df %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-change)  %>%
-      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
-      dplyr::group_by(trek) %>%
+    df <- df |>
+      dplyr::ungroup() |>
+      dplyr::select(-change)  |>
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) |>
+      dplyr::group_by(trek) |>
       dplyr::mutate(distCalc_m = dplyr::if_else(dplyr::row_number() == 1, 0, distCalc_m),
              timeCalc_min = dplyr::if_else(dplyr::row_number() == 1, 0, timeCalc_min)) 
     
     if(dropOrphans) {
-      df <- df %>% dplyr::filter(dplyr::n() > 1)
+      df <- df |> dplyr::filter(dplyr::n() > 1)
     }
     
-    df <- df %>%
-      dplyr::ungroup() %>%
-      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
-      dplyr::mutate(change = .data[[objField]] != dplyr::lag(.data[[objField]], default = .data[[objField]][1]) | (distCalc_m == 0 & timeCalc_min == 0)) %>%
-      dplyr::mutate(trek = cumsum(change)) %>%
-      dplyr::select(-change)  %>%
+    df <- df |>
+      dplyr::ungroup() |>
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) |>
+      dplyr::mutate(change = .data[[objField]] != dplyr::lag(.data[[objField]], default = .data[[objField]][1]) | (distCalc_m == 0 & timeCalc_min == 0)) |>
+      dplyr::mutate(trek = cumsum(change)) |>
+      dplyr::select(-change)  |>
       dplyr::arrange(.data[[objField]], .data[[timeField]]) 
     return(df)
   }
   
   speedFinder <- function(df){
     #calculate the speed in knots
-    df <- df %>%
-      dplyr::mutate(SPEED_CALC_KTS = dplyr::if_else(distCalc_m == 0 & timeCalc_min == 0, 0, round((distCalc_m / 1852) / (timeCalc_min / 60),2))) %>% 
+    df <- df |>
+      dplyr::mutate(SPEED_CALC_KTS = dplyr::if_else(distCalc_m == 0 & timeCalc_min == 0, 0, round((distCalc_m / 1852) / (timeCalc_min / 60),2))) |> 
       dplyr::arrange(.data[[objField]], .data[[timeField]]) 
     
     if ((!is.null(minKnots)|!is.null(maxKnots))){
@@ -117,9 +117,9 @@ VMS_clean_recs <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
       if (!is.null(maxKnots)) df<-df[df[[theSpeedField]]<=maxKnots,]
       df$SPEED_CALC_KTS <- NULL
       if(dropOrphans){
-        df <- df %>% 
-          dplyr::group_by(trek) %>% 
-          dplyr::filter(dplyr::n() > 1)%>%
+        df <- df |> 
+          dplyr::group_by(trek) |> 
+          dplyr::filter(dplyr::n() > 1)|>
           dplyr::ungroup()
       }
     }
@@ -130,34 +130,34 @@ VMS_clean_recs <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
     df <- calculate_dist_time(df, lat.field, lon.field, objField, timeField)
     #retain records where the distance from the previous position is >= minDist (i.e 50m) AND where
     #timeCalc_min and distCalc_m are both 0 (i.e. first position of a trek)
-    df <- df %>%
-      dplyr::filter(distCalc_m >= minDist_m | (distCalc_m == 0 & timeCalc_min == 0)) %>%
+    df <- df |>
+      dplyr::filter(distCalc_m >= minDist_m | (distCalc_m == 0 & timeCalc_min == 0)) |>
       dplyr::select(-distCalc_m, -timeCalc_min)
     return(df)
   }
   
   initialTidy <- function(df){
     #drop invalid coords
-    df <- df %>%
+    df <- df |>
       dplyr::filter(!(abs(df[[lon.field]]) < 1 & abs(df[[lat.field]]) < 1),
              df[[lon.field]] >= -180, df[[lon.field]] <= 180,
              df[[lat.field]] >= -90, df[[lat.field]] <= 90)
     
     if ("UPDATE_DATE" %in% names(df)) {
       if (!inherits(df$UPDATE_DATE, "POSIXct")) warning(paste("If 'UPDATE_DATE' exists within the data, it should be of class POSIXct so it can assist with cleaning.  For now, those cleaing steps will be skipped"))
-      df <- df %>%
-        dplyr::arrange(.data[[objField]], .data[[timeField]], UPDATE_DATE) %>%
-        dplyr::group_by(.data[[objField]], .data[[timeField]]) %>%
-        dplyr::slice(dplyr::n()) %>%
-        dplyr::ungroup()  %>%
+      df <- df |>
+        dplyr::arrange(.data[[objField]], .data[[timeField]], UPDATE_DATE) |>
+        dplyr::group_by(.data[[objField]], .data[[timeField]]) |>
+        dplyr::slice(dplyr::n()) |>
+        dplyr::ungroup()  |>
         dplyr::arrange(.data[[objField]], .data[[timeField]]) 
     }  
     
     #cases existed in test data where a single time was duplicated for a single VR.  
     #Keep only 1 of these times.  I'm not aware of a way to identify which would be the better record 
     #to retain
-    df <- df %>%
-      dplyr::arrange(.data[[objField]], .data[[timeField]]) %>%
+    df <- df |>
+      dplyr::arrange(.data[[objField]], .data[[timeField]]) |>
       dplyr::distinct(.data[[objField]], .data[[timeField]], .keep_all = TRUE)
     
     return(df)
@@ -178,7 +178,7 @@ VMS_clean_recs <- function(df=NULL,lat.field= "LATITUDE",lon.field="LONGITUDE",
   
   df <- speedFinder(df)
   
-  df <- df %>% as.data.frame()
+  df <- df |> as.data.frame()
   return(df)
   
   # if(!is.null(minKnots))df<-df[df$KNOTS_CALC>=minKnots,]

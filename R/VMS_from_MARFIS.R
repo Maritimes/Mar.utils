@@ -2,12 +2,26 @@
 #' @description This function takes a dataframe (with coordinate fields in decimal
 #' degrees), and extracts asssociated VMS data
 #' @param df a dataframe to be analyzed. 
-#' @param fn.oracle.username default is \code{'_none_'} This is your username for
-#' accessing oracle objects. For this function, it needs SELECT privileges on MFD_OBFMI.VMS_ALL. 
-#' @param fn.oracle.password default is \code{'_none_'} This is your password for
-#' accessing oracle objects. 
-#' @param fn.oracle.dsn default is \code{'_none_'} This is your dsn/ODBC
-#' identifier for accessing oracle objects. 
+#' @param cxn A valid Oracle connection object. This parameter allows you to 
+#' pass an existing connection, reducing the need to establish a new connection 
+#' within the function. If provided, it takes precedence over the connection-
+#' related parameters.
+#' @param fn.oracle.username Default is \code{'_none_'}. This is your username 
+#' for accessing Oracle objects. If you have a value for \code{oracle.username} 
+#' stored in your environment (e.g., from an rprofile file), this can be left 
+#' out and that value will be used. If a value for this is provided, it will 
+#' take priority over your existing value. Deprecated; use \code{cxn} instead.
+#' @param fn.oracle.password Default is \code{'_none_'}. This is your password 
+#' for accessing Oracle objects. If you have a value for \code{oracle.password} 
+#' stored in your environment (e.g., from an rprofile file), this can be left 
+#' out and that value will be used. If a value for this is provided, it will 
+#' take priority over your existing value. Deprecated; use \code{cxn} instead.
+#' @param fn.oracle.dsn Default is \code{'_none_'}. This is your DSN/ODBC 
+#' identifier for accessing Oracle objects. If you have a value 
+#' for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
+#' file), this can be left out and that value will be used. If a value for this 
+#' is provided, it will take priority over your existing value. Deprecated; use 
+#' \code{cxn} instead.
 #' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
@@ -37,6 +51,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 VMS_from_MARFIS <- function(df=NULL,
+                            cxn = NULL, 
                             fn.oracle.username = "_none_", 
                              fn.oracle.password = "_none_", 
                              fn.oracle.dsn = "_none_",
@@ -51,6 +66,7 @@ VMS_from_MARFIS <- function(df=NULL,
                              lon.field = NULL,
                              make_segments=TRUE,
                              make_segments_spatial = FALSE){
+  deprecationCheck(fn.oracle.username, fn.oracle.password, fn.oracle.dsn)
   #data.table doesn't like column name references - ensure the col names are known
   VR_NUMBER <- LANDED_DATE <- pseudo_start<- MARFLEETS_LIC <- LICENCE_ID <- GEAR_CODE <- POSITION_UTC_DATE <- NULL
   colnames(df)[colnames(df)==VR_field] <- "VR_NUMBER"
@@ -77,7 +93,8 @@ VMS_from_MARFIS <- function(df=NULL,
   vrns<- sort(unique(df$VR_NUMBER))
   message("Starting VMS extraction - this can take a long time - grab a coffee")
   if (all(is.na(bbox))){
-    theVMS <- VMS_get_recs(fn.oracle.username = fn.oracle.username, 
+    theVMS <- VMS_get_recs(cxn = cxn, 
+                           fn.oracle.username = fn.oracle.username, 
                            fn.oracle.password = fn.oracle.password, 
                            fn.oracle.dsn = fn.oracle.dsn,
                            usepkg = usepkg,
@@ -87,7 +104,8 @@ VMS_from_MARFIS <- function(df=NULL,
                            rowNum = 1000000, 
                            quietly = T)
   }else{
-    theVMS <- VMS_get_recs(fn.oracle.username = fn.oracle.username, 
+    theVMS <- VMS_get_recs(cxn = cxn, 
+                           fn.oracle.username = fn.oracle.username, 
                            fn.oracle.password = fn.oracle.password, 
                            fn.oracle.dsn = fn.oracle.dsn,
                            usepkg = usepkg,

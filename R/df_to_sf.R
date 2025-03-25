@@ -20,7 +20,6 @@
 #' @note this function was modified from 
 #' https://github.com/Mar-scal/Assessment_fns/blob/master/Maps/pbs_2_sf.R 
 #' @family general_use
-#' @importFrom dplyr %>%
 #' @author  Dave Keith \email{Dave.Keith@@dfo-mpo.gc.ca}, Freya Keyser \email{Freya.Keyser@@dfo-mpo.gc.ca} and adapted by Mike McMahon \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 df_to_sf <- function(df = NULL, 
@@ -72,16 +71,16 @@ df_to_sf <- function(df = NULL,
       if(type=="polys"){
         if(nrow(sid)<4) next
         sid$hole <- ifelse(sid[,order.field][1]<sid[,order.field][2],"N","Y")
-        sid <- sid %>%
-          sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field), hole) %>%
-          dplyr::summarize(do_union=F, .groups = 'keep') %>%
+        sid <- sid |>
+          sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) |>
+          dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field), hole) |>
+          dplyr::summarize(do_union=F, .groups = 'keep') |>
           sf::st_cast("POLYGON")
         if(j==1) {
           sids <- rbind(sids, sid)
         }else{
           if(unique(sid$hole)=="Y"){
-            sids <- suppressMessages(suppressWarnings(sf::st_difference(sids, sid))) %>%
+            sids <- suppressMessages(suppressWarnings(sf::st_difference(sids, sid))) |>
               dplyr::select(dplyr::all_of(c(primary.object.field, secondary.object.field, "hole")))
           }else if (unique(sid$hole)=="N"){
             sid <- dplyr::select(sid, dplyr::all_of(c(primary.object.field, secondary.object.field, "hole")))
@@ -93,10 +92,10 @@ df_to_sf <- function(df = NULL,
       }else{
         if(nrow(sid)<2) next
         sid <- sid[with(sid,order(sid[[order.field]])),]
-        sid <- sid %>%
-          sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) %>%
-          dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field)) %>%
-          dplyr::summarize(do_union=F, .groups = 'keep') %>%
+        sid <- sid |>
+          sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) |>
+          dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field)) |>
+          dplyr::summarize(do_union=F, .groups = 'keep') |>
           sf::st_cast("LINESTRING")
         if(j==1) {
           sids <- rbind(sids, sid)
@@ -106,7 +105,7 @@ df_to_sf <- function(df = NULL,
         }
       }
     }
-    pid <- sf::st_combine(sids) %>% sf::st_sf()
+    pid <- sf::st_combine(sids) |> sf::st_sf()
     # bind primary identifier onto the geometry
     pid = cbind(pid, allPrims[i])
     pids <- rbind(pids, pid)

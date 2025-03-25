@@ -281,8 +281,8 @@ assess_privacy <- function(
   }else if (grid.shape =="hex"){
     grid2Min<-Mar.data::hex_sf
   } else{
-    message("need to make a grid2min_sf")
-    grid2Min<-Mar.data::grid2Min
+    # message("need to make a grid2min_sf")
+    grid2Min<-Mar.data::grid2Min_sf
   }
   # know that the CRS of both grid2Min obj is WGS84, but perhaps saved with 
   #slight variations in the text
