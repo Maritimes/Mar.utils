@@ -25,7 +25,7 @@
 #' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data 
-#' ~ 5x faster.
+#' ~ 5x faster.Deprecated; use \code{cxn} instead.
 #' @param hrBuffer default is \code{4}.  This is the number of hours worth of 
 #' VMS data you would like to pad your area search by.  For example, if a vessel
 #' has a single VMS position in the results, padding it will add additional 
@@ -63,7 +63,8 @@ VMS_get_recs <- function(cxn = NULL,
 
   deprecationCheck(fn.oracle.username = fn.oracle.username, 
                    fn.oracle.password = fn.oracle.password, 
-                   fn.oracle.dsn = fn.oracle.dsn)
+                   fn.oracle.dsn = fn.oracle.dsn, 
+                   usepkg = usepkg)
   
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE <= to_date('",dateEnd,"','YYYY-MM-DD')") 

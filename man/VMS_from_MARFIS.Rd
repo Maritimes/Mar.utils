@@ -53,7 +53,7 @@ is provided, it will take priority over your existing value. Deprecated; use
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
 connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-5x faster.}
+5x faster. Deprecated; use \code{cxn} instead.}
 
 \item{data.dir}{the default is \code{NULL}. If you are hoping to load existing data,
 this folder should contain a data folder containing your rdata files. For this function, only

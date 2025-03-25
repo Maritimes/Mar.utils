@@ -8,10 +8,14 @@
 #' @noRd
 deprecationCheck <- function(...) {
   params <- list(...)
-  deprecated_params <- c("fn.oracle.username", "fn.oracle.password", "fn.oracle.dsn")
+  deprecated_params <- c("fn.oracle.username", "fn.oracle.password", "fn.oracle.dsn", "usepkg")
   for (param in deprecated_params) {
     if (param %in% names(params) && !is.null(params[[param]]) && !is.na(params[[param]]) && params[[param]] != "_none_") {
-      warning(paste("The parameter", param, "is deprecated. Please use the 'cxn' parameter to pass an existing Oracle connection."))
+      if (param == "usepkg" && params[[param]] %in% c("roracle", "rodbc")) {
+        warning(paste("The parameter", param, "with value", params[[param]], "is deprecated. Please use the 'cxn' parameter to pass an existing Oracle connection."))
+      } else if (param != "usepkg") {
+        warning(paste("The parameter", param, "is deprecated. Please use the 'cxn' parameter to pass an existing Oracle connection."))
+      }
     }
   }
 }

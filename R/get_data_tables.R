@@ -15,7 +15,7 @@
 #' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-#' 5x faster.
+#' 5x faster.Deprecated; use \code{cxn} instead.
 #' @param cxn A valid Oracle connection object. This parameter allows you to 
 #' pass an existing connection, reducing the need to establish a new connection 
 #' within the function. If provided, it takes precedence over the connection-
@@ -65,7 +65,8 @@ get_data_tables<-function(schema=NULL,
                           quietly=TRUE){
   deprecationCheck(fn.oracle.username = fn.oracle.username, 
                    fn.oracle.password = fn.oracle.password, 
-                   fn.oracle.dsn = fn.oracle.dsn)
+                   fn.oracle.dsn = fn.oracle.dsn,
+                   usepkg = usepkg)
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly){

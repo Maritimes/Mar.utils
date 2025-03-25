@@ -25,7 +25,7 @@
 #' @param usepkg default is \code{'rodbc'}. This indicates whether the 
 #' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 #' connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-#' 5x faster.
+#' 5x faster. Deprecated; use \code{cxn} instead.
 #' @param data.dir  the default is \code{NULL}. If you are hoping to load existing data,
 #' this folder should contain a data folder containing your rdata files. For this function, only
 #' MARFLEETS_LIC will be used, and only to add gear and licenced species onto each record.
@@ -68,7 +68,8 @@ VMS_from_MARFIS <- function(df=NULL,
                              make_segments_spatial = FALSE){
   deprecationCheck(fn.oracle.username = fn.oracle.username, 
                    fn.oracle.password = fn.oracle.password, 
-                   fn.oracle.dsn = fn.oracle.dsn)
+                   fn.oracle.dsn = fn.oracle.dsn,
+                   usepkg = usepkg)
   #data.table doesn't like column name references - ensure the col names are known
   VR_NUMBER <- LANDED_DATE <- pseudo_start<- MARFLEETS_LIC <- LICENCE_ID <- GEAR_CODE <- POSITION_UTC_DATE <- NULL
   colnames(df)[colnames(df)==VR_field] <- "VR_NUMBER"

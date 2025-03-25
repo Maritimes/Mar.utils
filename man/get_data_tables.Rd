@@ -45,7 +45,7 @@ related parameters.}
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
 connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-5x faster.}
+5x faster.Deprecated; use \code{cxn} instead.}
 
 \item{fn.oracle.username}{Default is \code{'_none_'}. This is your username 
 for accessing Oracle objects. If you have a value for \code{oracle.username} 

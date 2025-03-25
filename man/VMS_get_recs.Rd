@@ -50,7 +50,7 @@ is provided, it will take priority over your existing value. Deprecated; use
 \item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
 connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
 connect.  rodbc is slightly easier to setup, but roracle will extract data 
-~ 5x faster.}
+~ 5x faster.Deprecated; use \code{cxn} instead.}
 
 \item{dateStart}{default is \code{NULL}. This is the start date ('YYYY-MM-DD') 
 for your VMS data search}
