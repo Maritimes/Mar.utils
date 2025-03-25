@@ -66,7 +66,9 @@ VMS_from_MARFIS <- function(df=NULL,
                              lon.field = NULL,
                              make_segments=TRUE,
                              make_segments_spatial = FALSE){
-  deprecationCheck(fn.oracle.username, fn.oracle.password, fn.oracle.dsn)
+  deprecationCheck(fn.oracle.username = fn.oracle.username, 
+                   fn.oracle.password = fn.oracle.password, 
+                   fn.oracle.dsn = fn.oracle.dsn)
   #data.table doesn't like column name references - ensure the col names are known
   VR_NUMBER <- LANDED_DATE <- pseudo_start<- MARFLEETS_LIC <- LICENCE_ID <- GEAR_CODE <- POSITION_UTC_DATE <- NULL
   colnames(df)[colnames(df)==VR_field] <- "VR_NUMBER"

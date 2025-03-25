@@ -60,7 +60,10 @@ VMS_get_recs <- function(cxn = NULL,
                          minLon = NULL, maxLon = NULL,
                          minLat = NULL, maxLat = NULL, rowNum = 50000,
                        quietly = F){
-  deprecationCheck(fn.oracle.username, fn.oracle.password, fn.oracle.dsn)
+
+  deprecationCheck(fn.oracle.username = fn.oracle.username, 
+                   fn.oracle.password = fn.oracle.password, 
+                   fn.oracle.dsn = fn.oracle.dsn)
   
   if (is.null(dateEnd)) dateEnd = as.Date(dateStart) + lubridate::years(1)
   whereDateEnd = paste0("AND POSITION_UTC_DATE <= to_date('",dateEnd,"','YYYY-MM-DD')") 

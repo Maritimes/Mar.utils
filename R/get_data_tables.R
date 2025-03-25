@@ -63,7 +63,9 @@ get_data_tables<-function(schema=NULL,
                           env=.GlobalEnv,
                           fuzzyMatch = TRUE,
                           quietly=TRUE){
-  deprecationCheck(fn.oracle.username, fn.oracle.password, fn.oracle.dsn)
+  deprecationCheck(fn.oracle.username = fn.oracle.username, 
+                   fn.oracle.password = fn.oracle.password, 
+                   fn.oracle.dsn = fn.oracle.dsn)
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly){
