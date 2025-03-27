@@ -156,7 +156,7 @@ get_data_tables<-function(schema=NULL,
       cxn = oracle_cxn_custom$channel
       thecmd = oracle_cxn_custom$thecmd
     } else {
-      thecmd = connectionCheck(cxn)
+      thecmd <- Mar.utils:::connectionCheck(cxn)
     }
     if (force.extract){
       missingtables = tables
