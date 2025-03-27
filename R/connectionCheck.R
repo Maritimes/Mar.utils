@@ -1,12 +1,10 @@
-#' Check Connection Type
-#'
-#' This function checks the type of the provided connection and returns the appropriate command function.
-#' It is intended for internal use within the package.
-#'
+#' @title Check Connection Type
+#' @description This function checks the type of the provided connection and 
+#' returns the appropriate command function. 
 #' @param cxn The connection object to check.
 #' @return The command function corresponding to the connection type.
-#' @keywords internal
-#' @noRd
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}l
+#' @export
 connectionCheck <- function(cxn) {
   if (inherits(cxn, "RODBC")) {
     thecmd = RODBC::sqlQuery

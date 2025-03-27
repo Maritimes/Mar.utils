@@ -1,11 +1,9 @@
-#' Check for Deprecated Parameters
-#'
-#' This function checks for deprecated parameters and issues a warning if any are found.
-#' It is intended for internal use within the package.
-#'
+#' @title  Check for Deprecated Parameters
+#' @description This function checks for deprecated parameters and issues a 
+#' warning if any are found.  
 #' @param ... Parameters to check for deprecation.
-#' @keywords internal
-#' @noRd
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}l
+#' @export
 deprecationCheck <- function(...) {
   params <- list(...)
   deprecated_params <- c("fn.oracle.username", "fn.oracle.password", "fn.oracle.dsn", "usepkg")
