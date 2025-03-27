@@ -116,7 +116,7 @@ VMS_get_recs <- function(cxn = NULL,
     cxn = oracle_cxn$channel
     thecmd = oracle_cxn$thecmd
   } else {
-    thecmd <- Mar.utils:::connectionCheck(cxn)
+    thecmd <- Mar.utils::connectionCheck(cxn)
   }
   allRecs = thecmd(cxn, recSQL)
 
