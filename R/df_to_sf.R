@@ -28,7 +28,8 @@ df_to_sf <- function(df = NULL,
                      primary.object.field = "PID",
                      secondary.object.field = "SID",
                      order.field = "POS",
-                     type = "polys") {
+                     type = "polys",
+                     user.crs = 4326) {
 
   hole <- NA
   type <- tolower(type)
@@ -45,7 +46,7 @@ df_to_sf <- function(df = NULL,
   initState <- getOption("sf_use_s2")
   sf::sf_use_s2(FALSE)
   if (type =="points" | "EID" %in% names(df)){
-    df_sf <- sf::st_as_sf(df, coords = c(lon.field, lat.field), crs = 4326, agr = "constant")
+    df_sf <- sf::st_as_sf(df, coords = c(lon.field, lat.field), crs = user.crs, agr = "constant")
     df_sf<- cbind(df_sf, sf::st_coordinates(df_sf$geometry))
     colnames(df_sf)[colnames(df_sf)=="X"] <- lon.field
     colnames(df_sf)[colnames(df_sf)=="Y"] <- lat.field
@@ -72,7 +73,7 @@ df_to_sf <- function(df = NULL,
         if(nrow(sid)<4) next
         sid$hole <- ifelse(sid[,order.field][1]<sid[,order.field][2],"N","Y")
         sid <- sid |>
-          sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) |>
+          sf::st_as_sf(coords=c(lon.field, lat.field), crs=user.crs) |>
           dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field), hole) |>
           dplyr::summarize(do_union=F, .groups = 'keep') |>
           sf::st_cast("POLYGON")
@@ -93,7 +94,7 @@ df_to_sf <- function(df = NULL,
         if(nrow(sid)<2) next
         sid <- sid[with(sid,order(sid[[order.field]])),]
         sid <- sid |>
-          sf::st_as_sf(coords=c(lon.field, lat.field), crs=4326) |>
+          sf::st_as_sf(coords=c(lon.field, lat.field), crs=user.crs) |>
           dplyr::group_by(!!rlang::sym(primary.object.field), !!rlang::sym(secondary.object.field)) |>
           dplyr::summarize(do_union=F, .groups = 'keep') |>
           sf::st_cast("LINESTRING")
