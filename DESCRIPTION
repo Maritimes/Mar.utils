@@ -9,6 +9,7 @@ Depends:
 Imports:
     cleangeo,
     data.table,
+    digest,
     dplyr,
     geosphere,
     lubridate,
@@ -17,6 +18,7 @@ Imports:
     plyr,
     reshape2,
     rlang,
+    openssl,
     sf,
     spatstat.geom, 
     spatstat.random,
