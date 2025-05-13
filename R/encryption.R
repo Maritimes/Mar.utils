@@ -16,7 +16,7 @@
 #' @param file Path to save to
 #' @keywords internal
 .save_encrypted <- function(object, file) {
-  key <- .get_machine_id()  # Add dot here
+  key <- Mar.utils:::.get_machine_id()  # Add dot here
   objname <- deparse(substitute(object))
   obj_data <- list(object)
   names(obj_data) <- objname
@@ -32,7 +32,7 @@
 #' @param envir Environment where loaded objects will be assigned
 #' @keywords internal
 .load_encrypted <- function(file, envir = parent.frame()) {
-  key <- .get_machine_id()  # Add dot here
+  key <- Mar.utils:::.get_machine_id()  # Add dot here
   encrypted <- readBin(file, "raw", file.size(file))
   tryCatch({
     serialized <- openssl::aes_cbc_decrypt(encrypted, key = charToRaw(key))
