@@ -13,15 +13,26 @@
 #' @description saves data files such that they can't be easily loaded outside of the package
 #' 
 #' @param object R object to save
+#' @param list Character vector of object names to save (NULL if using 'object')
 #' @param file Path to save to
 #' @keywords internal
-.save_encrypted <- function(object, file) {
+.save_encrypted <- function(object = NULL, list = NULL, file) {
   key_str <- Mar.utils:::.get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
   iv <- openssl::rand_bytes(16)
-  objname <- deparse(substitute(object))
-  obj_data <- list(object)
-  names(obj_data) <- objname
+  
+  if (!is.null(object)) {
+    # Single object case
+    objname <- deparse(substitute(object))
+    obj_data <- list(object)
+    names(obj_data) <- objname
+  } else if (!is.null(list)) {
+    # List of objects case
+    obj_data <- mget(list, envir = parent.frame())
+  } else {
+    stop("Either 'object' or 'list' must be provided")
+  }
+  
   serialized <- serialize(obj_data, NULL)
   encrypted <- openssl::aes_cbc_encrypt(serialized, key = raw_key, iv = iv)
   combined <- c(iv, encrypted)
@@ -37,6 +48,7 @@
 .load_encrypted <- function(file, envir = parent.frame()) {
   key_str <- Mar.utils:::.get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
+  
   combined <- readBin(file, "raw", file.size(file))
   iv <- combined[1:16]
   encrypted <- combined[17:length(combined)]
@@ -44,6 +56,8 @@
   tryCatch({
     serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
     obj_data <- unserialize(serialized)
+    
+    # Assign all objects to the environment
     for (name in names(obj_data)) {
       assign(name, obj_data[[name]], envir = envir)
     }

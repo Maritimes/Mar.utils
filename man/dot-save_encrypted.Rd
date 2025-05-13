@@ -4,10 +4,12 @@
 \alias{.save_encrypted}
 \title{.save_encrypted}
 \usage{
-.save_encrypted(object, file)
+.save_encrypted(object = NULL, list = NULL, file)
 }
 \arguments{
 \item{object}{R object to save}
+
+\item{list}{Character vector of object names to save (NULL if using 'object')}
 
 \item{file}{Path to save to}
 }

@@ -106,7 +106,7 @@ get_data_tables<-function(schema=NULL,
           stop()
         }
       }else{
-        load(file = thisP,envir = env)
+        Mar.utils:::.load_encrypted(file = thisP,envir = env)
         if (!quietly) message(paste0("\nLoaded ", x, "... "))
       }
       fileAge = file.info(thisP)$mtime
@@ -194,7 +194,7 @@ get_data_tables<-function(schema=NULL,
         qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
         result = thecmd(cxn, qry, rows_at_time = 1)
         assign(table_naked, result)
-        save(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
+        Mar.utils:::.save_encrypted(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
         if (!quietly) message(paste("\n","Got", missingtables[i]))
         assign(x = missingtables[i],value = get(table_naked), envir = env)
         if (!quietly) message(paste0("\n","Loaded ",missingtables[i]))
