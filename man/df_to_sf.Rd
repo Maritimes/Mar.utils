@@ -11,7 +11,8 @@ df_to_sf(
   primary.object.field = "PID",
   secondary.object.field = "SID",
   order.field = "POS",
-  type = "polys"
+  type = "polys",
+  user.crs = 4326
 )
 }
 \arguments{
