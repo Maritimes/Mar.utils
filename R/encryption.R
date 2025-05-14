@@ -1,10 +1,11 @@
 #' @title .get_machine_id
-#' @description  supports encryption for data files
-#' 
+#' @description supports encryption for data files
+#' @param user Optional username override
+#' @param host Optional hostname override
 #' @keywords internal
-.get_machine_id <- function() {
-  user <- Sys.info()["user"]
-  host <- Sys.info()["nodename"]
+.get_machine_id <- function(user = NULL, host = NULL) {
+  if(is.null(user)) user <- Sys.info()["user"]
+  if(is.null(host)) host <- Sys.info()["nodename"]
   full_hash <- digest::digest(paste0(user, host), algo = "sha256", serialize = FALSE)
   return(substring(full_hash, 1, 32))
 }
@@ -15,8 +16,8 @@
 #' @param object R object to save
 #' @param list Character vector of object names to save (NULL if using 'object')
 #' @param file Path to save to
-#' @keywords internal
-.save_encrypted <- function(object = NULL, list = NULL, file) {
+#' @export
+save_encrypted <- function(object = NULL, list = NULL, file) {
   key_str <- Mar.utils:::.get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
   iv <- openssl::rand_bytes(16)
@@ -43,10 +44,12 @@
 #' @description loads encrypted data files
 #' 
 #' @param file Path to encrypted file
+#' @param extract_user Optional username of original file creator
+#' @param extract_computer Optional hostname of original file creator
 #' @param envir Environment where loaded objects will be assigned
-#' @keywords internal
-.load_encrypted <- function(file, envir = parent.frame()) {
-  key_str <- Mar.utils:::.get_machine_id()
+#' @export
+load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, envir = parent.frame()) {
+  key_str <- Mar.utils:::.get_machine_id(user = extract_user, host = extract_computer)
   raw_key <- openssl::sha256(charToRaw(key_str))
   
   combined <- readBin(file, "raw", file.size(file))
@@ -63,6 +66,10 @@
     }
     invisible(names(obj_data))
   }, error = function(e) {
-    stop("Unable to decrypt data. This file was likely created on a different machine.")
+    if(!is.null(extract_user) || !is.null(extract_computer)) {
+      stop("Unable to decrypt data. The provided creator credentials may be incorrect.")
+    } else {
+      stop("Unable to decrypt data. This file was likely created on a different machine. Try specifying extract_user and extract_computer parameters.")
+    }
   })
 }

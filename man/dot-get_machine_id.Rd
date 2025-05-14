@@ -4,7 +4,12 @@
 \alias{.get_machine_id}
 \title{.get_machine_id}
 \usage{
-.get_machine_id()
+.get_machine_id(user = NULL, host = NULL)
+}
+\arguments{
+\item{user}{Optional username override}
+
+\item{host}{Optional hostname override}
 }
 \description{
 supports encryption for data files
