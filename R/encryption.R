@@ -34,25 +34,25 @@ save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
   } else {
     stop("Either 'object' or 'list' must be provided")
   }
- 
-  # Validate compression parameter
-  if (is.logical(compress)) {
-    compress_method <- if(compress) "gzip" else FALSE
-  } else if (is.character(compress)) {
-    if (!compress %in% c("gzip", "bzip2", "xz")) {
-      stop("If character, 'compress' must be one of: 'gzip', 'bzip2', or 'xz'")
+  
+  # Serialize first
+  serialized <- serialize(obj_data, NULL)
+  
+  # Apply compression if requested (after serialization, before encryption)
+  if (compress) {
+    if (is.logical(compress)) {
+      serialized <- memCompress(serialized, "gzip")
+    } else if (is.character(compress)) {
+      if (!compress %in% c("gzip", "bzip2", "xz")) {
+        stop("If character, 'compress' must be one of: 'gzip', 'bzip2', or 'xz'")
+      }
+      serialized <- memCompress(serialized, compress)
+    } else {
+      stop("'compress' must be logical or character")
     }
-    compress_method <- compress
-  } else if (is.numeric(compress)) {
-    if (compress < 0 || compress > 9) {
-      stop("If numeric, 'compress' must be between 0 and 9")
-    }
-    compress_method <- compress
-  } else {
-    stop("'compress' must be logical, character, or numeric")
   }
   
-  serialized <- serialize(obj_data, NULL, compress = compress_method)
+  # Encrypt the (potentially compressed) serialized data
   encrypted <- openssl::aes_cbc_encrypt(serialized, key = raw_key, iv = iv)
   combined <- c(iv, encrypted)
   writeBin(combined, file)
@@ -68,31 +68,43 @@ save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
 #' @return Names of loaded objects (invisibly)
 #' @export
 load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, envir = parent.frame()) {
-  if (!file.exists(file)) {
-    stop("File does not exist: ", file)
-  }
+  key_str <- .get_machine_id(user = extract_user, host = extract_computer)
+  raw_key <- openssl::sha256(charToRaw(key_str))
   
-  # Try to load as encrypted first
+  combined <- readBin(file, "raw", file.size(file))
+  iv <- combined[1:16]
+  encrypted <- combined[17:length(combined)]
+  
   tryCatch({
-    key_str <- .get_machine_id(user = extract_user, host = extract_computer)
-    raw_key <- openssl::sha256(charToRaw(key_str))
-    
-    combined <- readBin(file, "raw", file.size(file))
-    iv <- combined[1:16]
-    encrypted <- combined[17:length(combined)]
-    
     serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
-    obj_data <- unserialize(serialized)
+    
+    # Try to decompress if needed
+    tryCatch({
+      # Try gzip decompression first
+      decompressed <- memDecompress(serialized, "gzip")
+      obj_data <- unserialize(decompressed)
+    }, error = function(e) {
+      # If gzip fails, try other methods
+      tryCatch({
+        decompressed <- memDecompress(serialized, "bzip2")
+        obj_data <- unserialize(decompressed)
+      }, error = function(e) {
+        tryCatch({
+          decompressed <- memDecompress(serialized, "xz")
+          obj_data <- unserialize(decompressed)
+        }, error = function(e) {
+          # If all decompression methods fail, assume no compression was used
+          obj_data <- unserialize(serialized)
+        })
+      })
+    })
+    
+    # Assign all objects to the environment
     for (name in names(obj_data)) {
       assign(name, obj_data[[name]], envir = envir)
     }
-    return(invisible(names(obj_data)))
+    invisible(names(obj_data))
   }, error = function(e) {
-    tryCatch({
-      loaded_objects <- load(file, envir = envir)
-      return(invisible(loaded_objects))
-    }, error = function(e2) {
-      stop("Failed to load file as either encrypted or unencrypted: ", e2$message)
-    })
+    stop("Unable to decrypt data. This file was likely created on a different machine.")
   })
 }
