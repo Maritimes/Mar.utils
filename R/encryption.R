@@ -58,36 +58,41 @@ save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
   writeBin(combined, file)
 }
 
-#' @title .load_encrypted
-#' @description loads encrypted data files
+#' @title load_encrypted
+#' @description Loads data files, handling both encrypted and unencrypted formats
 #' 
-#' @param file Path to encrypted file
+#' @param file Path to the file to load
 #' @param extract_user Optional username of original file creator
 #' @param extract_computer Optional hostname of original file creator
 #' @param envir Environment where loaded objects will be assigned
+#' @return Names of loaded objects (invisibly)
 #' @export
 load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, envir = parent.frame()) {
-  key_str <- Mar.utils:::.get_machine_id(user = extract_user, host = extract_computer)
-  raw_key <- openssl::sha256(charToRaw(key_str))
+  if (!file.exists(file)) {
+    stop("File does not exist: ", file)
+  }
   
-  combined <- readBin(file, "raw", file.size(file))
-  iv <- combined[1:16]
-  encrypted <- combined[17:length(combined)]
-  
+  # Try to load as encrypted first
   tryCatch({
+    key_str <- .get_machine_id(user = extract_user, host = extract_computer)
+    raw_key <- openssl::sha256(charToRaw(key_str))
+    
+    combined <- readBin(file, "raw", file.size(file))
+    iv <- combined[1:16]
+    encrypted <- combined[17:length(combined)]
+    
     serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
     obj_data <- unserialize(serialized)
-    
-    # Assign all objects to the environment
     for (name in names(obj_data)) {
       assign(name, obj_data[[name]], envir = envir)
     }
-    invisible(names(obj_data))
+    return(invisible(names(obj_data)))
   }, error = function(e) {
-    if(!is.null(extract_user) || !is.null(extract_computer)) {
-      stop("Unable to decrypt data. The provided creator credentials may be incorrect.")
-    } else {
-      stop("Unable to decrypt data. This file was likely created on a different machine. Try specifying extract_user and extract_computer parameters.")
-    }
+    tryCatch({
+      loaded_objects <- load(file, envir = envir)
+      return(invisible(loaded_objects))
+    }, error = function(e2) {
+      stop("Failed to load file as either encrypted or unencrypted: ", e2$message)
+    })
   })
 }

@@ -4,7 +4,7 @@
 \alias{save_encrypted}
 \title{.save_encrypted}
 \usage{
-save_encrypted(object = NULL, list = NULL, file)
+save_encrypted(object = NULL, list = NULL, file, compress = TRUE)
 }
 \arguments{
 \item{object}{R object to save}
@@ -12,6 +12,8 @@ save_encrypted(object = NULL, list = NULL, file)
 \item{list}{Character vector of object names to save (NULL if using 'object')}
 
 \item{file}{Path to save to}
+
+\item{compress}{logical or character string specifying the compression method.}
 }
 \description{
 saves data files such that they can't be easily loaded outside of the package

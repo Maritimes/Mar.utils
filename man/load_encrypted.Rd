@@ -2,7 +2,7 @@
 % Please edit documentation in R/encryption.R
 \name{load_encrypted}
 \alias{load_encrypted}
-\title{.load_encrypted}
+\title{load_encrypted}
 \usage{
 load_encrypted(
   file,
@@ -12,7 +12,7 @@ load_encrypted(
 )
 }
 \arguments{
-\item{file}{Path to encrypted file}
+\item{file}{Path to the file to load}
 
 \item{extract_user}{Optional username of original file creator}
 
@@ -20,6 +20,9 @@ load_encrypted(
 
 \item{envir}{Environment where loaded objects will be assigned}
 }
+\value{
+Names of loaded objects (invisibly)
+}
 \description{
-loads encrypted data files
+Loads data files, handling both encrypted and unencrypted formats
 }
