@@ -16,8 +16,9 @@
 #' @param object R object to save
 #' @param list Character vector of object names to save (NULL if using 'object')
 #' @param file Path to save to
+#' @param compress logical or character string specifying the compression method.
 #' @export
-save_encrypted <- function(object = NULL, list = NULL, file) {
+save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
   key_str <- Mar.utils:::.get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
   iv <- openssl::rand_bytes(16)
@@ -33,8 +34,25 @@ save_encrypted <- function(object = NULL, list = NULL, file) {
   } else {
     stop("Either 'object' or 'list' must be provided")
   }
+ 
+  # Validate compression parameter
+  if (is.logical(compress)) {
+    compress_method <- if(compress) "gzip" else FALSE
+  } else if (is.character(compress)) {
+    if (!compress %in% c("gzip", "bzip2", "xz")) {
+      stop("If character, 'compress' must be one of: 'gzip', 'bzip2', or 'xz'")
+    }
+    compress_method <- compress
+  } else if (is.numeric(compress)) {
+    if (compress < 0 || compress > 9) {
+      stop("If numeric, 'compress' must be between 0 and 9")
+    }
+    compress_method <- compress
+  } else {
+    stop("'compress' must be logical, character, or numeric")
+  }
   
-  serialized <- serialize(obj_data, NULL)
+  serialized <- serialize(obj_data, NULL, compress = compress_method)
   encrypted <- openssl::aes_cbc_encrypt(serialized, key = raw_key, iv = iv)
   combined <- c(iv, encrypted)
   writeBin(combined, file)
