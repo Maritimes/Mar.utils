@@ -10,7 +10,7 @@
   return(substring(full_hash, 1, 32))
 }
 
-#' @title .save_encrypted
+#' @title save_encrypted
 #' @description saves data files such that they can't be easily loaded outside of the package
 #' 
 #' @param object R object to save
