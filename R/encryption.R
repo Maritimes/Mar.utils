@@ -68,43 +68,37 @@ save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
 #' @return Names of loaded objects (invisibly)
 #' @export
 load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, envir = parent.frame()) {
-  key_str <- .get_machine_id(user = extract_user, host = extract_computer)
-  raw_key <- openssl::sha256(charToRaw(key_str))
+  # Check if file exists
+  if (!file.exists(file)) {
+    stop("File does not exist: ", file)
+  }
   
-  combined <- readBin(file, "raw", file.size(file))
-  iv <- combined[1:16]
-  encrypted <- combined[17:length(combined)]
-  
+  # Try to load as encrypted first
   tryCatch({
-    serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
+    key_str <- .get_machine_id(user = extract_user, host = extract_computer)
+    raw_key <- openssl::sha256(charToRaw(key_str))
     
-    # Try to decompress if needed
-    tryCatch({
-      # Try gzip decompression first
-      decompressed <- memDecompress(serialized, "gzip")
-      obj_data <- unserialize(decompressed)
-    }, error = function(e) {
-      # If gzip fails, try other methods
-      tryCatch({
-        decompressed <- memDecompress(serialized, "bzip2")
-        obj_data <- unserialize(decompressed)
-      }, error = function(e) {
-        tryCatch({
-          decompressed <- memDecompress(serialized, "xz")
-          obj_data <- unserialize(decompressed)
-        }, error = function(e) {
-          # If all decompression methods fail, assume no compression was used
-          obj_data <- unserialize(serialized)
-        })
-      })
-    })
+    combined <- readBin(file, "raw", file.size(file))
+    iv <- combined[1:16]
+    encrypted <- combined[17:length(combined)]
+    
+    serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
+    # Let unserialize handle decompression automatically - no manual decompression needed
+    obj_data <- unserialize(serialized)
     
     # Assign all objects to the environment
     for (name in names(obj_data)) {
       assign(name, obj_data[[name]], envir = envir)
     }
-    invisible(names(obj_data))
+    return(invisible(names(obj_data)))
   }, error = function(e) {
-    stop("Unable to decrypt data. This file was likely created on a different machine.")
+    # If decryption fails, try to load as unencrypted RData
+    message("Note: File appears to be unencrypted. Loading as standard RData file.")
+    tryCatch({
+      loaded_objects <- load(file, envir = envir)
+      return(invisible(loaded_objects))
+    }, error = function(e2) {
+      stop("Failed to load file as either encrypted or unencrypted: ", e2$message)
+    })
   })
 }
