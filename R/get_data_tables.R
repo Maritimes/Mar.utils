@@ -2,7 +2,9 @@
 #' @description This function allows users to extract tables for which they have select permissions
 #' from Oracle.
 #' @param schema default is \code{NULL}. This is the schema you want to access 
-#' a additional tables from.
+#' a additional tables from. A value of "<NA>" will check the schema associated 
+#' with the logged in user (i.e. the user that made the connection).  An "<NA>"
+#' schema is often necessary for ISDB data extractions.
 #' @param data.dir  The default is your working directory. If you are hoping to load existing data,
 #' this folder should contain a data folder containing your rdata files. If you are extracting data,
 #' a data folder will be created under this folder.
@@ -78,6 +80,7 @@ get_data_tables<-function(schema=NULL,
   } 
   timer.start = proc.time()
   try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
+
     loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
@@ -106,6 +109,8 @@ get_data_tables<-function(schema=NULL,
           stop()
         }
       }else{
+        message(thisP)
+        browser()
         load_encrypted(file = thisP,envir = env)
         if (!quietly) message(paste0("\nLoaded ", x, "... "))
       }
@@ -117,8 +122,12 @@ get_data_tables<-function(schema=NULL,
     if (!quietly) 
       return(TRUE)
   }
-  
-  reqd = toupper(paste0(schema, ".", tables))
+  if (schema == "<NA>"){
+    reqd = toupper(tables)
+  }else{
+    reqd = toupper(paste0(schema, ".", tables))
+  }
+
   res <- NA
   for (r in 1:length(reqd)){
     loadsuccess = tryCatch(
@@ -164,9 +173,14 @@ get_data_tables<-function(schema=NULL,
       missingtables = tables[which(res==-1)]
     }
     for (i in 1:length(missingtables)){
+      browser()
       if (!quietly) message(paste0("\n","Verifying access to ",missingtables[i]," ..."))
-      qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
-      
+      if(schema=="<NA>"){
+        qry = paste0("select '1' from  ",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
+      }else{
+       qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
+      }
+      browser()
       m = tryCatch(
         {
           thecmd(cxn, qry, rows_at_time = 1)
@@ -191,10 +205,18 @@ get_data_tables<-function(schema=NULL,
         }else{
           where_N = paste0(" WHERE rownum <= ", rownum)
         }
-        qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
+        if(schema=="<NA>"){
+          qry = paste0("SELECT * from ",table_naked, where_N)
+        }else{
+          qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
+        }
         result = thecmd(cxn, qry, rows_at_time = 1)
         assign(table_naked, result)
-        save_encrypted(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")))
+        if(schema=="<NA>"){
+        save_encrypted(list = table_naked, file = file.path(data.dir, paste0(missingtables[i],".RData")), envir = env)
+        }else{
+          save_encrypted(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")), envir = env)
+        }
         if (!quietly) message(paste("\n","Got", missingtables[i]))
         assign(x = missingtables[i],value = get(table_naked), envir = env)
         if (!quietly) message(paste0("\n","Loaded ",missingtables[i]))

@@ -6,6 +6,9 @@
 .get_machine_id <- function(user = NULL, host = NULL) {
   if(is.null(user)) user <- Sys.info()["user"]
   if(is.null(host)) host <- Sys.info()["nodename"]
+  user <- tolower(user)
+  host <- tolower(host)
+  
   full_hash <- digest::digest(paste0(user, host), algo = "sha256", serialize = FALSE)
   return(substring(full_hash, 1, 32))
 }
@@ -18,7 +21,7 @@
 #' @param file Path to save to
 #' @param compress logical or character string specifying the compression method.
 #' @export
-save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
+save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE, envir = parent.frame()) {
   key_str <- Mar.utils:::.get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
   iv <- openssl::rand_bytes(16)
@@ -30,7 +33,7 @@ save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE) {
     names(obj_data) <- objname
   } else if (!is.null(list)) {
     # List of objects case
-    obj_data <- mget(list, envir = parent.frame())
+    obj_data <- mget(list, envir = envir)
   } else {
     stop("Either 'object' or 'list' must be provided")
   }
@@ -93,7 +96,9 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     return(invisible(names(obj_data)))
   }, error = function(e) {
     # If decryption fails, try to load as unencrypted RData
-    message("Note: File appears to be unencrypted. Loading as standard RData file.")
+    #message("Note: File appears to be unencrypted. Loading as standard RData file.")
+    message("Decryption failed: ", e$message)
+    message("Falling back to unencrypted load (may not succeed).")
     tryCatch({
       loaded_objects <- load(file, envir = envir)
       return(invisible(loaded_objects))
