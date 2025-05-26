@@ -110,7 +110,6 @@ get_data_tables<-function(schema=NULL,
         }
       }else{
         message(thisP)
-        browser()
         load_encrypted(file = thisP,envir = env)
         if (!quietly) message(paste0("\nLoaded ", x, "... "))
       }
@@ -173,14 +172,12 @@ get_data_tables<-function(schema=NULL,
       missingtables = tables[which(res==-1)]
     }
     for (i in 1:length(missingtables)){
-      browser()
       if (!quietly) message(paste0("\n","Verifying access to ",missingtables[i]," ..."))
       if(schema=="<NA>"){
         qry = paste0("select '1' from  ",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
       }else{
        qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
       }
-      browser()
       m = tryCatch(
         {
           thecmd(cxn, qry, rows_at_time = 1)
@@ -211,7 +208,7 @@ get_data_tables<-function(schema=NULL,
           qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
         }
         result = thecmd(cxn, qry, rows_at_time = 1)
-        assign(table_naked, result)
+        assign(table_naked, result, envir = env)
         if(schema=="<NA>"){
         save_encrypted(list = table_naked, file = file.path(data.dir, paste0(missingtables[i],".RData")), envir = env)
         }else{

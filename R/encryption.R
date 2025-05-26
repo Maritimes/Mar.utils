@@ -14,29 +14,46 @@
 }
 
 #' @title save_encrypted
-#' @description saves data files such that they can't be easily loaded outside of the package
-#' 
+#' @description Saves data files encrypted or unencrypted based on a toggle such
+#' that they can't be easily loaded by other users.
 #' @param object R object to save
 #' @param list Character vector of object names to save (NULL if using 'object')
 #' @param file Path to save to
 #' @param compress logical or character string specifying the compression method.
+#' @param envir Environment to look in for objects (when using list)
+#' @param encrypt Logical. If TRUE (default), performs encryption. If FALSE, saves normally via base::save.
 #' @export
-save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE, envir = parent.frame()) {
-  key_str <- Mar.utils:::.get_machine_id()
-  raw_key <- openssl::sha256(charToRaw(key_str))
-  iv <- openssl::rand_bytes(16)
+save_encrypted <- function(object = NULL,
+                           list = NULL,
+                           file,
+                           compress = TRUE,
+                           envir = parent.frame(),
+                           encrypt = TRUE) {
   
   if (!is.null(object)) {
-    # Single object case
     objname <- deparse(substitute(object))
     obj_data <- list(object)
     names(obj_data) <- objname
   } else if (!is.null(list)) {
-    # List of objects case
     obj_data <- mget(list, envir = envir)
   } else {
     stop("Either 'object' or 'list' must be provided")
   }
+  
+  if (!encrypt) {
+    # Skip encryption — just save normally
+    if (!is.null(list)) {
+      save(list = list, file = file, envir = envir, compress = compress)
+    } else {
+      save(list = names(obj_data), file = file, envir = list2env(obj_data, parent = emptyenv()), compress = compress)
+    }
+    return(invisible(NULL))
+  }
+  
+  # Encrypted save
+  key_str <- Mar.utils:::.get_machine_id()
+  raw_key <- openssl::sha256(charToRaw(key_str))
+  iv <- openssl::rand_bytes(16)
   
   # Serialize first
   serialized <- serialize(obj_data, NULL)
@@ -59,6 +76,8 @@ save_encrypted <- function(object = NULL, list = NULL, file, compress = TRUE, en
   encrypted <- openssl::aes_cbc_encrypt(serialized, key = raw_key, iv = iv)
   combined <- c(iv, encrypted)
   writeBin(combined, file)
+  
+  invisible(NULL)
 }
 
 #' @title load_encrypted
@@ -87,7 +106,8 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     
     serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
     # Let unserialize handle decompression automatically - no manual decompression needed
-    obj_data <- unserialize(serialized)
+    decompressed <- memDecompress(serialized, type = "gzip")
+    obj_data <- unserialize(decompressed)
     
     # Assign all objects to the environment
     for (name in names(obj_data)) {
