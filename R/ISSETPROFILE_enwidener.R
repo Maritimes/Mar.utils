@@ -10,6 +10,10 @@
 #' @return A data.table in the same shape as your SQL view.
 #' @export
 ISSETPROFILE_enwidener <- function(ISSETPROFILE) {
+  if ("DUR_32" %in% colnames(ISSETPROFILE)) {
+    return(ISSETPROFILE)
+  }
+  
   ## 1) to data.table, drop NA codes, cheap fixes
   dt <- data.table::as.data.table(ISSETPROFILE)
   dt <- dt[!is.na(PNTCD_ID) & PNTCD_ID %in% 1:4]
