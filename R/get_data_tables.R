@@ -210,12 +210,12 @@ get_data_tables<-function(schema=NULL,
         result = thecmd(cxn, qry, rows_at_time = 1)
         assign(table_naked, result, envir = env)
         if(schema=="<NA>"){
-        save_encrypted(list = table_naked, file = file.path(data.dir, paste0(missingtables[i],".RData")), envir = env)
+          save_encrypted(list = table_naked, file = file.path(data.dir, paste0(missingtables[i],".RData")), envir = env)
         }else{
           save_encrypted(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")), envir = env)
         }
         if (!quietly) message(paste("\n","Got", missingtables[i]))
-        assign(x = missingtables[i],value = get(table_naked), envir = env)
+        assign(x = missingtables[i],value = result, envir = env)
         if (!quietly) message(paste0("\n","Loaded ",missingtables[i]))
       }
     } 
