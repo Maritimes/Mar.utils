@@ -1,6 +1,6 @@
 Package: Mar.utils
 Title: A suite of functions used by a variety of Maritimes packages
-Version: 2025.03.25
+Version: 2025.05.27
 Authors@R: c( person("Mike", "McMahon", email="Mike.McMahon@dfo-mpo.gc.ca", role=c("aut", "cre")) )
 Maintainer: Mike McMahon <Mike.McMahon@dfo-mpo.gc.ca>
 Description: This package contains a number of utility function used by several of the Maritimes R packages.
@@ -8,7 +8,7 @@ Depends:
     R (>= 4.1.0)
 Imports:
     cleangeo,
-    data.table,
+    data.table (>= 1.14.3),
     digest,
     dplyr,
     geosphere,

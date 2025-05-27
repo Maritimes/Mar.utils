@@ -2,9 +2,16 @@
 % Please edit documentation in R/encryption.R
 \name{save_encrypted}
 \alias{save_encrypted}
-\title{.save_encrypted}
+\title{save_encrypted}
 \usage{
-save_encrypted(object = NULL, list = NULL, file, compress = TRUE)
+save_encrypted(
+  object = NULL,
+  list = NULL,
+  file,
+  compress = TRUE,
+  envir = parent.frame(),
+  encrypt = TRUE
+)
 }
 \arguments{
 \item{object}{R object to save}
@@ -14,7 +21,12 @@ save_encrypted(object = NULL, list = NULL, file, compress = TRUE)
 \item{file}{Path to save to}
 
 \item{compress}{logical or character string specifying the compression method.}
+
+\item{envir}{Environment to look in for objects (when using list)}
+
+\item{encrypt}{Logical. If TRUE (default), performs encryption. If FALSE, saves normally via base::save.}
 }
 \description{
-saves data files such that they can't be easily loaded outside of the package
+Saves data files encrypted or unencrypted based on a toggle such
+that they can't be easily loaded by other users.
 }

@@ -2,6 +2,7 @@
 
 export(DDMMSS_to_DD)
 export(DDMMx_to_DD)
+export(ISSETPROFILE_enwidener)
 export(Mode)
 export(SQL_in)
 export(VMS_clean_recs)
@@ -40,4 +41,3 @@ export(updateCheck)
 export(updateExpected)
 export(vali_dates)
 export(where_now)
-import(data.table)

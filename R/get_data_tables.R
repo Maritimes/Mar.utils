@@ -109,7 +109,6 @@ get_data_tables<-function(schema=NULL,
           stop()
         }
       }else{
-        message(thisP)
         load_encrypted(file = thisP,envir = env)
         if (!quietly) message(paste0("\nLoaded ", x, "... "))
       }

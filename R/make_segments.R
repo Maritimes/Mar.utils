@@ -29,7 +29,6 @@
 #' @param gpkgName default is \code{"make_segments.gpkg"}.  If \code{create.spatial = TRUE}, a gpkg 
 #' file will be created, and the name here will control what it is called.
 #' @param path this is the path to the gpkg file (e.g. "c:/folder/")
-#' @import data.table
 #' @return a list containing sf objects.  Additionally, a gpkg can be generated.
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export

@@ -32,7 +32,6 @@
 #' @param dropOrphans default is \code{TRUE}.  VMS data is primarily used for tracks, but during the 
 #' filtering process, it's possible to end up with singular positions.  By default, these lone 
 #' positions will be discarded.
-#' @import data.table
 #' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export

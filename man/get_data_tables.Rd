@@ -23,7 +23,9 @@ get_data_tables(
 }
 \arguments{
 \item{schema}{default is \code{NULL}. This is the schema you want to access 
-a additional tables from.}
+a additional tables from. A value of "<NA>" will check the schema associated 
+with the logged in user (i.e. the user that made the connection).  An "<NA>"
+schema is often necessary for ISDB data extractions.}
 
 \item{data.dir}{The default is your working directory. If you are hoping to load existing data,
 this folder should contain a data folder containing your rdata files. If you are extracting data,

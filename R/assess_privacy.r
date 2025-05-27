@@ -81,9 +81,6 @@
 
 #' @param custom.grid  default is \code{NULL}.  If there is a need to use a custom grid to apply to 
 #' the data, 
-
-#' @import data.table
-
 #' @return a list containing an sf grid layer, an sf overlay later, and if \code{create.spatial==T},
 #' a gpkg spatial file containing these same objects. Additionally, if \code{create.centroid.csv =T},
 #' it can also produce a csv of the centroids of the grid layer (which willl also be loaded into the 
