@@ -10,9 +10,9 @@
 #' @return A dataframe.
 #' @export
 ISSETPROFILE_enwidener <- function(df) {
-  # 0) idempotence check
+
   if ("DUR_32" %in% names(df)) {
-    message("ISSETPROFILE already enwidened, returning unchanged.")
+    # message("ISSETPROFILE already enwidened, returning unchanged.")
     return(df)
   }
   
@@ -23,7 +23,7 @@ ISSETPROFILE_enwidener <- function(df) {
     SETDATE   = as.Date(SETDATE),
     DATE_TIME = as.POSIXct(
       paste(SETDATE, sprintf("%04d", as.numeric(SETTIME))),
-      format = "%Y-%m-%d %H%M", tz = "d"
+      format = "%Y-%m-%d %H%M", tz = "America/Halifax"
     ),
     LONGITUDE = -LONGITUDE
   )]
