@@ -4,10 +4,10 @@
 \alias{ISSETPROFILE_enwidener}
 \title{ISSETPROFILE_enwidener}
 \usage{
-ISSETPROFILE_enwidener(ISSETPROFILE)
+ISSETPROFILE_enwidener(df)
 }
 \arguments{
-\item{ISSETPROFILE}{A data.frame of the structure of ISDB.ISSETPROFILE - having 
+\item{df}{A data.frame of the structure of ISDB.ISSETPROFILE - having 
 columns SETDATE, SETTIME, LATITUDE, LONGITUDE, DEPTH, VESSEL_SPEED, AIR_TEMPERATURE, 
 NET_TEMPERATURE, WATER_TEMPERATURE, BAR_PRESSURE, FISHSET_ID, SET_NO, PNTCD_ID.}
 }

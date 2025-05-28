@@ -4,20 +4,20 @@
 #' Values such as AIR_TMP which would have previously been associated with P1 - P4 
 #' now become AIR_TMP1 through AIR_TMP4.  Additionally, LATITUDE, LONGITUDE and YEAR
 #' fields are added using the first value for each of P1-P4 for each set.
-#' @param ISSETPROFILE A data.frame of the structure of ISDB.ISSETPROFILE - having 
+#' @param df A data.frame of the structure of ISDB.ISSETPROFILE - having 
 #' columns SETDATE, SETTIME, LATITUDE, LONGITUDE, DEPTH, VESSEL_SPEED, AIR_TEMPERATURE, 
 #' NET_TEMPERATURE, WATER_TEMPERATURE, BAR_PRESSURE, FISHSET_ID, SET_NO, PNTCD_ID.
 #' @return A dataframe.
 #' @export
-ISSETPROFILE_enwidener <- function(ISSETPROFILE) {
+ISSETPROFILE_enwidener <- function(df) {
   # 0) idempotence check
-  if ("DUR_32" %in% names(ISSETPROFILE)) {
+  if ("DUR_32" %in% names(df)) {
     message("ISSETPROFILE already enwidened, returning unchanged.")
-    return(ISSETPROFILE)
+    return(df)
   }
   
   # 1) bring in as data.table, drop NA codes
-  dt <- data.table::as.data.table(ISSETPROFILE)
+  dt <- data.table::as.data.table(df)
   dt <- dt[!is.na(PNTCD_ID) & PNTCD_ID %in% 1:4]
   dt[ , `:=`(
     SETDATE   = as.Date(SETDATE),
