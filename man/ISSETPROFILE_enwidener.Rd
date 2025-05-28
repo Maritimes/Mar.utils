@@ -12,7 +12,7 @@ columns SETDATE, SETTIME, LATITUDE, LONGITUDE, DEPTH, VESSEL_SPEED, AIR_TEMPERAT
 NET_TEMPERATURE, WATER_TEMPERATURE, BAR_PRESSURE, FISHSET_ID, SET_NO, PNTCD_ID.}
 }
 \value{
-A data.table in the same shape as your SQL view.
+A dataframe.
 }
 \description{
 This function reshapes the default ISDB.ISSETPROFILE data such that 
