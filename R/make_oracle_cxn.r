@@ -53,10 +53,10 @@ make_oracle_cxn <- function(usepkg = 'rodbc',
     )
     if (inherits(oracle_cxn,"OraConnection")) {
       if (!quietly) message("\nSuccessfully connected to Oracle via ROracle\n")
-      results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
+      # results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
-      return(results)
+      return(oracle_cxn)
     } else {
       message("\n!!! An ROracle connection could not be established with Oracle. !!!  
                             
@@ -93,10 +93,10 @@ You can check what you have by opening a command window and typing 'set'.
     )
     if (inherits(oracle_cxn,"RODBC")) {
       if (!quietly) message("\nSuccessfully connected to Oracle via RODBC\n")
-      results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
+      # results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
-      return(results)
+      return(oracle_cxn)
     } else {
       message("\n!!! An RODBC connection could not be established with Oracle. !!!
               
@@ -122,15 +122,15 @@ Have a look at Tools>Global Options>General>R Version to see which R you're usin
   
   if (!is.null(oracle_cxn)){
     if (inherits(oracle_cxn,"RODBC")){
-      results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
+      # results = list(usepkg='rodbc', channel = oracle_cxn, thecmd=eval(parse(text='RODBC::sqlQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
-      return(results)
+      return(oracle_cxn)
     }else if (inherits(oracle_cxn,"OraConnection")) {
-      results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
+      # results = list(usepkg='roracle', channel = oracle_cxn, thecmd=eval(parse(text='ROracle::dbGetQuery')))
       Sys.setenv(TZ = orig_TZ)
       Sys.setenv(ORA_SDTZ = orig_ORA_SDTZ)
-      return(results)
+      return(oracle_cxn)
     } 
   } else {
     #get connection info - only prompt for values not in rprofile

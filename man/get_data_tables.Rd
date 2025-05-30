@@ -6,14 +6,10 @@
 \usage{
 get_data_tables(
   schema = NULL,
-  data.dir = file.path(getwd(), "data"),
+  data.dir = file.path(getwd()),
   tables = NULL,
   rownum = NULL,
   cxn = NULL,
-  usepkg = "rodbc",
-  fn.oracle.username = "_none_",
-  fn.oracle.password = "_none_",
-  fn.oracle.dsn = "_none_",
   checkOnly = FALSE,
   force.extract = FALSE,
   env = .GlobalEnv,
@@ -28,9 +24,8 @@ with the logged in user (i.e. the user that made the connection).  An "<NA>"
 schema is often necessary for ISDB data extractions.}
 
 \item{data.dir}{The default is your working directory. If you are hoping to load existing data,
-this folder should contain a data folder containing your rdata files. If you are extracting data,
-a data folder will be created under this folder.
-extracted files to go.}
+this should point to a folder containing your rdata files. If you are extracting data,
+the data will be saved here.}
 
 \item{tables}{The default value is \code{NULL}.  This is a vector of table 
 names you want to extract that exist in identified \code{schema} of the the database.}
@@ -43,30 +38,6 @@ retrieved.  Otherwise, it will return the specified number of rows.}
 pass an existing connection, reducing the need to establish a new connection 
 within the function. If provided, it takes precedence over the connection-
 related parameters.}
-
-\item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
-connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
-connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-5x faster.Deprecated; use \code{cxn} instead.}
-
-\item{fn.oracle.username}{Default is \code{'_none_'}. This is your username 
-for accessing Oracle objects. If you have a value for \code{oracle.username} 
-stored in your environment (e.g., from an rprofile file), this can be left 
-out and that value will be used. If a value for this is provided, it will 
-take priority over your existing value. Deprecated; use \code{cxn} instead.}
-
-\item{fn.oracle.password}{Default is \code{'_none_'}. This is your password 
-for accessing Oracle objects. If you have a value for \code{oracle.password} 
-stored in your environment (e.g., from an rprofile file), this can be left 
-out and that value will be used. If a value for this is provided, it will 
-take priority over your existing value. Deprecated; use \code{cxn} instead.}
-
-\item{fn.oracle.dsn}{Default is \code{'_none_'}. This is your DSN/ODBC 
-identifier for accessing Oracle objects. If you have a value 
-for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
-file), this can be left out and that value will be used. If a value for this 
-is provided, it will take priority over your existing value. Deprecated; use 
-\code{cxn} instead.}
 
 \item{checkOnly}{default is \code{FALSE}  This flag allows the function to be 
 run such that it checks for the existence of the files, but doesn't load them.}

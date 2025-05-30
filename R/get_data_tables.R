@@ -6,38 +6,17 @@
 #' with the logged in user (i.e. the user that made the connection).  An "<NA>"
 #' schema is often necessary for ISDB data extractions.
 #' @param data.dir  The default is your working directory. If you are hoping to load existing data,
-#' this folder should contain a data folder containing your rdata files. If you are extracting data,
-#' a data folder will be created under this folder.
-#' extracted files to go.
+#' this should point to a folder containing your rdata files. If you are extracting data,
+#' the data will be saved here.
 #' @param tables The default value is \code{NULL}.  This is a vector of table 
 #' names you want to extract that exist in identified \code{schema} of the the database.
 #' @param rownum The default value is \code{NULL}. This is an integer that can be used to limit the 
 #' number  of records retrieved from the specified table(s).  If it is left as \code{NULL}, all records 
 #' retrieved.  Otherwise, it will return the specified number of rows.
-#' @param usepkg default is \code{'rodbc'}. This indicates whether the 
-#' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
-#' connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-#' 5x faster.Deprecated; use \code{cxn} instead.
 #' @param cxn A valid Oracle connection object. This parameter allows you to 
 #' pass an existing connection, reducing the need to establish a new connection 
 #' within the function. If provided, it takes precedence over the connection-
 #' related parameters.
-#' @param fn.oracle.username Default is \code{'_none_'}. This is your username 
-#' for accessing Oracle objects. If you have a value for \code{oracle.username} 
-#' stored in your environment (e.g., from an rprofile file), this can be left 
-#' out and that value will be used. If a value for this is provided, it will 
-#' take priority over your existing value. Deprecated; use \code{cxn} instead.
-#' @param fn.oracle.password Default is \code{'_none_'}. This is your password 
-#' for accessing Oracle objects. If you have a value for \code{oracle.password} 
-#' stored in your environment (e.g., from an rprofile file), this can be left 
-#' out and that value will be used. If a value for this is provided, it will 
-#' take priority over your existing value. Deprecated; use \code{cxn} instead.
-#' @param fn.oracle.dsn Default is \code{'_none_'}. This is your DSN/ODBC 
-#' identifier for accessing Oracle objects. If you have a value 
-#' for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
-#' file), this can be left out and that value will be used. If a value for this 
-#' is provided, it will take priority over your existing value. Deprecated; use 
-#' \code{cxn} instead.
 #' @param checkOnly default is \code{FALSE}  This flag allows the function to be 
 #' run such that it checks for the existence of the files, but doesn't load them.
 #' @param force.extract default is \code{FALSE}  This flag forces a re-extraction of all of the 
@@ -52,23 +31,15 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 get_data_tables<-function(schema=NULL,
-                          data.dir = file.path(getwd(), 'data'),
+                          data.dir = file.path(getwd()),
                           tables = NULL,
                           rownum = NULL,
                           cxn = NULL,
-                          usepkg = 'rodbc', 
-                          fn.oracle.username ="_none_",
-                          fn.oracle.password="_none_",
-                          fn.oracle.dsn="_none_",
                           checkOnly = FALSE,
                           force.extract = FALSE,
                           env=.GlobalEnv,
                           fuzzyMatch = TRUE,
                           quietly=TRUE){
-  deprecationCheck(fn.oracle.username = fn.oracle.username, 
-                   fn.oracle.password = fn.oracle.password, 
-                   fn.oracle.dsn = fn.oracle.dsn,
-                   usepkg = usepkg)
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly){
@@ -155,13 +126,8 @@ get_data_tables<-function(schema=NULL,
     return(invisible(NULL))
   } else {
     if (is.null(cxn)) {
-      oracle_cxn_custom = Mar.utils::make_oracle_cxn(usepkg, fn.oracle.username, fn.oracle.password, fn.oracle.dsn)  
-      if (!inherits(oracle_cxn_custom, "list")) {
         message("\nCan't get the data without a DB connection. Aborting.\n")
         return(NULL)
-      }
-      cxn = oracle_cxn_custom$channel
-      thecmd = oracle_cxn_custom$thecmd
     } else {
       thecmd <- Mar.utils::connectionCheck(cxn)
     }

@@ -7,10 +7,6 @@
 VMS_from_MARFIS(
   df = NULL,
   cxn = NULL,
-  fn.oracle.username = "_none_",
-  fn.oracle.password = "_none_",
-  fn.oracle.dsn = "_none_",
-  usepkg = "rodbc",
   data.dir = NULL,
   VR_field = "VR_NUMBER",
   LIC_field = "LICENCE_ID",
@@ -28,32 +24,7 @@ VMS_from_MARFIS(
 
 \item{cxn}{A valid Oracle connection object. This parameter allows you to 
 pass an existing connection, reducing the need to establish a new connection 
-within the function. If provided, it takes precedence over the connection-
-related parameters.}
-
-\item{fn.oracle.username}{Default is \code{'_none_'}. This is your username 
-for accessing Oracle objects. If you have a value for \code{oracle.username} 
-stored in your environment (e.g., from an rprofile file), this can be left 
-out and that value will be used. If a value for this is provided, it will 
-take priority over your existing value. Deprecated; use \code{cxn} instead.}
-
-\item{fn.oracle.password}{Default is \code{'_none_'}. This is your password 
-for accessing Oracle objects. If you have a value for \code{oracle.password} 
-stored in your environment (e.g., from an rprofile file), this can be left 
-out and that value will be used. If a value for this is provided, it will 
-take priority over your existing value. Deprecated; use \code{cxn} instead.}
-
-\item{fn.oracle.dsn}{Default is \code{'_none_'}. This is your DSN/ODBC 
-identifier for accessing Oracle objects. If you have a value 
-for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
-file), this can be left out and that value will be used. If a value for this 
-is provided, it will take priority over your existing value. Deprecated; use 
-\code{cxn} instead.}
-
-\item{usepkg}{default is \code{'rodbc'}. This indicates whether the 
-connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
-connect.  rodbc is slightly easier to setup, but roracle will extract data ~ 
-5x faster. Deprecated; use \code{cxn} instead.}
+within the function.}
 
 \item{data.dir}{the default is \code{NULL}. If you are hoping to load existing data,
 this folder should contain a data folder containing your rdata files. For this function, only

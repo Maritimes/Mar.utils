@@ -6,26 +6,6 @@
 #' pass an existing connection, reducing the need to establish a new connection 
 #' within the function. If provided, it takes precedence over the connection-
 #' related parameters.
-#' @param fn.oracle.username Default is \code{'_none_'}. This is your username 
-#' for accessing Oracle objects. If you have a value for \code{oracle.username} 
-#' stored in your environment (e.g., from an rprofile file), this can be left 
-#' out and that value will be used. If a value for this is provided, it will 
-#' take priority over your existing value. Deprecated; use \code{cxn} instead.
-#' @param fn.oracle.password Default is \code{'_none_'}. This is your password 
-#' for accessing Oracle objects. If you have a value for \code{oracle.password} 
-#' stored in your environment (e.g., from an rprofile file), this can be left 
-#' out and that value will be used. If a value for this is provided, it will 
-#' take priority over your existing value. Deprecated; use \code{cxn} instead.
-#' @param fn.oracle.dsn Default is \code{'_none_'}. This is your DSN/ODBC 
-#' identifier for accessing Oracle objects. If you have a value 
-#' for \code{oracle.dsn} stored in your environment (e.g., from an rprofile 
-#' file), this can be left out and that value will be used. If a value for this 
-#' is provided, it will take priority over your existing value. Deprecated; use 
-#' \code{cxn} instead.
-#' @param usepkg default is \code{'rodbc'}. This indicates whether the 
-#' connection to Oracle should use \code{'rodbc'} or \code{'roracle'} to 
-#' connect.  rodbc is slightly easier to setup, but roracle will extract data 
-#' ~ 5x faster.Deprecated; use \code{cxn} instead.
 #' @param hrBuffer default is \code{4}.  This is the number of hours worth of 
 #' VMS data you would like to pad your area search by.  For example, if a vessel
 #' has a single VMS position in the results, padding it will add additional 
@@ -52,10 +32,7 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 VMS_get_recs <- function(cxn = NULL, 
-                         fn.oracle.username = "_none_", 
-                         fn.oracle.password = "_none_", 
-                         fn.oracle.dsn = "_none_",
-                         usepkg = 'rodbc', dateStart = NULL, dateEnd = NULL, 
+                         dateStart = NULL, dateEnd = NULL, 
                          vrnList = NULL, hrBuffer = 4,   
                          minLon = NULL, maxLon = NULL,
                          minLat = NULL, maxLat = NULL, rowNum = 50000,
@@ -104,20 +81,8 @@ VMS_get_recs <- function(cxn = NULL,
                           W_maxX, " AND ", 
                           W_minY,  " AND ",
                           W_maxY,") ",whereVRN, sqlLimit)
-  if (is.null(cxn)) {
-    oracle_cxn = make_oracle_cxn(fn.oracle.username = fn.oracle.username, 
-                                 fn.oracle.password = fn.oracle.password, 
-                                 fn.oracle.dsn = fn.oracle.dsn,
-                                 usepkg = usepkg, quietly = quietly)
-    if (!is.list(oracle_cxn)) {
-      message("\nCan't do this without a DB connection. Aborting.\n")
-      return(NULL)
-    }
-    cxn = oracle_cxn$channel
-    thecmd = oracle_cxn$thecmd
-  } else {
     thecmd <- Mar.utils::connectionCheck(cxn)
-  }
+
   allRecs = thecmd(cxn, recSQL)
 
   if (nrow(allRecs)<1){
