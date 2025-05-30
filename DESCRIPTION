@@ -19,6 +19,7 @@ Imports:
     reshape2,
     rlang,
     openssl,
+    plyr,
     sf,
     spatstat.geom, 
     spatstat.random,

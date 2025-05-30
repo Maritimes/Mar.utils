@@ -68,9 +68,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     return(dfDets)
   }
   # #check for trips that only have one point
-  check <- df |>
-    dplyr::count(objField)|>
-    as.data.frame()
+  check = plyr::count(df, objField)
   names(check)[names(check)==objField]<-"objID"
   dataLines = df[df[,objField] %in% check[check$freq>1,"objID"],]
   dataPoints = df[df[,objField] %in% check[check$freq==1,"objID"],]
