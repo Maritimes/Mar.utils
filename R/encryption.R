@@ -29,7 +29,6 @@ save_encrypted <- function(object = NULL,
                            compress = TRUE,
                            envir = parent.frame(),
                            encrypt = TRUE) {
-  
   if (!is.null(object)) {
     objname <- deparse(substitute(object))
     obj_data <- list(object)
@@ -41,7 +40,6 @@ save_encrypted <- function(object = NULL,
   }
   
   if (!encrypt) {
-    # Skip encryption — just save normally
     if (!is.null(list)) {
       save(list = list, file = file, envir = envir, compress = compress)
     } else {
@@ -50,15 +48,12 @@ save_encrypted <- function(object = NULL,
     return(invisible(NULL))
   }
   
-  # Encrypted save
   key_str <- Mar.utils:::.get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
   iv <- openssl::rand_bytes(16)
   
-  # Serialize first
   serialized <- serialize(obj_data, NULL)
   
-  # Apply compression if requested (after serialization, before encryption)
   if (compress) {
     if (is.logical(compress)) {
       serialized <- memCompress(serialized, "gzip")
@@ -72,10 +67,13 @@ save_encrypted <- function(object = NULL,
     }
   }
   
-  # Encrypt the (potentially compressed) serialized data
   encrypted <- openssl::aes_cbc_encrypt(serialized, key = raw_key, iv = iv)
-  combined <- c(iv, encrypted)
-  writeBin(combined, file)
+  
+  # Convert encrypted raw vector to base64 string
+  encrypted_base64 <- base64enc::base64encode(encrypted)
+  
+  # Combine IV and encrypted_base64 as strings and write to file
+  writeLines(c(base64enc::base64encode(iv), encrypted_base64), con = file)
   
   invisible(NULL)
 }
@@ -90,33 +88,31 @@ save_encrypted <- function(object = NULL,
 #' @return Names of loaded objects (invisibly)
 #' @export
 load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, envir = parent.frame()) {
-  # Check if file exists
   if (!file.exists(file)) {
     stop("File does not exist: ", file)
   }
   
-  # Try to load as encrypted first
   tryCatch({
     key_str <- .get_machine_id(user = extract_user, host = extract_computer)
     raw_key <- openssl::sha256(charToRaw(key_str))
     
-    combined <- readBin(file, "raw", file.size(file))
-    iv <- combined[1:16]
-    encrypted <- combined[17:length(combined)]
+    # Read the IV and encrypted base64 content from the file
+    lines <- readLines(con = file)
+    iv <- base64enc::base64decode(lines[1])
+    encrypted_base64 <- lines[2]
+    
+    # Convert the encrypted base64 back to raw bytes for decryption
+    encrypted <- base64enc::base64decode(encrypted_base64)
     
     serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
-    # Let unserialize handle decompression automatically - no manual decompression needed
     decompressed <- memDecompress(serialized, type = "gzip")
     obj_data <- unserialize(decompressed)
     
-    # Assign all objects to the environment
     for (name in names(obj_data)) {
       assign(name, obj_data[[name]], envir = envir)
     }
     return(invisible(names(obj_data)))
   }, error = function(e) {
-    # If decryption fails, try to load as unencrypted RData
-    #message("Note: File appears to be unencrypted. Loading as standard RData file.")
     message("Decryption failed: ", e$message)
     message("Falling back to unencrypted load (may not succeed).")
     tryCatch({
