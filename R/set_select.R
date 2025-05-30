@@ -174,7 +174,6 @@ set_select <- function(
     overlapping_areas <- sf::st_intersection(avoid_sf, filtStrata)
     
     filtStrata_sp <- methods::as(filtStrata, "Spatial")
-    # filtStrata_sp <- sp::Spatial(filtStrata)
     filtStrata_sp <- cleangeo::clgeo_Clean(filtStrata_sp)
     filtStrata <- sf::st_as_sf(filtStrata_sp)
 

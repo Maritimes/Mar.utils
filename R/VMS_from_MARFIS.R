@@ -101,13 +101,11 @@ VMS_from_MARFIS <- function(df = NULL,
   theVMS <- theVMS[theVMS$VR_NUMBER %in% df$VR_NUMBER, ]
   
   # associate all of the vms date with fishing activity where the positions are between the 'pseudo-start' and the LANDED_DATE
-  combined = sqldf::sqldf("select * 
-                           from theVMS v left join df m on 
-                           v.VR_NUMBER = m.VR_NUMBER and 
-                           v.POSITION_UTC_DATE between m.pseudo_start and m.LANDED_DATE")
-  
-  # remove duplicate (VR) column
-  combined <- combined[!is.na(combined$LICENCE_ID), !duplicated(colnames(combined))]
+
+  combined <- merge(theVMS, df, by = "VR_NUMBER", all.x = TRUE)
+  combined <- combined[with(combined, POSITION_UTC_DATE >= pseudo_start & POSITION_UTC_DATE <= LANDED_DATE), ]
+  combined <- combined[!is.na(combined$LICENCE_ID), ]
+  combined <- combined[, !duplicated(colnames(combined))]
   
   if (!is.null(data.dir)) {
     e = new.env()
