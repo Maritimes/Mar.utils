@@ -113,8 +113,8 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     }
     return(invisible(names(obj_data)))
   }, error = function(e) {
-    message("Decryption failed: ", e$message)
-    message("Falling back to unencrypted load (may not succeed).")
+    # message("Decryption failed: ", e$message)
+    # message("Falling back to unencrypted load (may not succeed).")
     tryCatch({
       loaded_objects <- load(file, envir = envir)
       return(invisible(loaded_objects))
