@@ -29,7 +29,6 @@ save_encrypted <- function(object = NULL,
                            compress = TRUE,
                            envir = parent.frame(),
                            encrypt = TRUE) {
-  browser()
   if (!is.null(object)) {
     objname <- deparse(substitute(object))
     obj_data <- list(object)

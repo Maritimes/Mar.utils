@@ -27,6 +27,7 @@
 #' (generally) synonymous  schema identifiers (i.e. MARFIS.==MARFISSCI.; RV.==GROUNDFISH.;
 #' ISDB.=OBSERVER.)  Changing to False forces an exact match.
 #' @param quietly default is \code{FALSE}.  If TRUE, no output messages will be shown.
+#' @param ... other arguments passed to methods - perhaps \code{extract_user} and \code{extract_computer}
 #' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
@@ -39,7 +40,8 @@ get_data_tables<-function(schema=NULL,
                           force.extract = FALSE,
                           env=.GlobalEnv,
                           fuzzyMatch = TRUE,
-                          quietly=TRUE){
+                          quietly=TRUE,
+                          ...){
   schema=toupper(schema)
   tables = toupper(tables)
   if (!quietly){
@@ -80,7 +82,7 @@ get_data_tables<-function(schema=NULL,
           stop()
         }
       }else{
-        load_encrypted(file = thisP,envir = env)
+        load_encrypted(file = thisP,envir = env, ...)
         if (!quietly) message(paste0("\nLoaded ", x, "... "))
       }
       fileAge = file.info(thisP)$mtime

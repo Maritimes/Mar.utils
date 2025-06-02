@@ -22,6 +22,7 @@
 #' @param make_segments_spatial the default is \code{FALSE}. This indicates whether or not a shapefile
 #' should be created of all of the VMS data as lines (in addition to a data frame). 
 #' \code{make_segments} must be TRUE for shapefiles to be generated. 
+#' @param ... other arguments passed to methods - perhaps \code{extract_user} and \code{extract_computer}
 #' @return a list containing a data.frame called "marf_VMS" of the joined marfis/VMS data, and, 
 #' if \code{make_segments} is TRUE, an sp object called "marf_VMS_segments". Additionally, if 
 #' make_segments and make_segments_shp are both TRUE, a shapefile will be created in the working 
@@ -39,7 +40,7 @@ VMS_from_MARFIS <- function(df = NULL,
                             lat.field = NULL,
                             lon.field = NULL,
                             make_segments = TRUE,
-                            make_segments_spatial = FALSE) {
+                            make_segments_spatial = FALSE, ...) {
 
   # data.table doesn't like column name references - ensure the col names are known
   VR_NUMBER <- LANDED_DATE <- pseudo_start <- MARFLEETS_LIC <- LICENCE_ID <- GEAR_CODE <- POSITION_UTC_DATE <- NULL
@@ -112,7 +113,7 @@ VMS_from_MARFIS <- function(df = NULL,
     Mar.utils::get_data_tables(cxn = cxn, 
                     schema = "MARFISSCI", 
                     tables = "MARFLEETS_LIC", 
-                    env = e)
+                    env = e, ...)
     theseLics <- unique(e$MARFLEETS_LIC[e$MARFLEETS_LIC$LICENCE_ID %in% combined$LICENCE_ID, c("LICENCE_ID", "GEAR_CODE", "GEAR", "SPECIES")])
     combined <- merge(combined, theseLics, by = c("LICENCE_ID", "GEAR_CODE"), all.x = T)
   } else {
