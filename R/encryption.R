@@ -92,34 +92,48 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     stop("File does not exist: ", file)
   }
   
+  first_line <- readLines(con = file, n = 1)
+  if (!isTRUE(nzchar(first_line))) {
+    stop("File is either empty or not accessible: ", file)
+  }
+  
+  encrypted_format_detected <- FALSE
   tryCatch({
-    key_str <- .get_machine_id(user = extract_user, host = extract_computer)
-    raw_key <- openssl::sha256(charToRaw(key_str))
-    
-    # Read the IV and encrypted base64 content from the file
-    lines <- readLines(con = file)
-    iv <- base64enc::base64decode(lines[1])
-    encrypted_base64 <- lines[2]
-    
-    # Convert the encrypted base64 back to raw bytes for decryption
-    encrypted <- base64enc::base64decode(encrypted_base64)
-    
-    serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
-    decompressed <- memDecompress(serialized, type = "gzip")
-    obj_data <- unserialize(decompressed)
-    
-    for (name in names(obj_data)) {
-      assign(name, obj_data[[name]], envir = envir)
-    }
-    return(invisible(names(obj_data)))
+    iv <- base64enc::base64decode(first_line)
+    encrypted_format_detected <- TRUE
   }, error = function(e) {
-    # message("Decryption failed: ", e$message)
-    # message("Falling back to unencrypted load (may not succeed).")
+   # cat("File is not recognized as being in the encrypted format:", file, "\n")
+  })
+  
+  if (encrypted_format_detected) {
+    tryCatch({
+      key_str <- .get_machine_id(user = extract_user, host = extract_computer)
+      raw_key <- openssl::sha256(charToRaw(key_str))
+      
+      # Read the remaining encrypted base64 content from the file
+      lines <- readLines(con = file)
+      encrypted_base64 <- lines[2]
+      
+      # Convert the encrypted base64 back to raw bytes for decryption
+      encrypted <- base64enc::base64decode(encrypted_base64)
+      
+      serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
+      decompressed <- memDecompress(serialized, type = "gzip")
+      obj_data <- unserialize(decompressed)
+      
+      for (name in names(obj_data)) {
+        assign(name, obj_data[[name]], envir = envir)
+      }
+      return(invisible(names(obj_data)))
+    }, error = function(e) {
+      stop("Failed to decrypt the encrypted content: ", e$message)
+    })
+  } else {
     tryCatch({
       loaded_objects <- load(file, envir = envir)
       return(invisible(loaded_objects))
     }, error = function(e2) {
-      stop("Failed to load file as either encrypted or unencrypted: ", e2$message)
+      stop("Failed to load unencrypted file: ", e2$message)
     })
-  })
+  }
 }
