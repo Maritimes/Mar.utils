@@ -15,7 +15,8 @@ get_data_tables(
   env = .GlobalEnv,
   fuzzyMatch = TRUE,
   quietly = TRUE,
-  ...
+  extract_user = NULL,
+  extract_computer = NULL
 )
 }
 \arguments{
@@ -55,7 +56,13 @@ ISDB.=OBSERVER.)  Changing to False forces an exact match.}
 
 \item{quietly}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
 
-\item{...}{other arguments passed to methods - perhaps \code{extract_user} and \code{extract_computer}}
+\item{extract_user}{default is \code{NULL}.  This parameter can be used with
+\code{extract_computer} to load encypted data files extracted by another user
+and/or computer}
+
+\item{extract_computer}{default is \code{NULL}.  This parameter can be used with
+\code{extract_user} to load encypted data files extracted by another user
+and/or computer}
 }
 \description{
 This function allows users to extract tables for which they have select permissions
