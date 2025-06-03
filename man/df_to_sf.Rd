@@ -36,6 +36,9 @@ the order points should be joined.  In order to specifiy a "hole", the order fie
 oordinates specifying the hole should be descending (rather than ascending).}
 
 \item{type}{the default is \code{"polys"}, but it can also be \code{"lines"} or \code{"points"}}
+
+\item{user.crs}{the default is \code{4326}.  This is the coordinate system that should
+be assigned to spatial object created from \code{df}.}
 }
 \value{
 an sf object

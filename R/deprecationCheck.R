@@ -8,7 +8,7 @@ deprecationCheck <- function(...) {
   params <- list(...)
   deprecated_params <- c("fn.oracle.username", "fn.oracle.password", "fn.oracle.dsn", "usepkg")
   
-  sfn_params <- c("fn.oracle.username", "fn.oracle.password", "fn.oracle.dsn")
+  fn_params <- c("fn.oracle.username", "fn.oracle.password", "fn.oracle.dsn")
   params_are_none <- all(sapply(params[fn_params], function(x) x == "_none_"))
   usepkg_deprecated <- "usepkg" %in% names(params) && params[["usepkg"]] %in% c("roracle", "rodbc")
   

@@ -16,7 +16,8 @@ VMS_from_MARFIS(
   lat.field = NULL,
   lon.field = NULL,
   make_segments = TRUE,
-  make_segments_spatial = FALSE
+  make_segments_spatial = FALSE,
+  ...
 )
 }
 \arguments{
@@ -52,6 +53,8 @@ include an sp object of all of the VMS data as lines (in addition to a data fram
 \item{make_segments_spatial}{the default is \code{FALSE}. This indicates whether or not a shapefile
 should be created of all of the VMS data as lines (in addition to a data frame). 
 \code{make_segments} must be TRUE for shapefiles to be generated.}
+
+\item{...}{other arguments passed to methods - perhaps \code{extract_user} and \code{extract_computer}}
 }
 \value{
 a list containing a data.frame called "marf_VMS" of the joined marfis/VMS data, and, 

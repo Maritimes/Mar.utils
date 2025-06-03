@@ -48,7 +48,7 @@ save_encrypted <- function(object = NULL,
     return(invisible(NULL))
   }
   
-  key_str <- Mar.utils:::.get_machine_id()
+  key_str <- .get_machine_id()
   raw_key <- openssl::sha256(charToRaw(key_str))
   iv <- openssl::rand_bytes(16)
   

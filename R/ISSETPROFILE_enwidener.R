@@ -8,6 +8,7 @@
 #' columns SETDATE, SETTIME, LATITUDE, LONGITUDE, DEPTH, VESSEL_SPEED, AIR_TEMPERATURE, 
 #' NET_TEMPERATURE, WATER_TEMPERATURE, BAR_PRESSURE, FISHSET_ID, SET_NO, PNTCD_ID.
 #' @return A dataframe.
+#' @import data.table
 #' @export
 ISSETPROFILE_enwidener <- function(df) {
 

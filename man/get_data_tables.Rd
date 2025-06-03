@@ -14,7 +14,8 @@ get_data_tables(
   force.extract = FALSE,
   env = .GlobalEnv,
   fuzzyMatch = TRUE,
-  quietly = TRUE
+  quietly = TRUE,
+  ...
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ default value is \code{.GlobalEnv}.}
 ISDB.=OBSERVER.)  Changing to False forces an exact match.}
 
 \item{quietly}{default is \code{FALSE}.  If TRUE, no output messages will be shown.}
+
+\item{...}{other arguments passed to methods - perhaps \code{extract_user} and \code{extract_computer}}
 }
 \description{
 This function allows users to extract tables for which they have select permissions

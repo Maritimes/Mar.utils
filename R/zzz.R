@@ -9,3 +9,4 @@ NULL
 #   options(stringsAsFactors = FALSE)
 #   updateCheck(gitPkg = 'Maritimes/Mar.utils')
 # }
+utils::globalVariables(c("AIR_TEMPERATURE", "BAR_PRESSURE", "DATE_TIME", "DEPTH", "FISHSET_ID", "LATITUDE", "LONGITUDE", "NET_TEMPERATURE", "PNTCD_ID", "SETDATE", "SETTIME", "SET_NO", "VESSEL_SPEED", "WATER_TEMPERATURE"))

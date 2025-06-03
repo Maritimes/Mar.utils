@@ -16,6 +16,8 @@
 #' the order points should be joined.  In order to specifiy a "hole", the order field for the c
 #' oordinates specifying the hole should be descending (rather than ascending).
 #' @param type the default is \code{"polys"}, but it can also be \code{"lines"} or \code{"points"}
+#' @param user.crs the default is \code{4326}.  This is the coordinate system that should
+#' be assigned to spatial object created from \code{df}. 
 #' @return an sf object
 #' @note this function was modified from 
 #' https://github.com/Mar-scal/Assessment_fns/blob/master/Maps/pbs_2_sf.R 
