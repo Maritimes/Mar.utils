@@ -92,17 +92,19 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     stop("File does not exist: ", file)
   }
   
-  first_line <- readLines(con = file, n = 1)
-  if (!isTRUE(nzchar(first_line))) {
-    stop("File is either empty or not accessible: ", file)
-  }
-  
+  # Attempt to read and identify first line as an IV header
+  first_line_raw <- NULL
   encrypted_format_detected <- FALSE
+  
   tryCatch({
-    iv <- base64enc::base64decode(first_line)
-    encrypted_format_detected <- TRUE
+    first_line_raw <- base64enc::base64decode(readLines(con = file, n = 1, warn = FALSE))
+    if (length(first_line_raw) == 16) {
+      encrypted_format_detected <- TRUE
+    }
+  }, warning = function(w) {
+   # cat("Not a valid encrypted header found, treating as unencrypted file:", file, "\n")
   }, error = function(e) {
-   # cat("File is not recognized as being in the encrypted format:", file, "\n")
+  #  cat("Error detecting file encryption status. Treating as unencrypted:", file, "\n")
   })
   
   if (encrypted_format_detected) {
@@ -110,14 +112,14 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
       key_str <- .get_machine_id(user = extract_user, host = extract_computer)
       raw_key <- openssl::sha256(charToRaw(key_str))
       
-      # Read the remaining encrypted base64 content from the file
+      # Read the remaining encrypted base64 content
       lines <- readLines(con = file)
       encrypted_base64 <- lines[2]
       
       # Convert the encrypted base64 back to raw bytes for decryption
       encrypted <- base64enc::base64decode(encrypted_base64)
       
-      serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = iv)
+      serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = first_line_raw)
       decompressed <- memDecompress(serialized, type = "gzip")
       obj_data <- unserialize(decompressed)
       
@@ -125,6 +127,7 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
         assign(name, obj_data[[name]], envir = envir)
       }
       return(invisible(names(obj_data)))
+      
     }, error = function(e) {
       stop("Failed to decrypt the encrypted content: ", e$message)
     })
