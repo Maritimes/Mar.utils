@@ -36,176 +36,160 @@
 #' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-get_data_tables<-function(schema=NULL,
-                          data.dir = file.path(getwd()),
-                          tables = NULL,
-                          rownum = NULL,
-                          cxn = NULL,
-                          checkOnly = FALSE,
-                          force.extract = FALSE,
-                          env=.GlobalEnv,
-                          fuzzyMatch = TRUE,
-                          quietly=TRUE, 
-                          extract_user = NULL, 
-                          extract_computer = NULL){
-  schema=toupper(schema)
+get_data_tables <- function(schema = NULL,
+                            data.dir = file.path(getwd()),
+                            tables = NULL,
+                            rownum = NULL,
+                            cxn = NULL,
+                            checkOnly = FALSE,
+                            force.extract = FALSE,
+                            env = .GlobalEnv,
+                            fuzzyMatch = TRUE,
+                            quietly = TRUE,
+                            extract_user = NULL,
+                            extract_computer = NULL) {
+  
+  schema = toupper(schema)
   tables = toupper(tables)
-  if (!quietly){
-    if(!checkOnly) {
-      message("\nLoading data...")
-    }else{
-      message("\nVerifying existence of data...")
-    }
-  } 
+  if (!quietly) {
+    message(if (!checkOnly) "\nLoading data..." else "\nVerifying existence of data...")
+  }
+  
   timer.start = proc.time()
+  
   try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
-
+    
     loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
-      if (fuzzyMatch){
-        if (grepl(x= thisP,pattern = "MARFIS\\.|MARFISSCI\\.")){
-          if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T))) {
-            thisP = gsub(x= thisP,pattern = "MARFISSCI",replacement ="MARFIS",ignore.case = T)
+      
+      if (fuzzyMatch) {
+        if (grepl(x = thisP, pattern = "MARFIS\\.|MARFISSCI\\.")) {
+          if (!file.exists(thisP) & file.exists(gsub(x = thisP, pattern = "MARFISSCI", replacement = "MARFIS", ignore.case = TRUE))) {
+            thisP = gsub(x = thisP, pattern = "MARFISSCI", replacement = "MARFIS", ignore.case = TRUE)
           }
-        } else  if (grepl(x= thisP,pattern = "RV\\.|GROUNDFISH.")){
-          if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T))) {
-            thisP = gsub(x= thisP,pattern = "GROUNDFISH",replacement ="RV",ignore.case = T)
+        } else if (grepl(x = thisP, pattern = "RV\\.|GROUNDFISH.")) {
+          if (!file.exists(thisP) & file.exists(gsub(x = thisP, pattern = "GROUNDFISH", replacement = "RV", ignore.case = TRUE))) {
+            thisP = gsub(x = thisP, pattern = "GROUNDFISH", replacement = "RV", ignore.case = TRUE)
           }
-        } else if (grepl(x= thisP,pattern = "ISDB\\.|OBSERVER.")){
-          if (!file.exists(thisP) & file.exists(gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T))) {
-            thisP = gsub(x= thisP,pattern = "OBSERVER",replacement ="ISDB",ignore.case = T)
+        } else if (grepl(x = thisP, pattern = "ISDB\\.|OBSERVER.")) {
+          if (!file.exists(thisP) & file.exists(gsub(x = thisP, pattern = "OBSERVER", replacement = "ISDB", ignore.case = TRUE))) {
+            thisP = gsub(x = thisP, pattern = "OBSERVER", replacement = "ISDB", ignore.case = TRUE)
           }
         }
       }
+      
       thisP = gsub(pattern = "//", replacement = "/", x = thisP)
       
-      if(checkOnly) {
-        if(file.exists(thisP)){
-          if (!quietly) message(paste0("\nVerified ", x, "... "))
-        }else{
-          if (!quietly) message(paste0("\nMissing ", x, " (download will be attempted)... "))
-          stop()
+      tryCatch({
+        if (checkOnly) {
+          if (file.exists(thisP)) {
+            if (!quietly) message(paste0("\nVerified ", x, "... "))
+          } else {
+            stop("\nMissing ", x, " (download will be attempted)... ")
+          }
+        } else {
+          load_encrypted(file = thisP, envir = env, extract_user = extract_user, extract_computer = extract_computer)
+          if (!quietly) message(paste0("\nLoaded ", x, "... "))
         }
-      }else{
-        load_encrypted(file = thisP,envir = env, extract_user = extract_user, extract_computer = extract_computer)
-        if (!quietly) message(paste0("\nLoaded ", x, "... "))
-      }
-      fileAge = file.info(thisP)$mtime
-      fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
-      if (!quietly) message(paste0(" (Data modified ", fileAge, " days ago.)"))
+        
+        fileAge = file.info(thisP)$mtime
+        fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
+        if (!quietly) message(paste0(" (Data modified ", fileAge, " days ago.)"))
+      }, error = function(e) {
+        if (grepl("Failed to decrypt", e$message)) {
+          stop("Incorrect decryption credentials provided. Please provide valid credentials or a cxn object with the necessary permissions.")
+        } else {
+          if (!quietly) message(paste0("\nFailed to load ", x, " due to unexpected error: ", e$message))
+          stop(e) # Re-throw the error if it's not related to decryption failure
+        }
+      })
     }
-    sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)  
-    if (!quietly) 
-      return(TRUE)
+    
+    sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)
+    if (!quietly) return(TRUE)
   }
-  if (schema == "<NA>"){
-    reqd = toupper(tables)
-  }else{
-    reqd = toupper(paste0(schema, ".", tables))
-  }
-
-  res <- NA
-  for (r in 1:length(reqd)){
-    loadsuccess = tryCatch(
-      {
-        try_load(reqd[r], data.dir, checkOnly)
-      }, 
-      warning = function(w) {
-        print()
-      },
-      error=function(cond){
-        return(-1)
+  
+  reqd = if (schema == "<NA>") toupper(tables) else toupper(paste0(schema, ".", tables))
+  
+  for (r in seq_along(reqd)) {
+    loadsuccess = tryCatch({
+      try_load(reqd[r], data.dir, checkOnly)
+      1
+    }, error = function(e) {
+      if (grepl("Incorrect decryption credentials", e$message)) {
+        stop(e$message)
       }
-    )
-    res <- c(res, loadsuccess)
+      -1
+    })
+    
+    if (loadsuccess == -1 && !is.null(cxn) && !force.extract) {
+      message("\nCan't proceed without a DB connection to retrieve missing data. Aborting.\n")
+      return(invisible(NULL))
+    }
   }
-  res<- res[!is.na(res)]
-  if (all(res %in% 1) & !force.extract){
-    t = timer.start - proc.time()
-    if (!quietly){
-      t = round(t[3], 0) * -1
-      if(!checkOnly) {
-        message(paste0("\n\n", t, " seconds to load..."))
-      }else{ 
-        message(paste0("\n\n", t, " seconds to check..."))
-      }
-    } 
+  
+  if (!force.extract) {
+    t = proc.time() - timer.start
+    t = round(t[3], 0)
+    if (!quietly) message(paste0("\n\n", t, " seconds to complete operation."))
     return(invisible(NULL))
-  } else {
-    if (is.null(cxn)) {
-        message("\nCan't get the data without a DB connection. Aborting.\n")
-        return(NULL)
-    } else {
-      thecmd <- Mar.utils::connectionCheck(cxn)
-    }
-    if (force.extract){
-      missingtables = tables
-    }else{
-      missingtables = tables[which(res==-1)]
-    }
-    for (i in 1:length(missingtables)){
-      if (!quietly) message(paste0("\n","Verifying access to ",missingtables[i]," ..."))
-      if(schema=="<NA>"){
-        qry = paste0("select '1' from  ",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
-      }else{
-       qry = paste0("select '1' from ",schema,".",gsub(paste0(schema,"."),"",missingtables[i])," WHERE ROWNUM<=1")
-      }
-      m = tryCatch(
-        {
-          thecmd(cxn, qry, rows_at_time = 1)
-        },
-        error=function(cond){
-          return(-1)
-        }
-      )
-      if (is.numeric(m) && m==-1){
-        message("\nCan't find or access the specified table")
-        message(qry)
-        next
-      }else if (is.data.frame(m) && nrow(m) == 0){
-        message("\nTable exists but contains no data")
-        next
-      }
-      if(!checkOnly) {
-        message(paste0("\n","Extracting ",missingtables[i],"..."))
-        table_naked = gsub(paste0(schema,"."),"",missingtables[i])
-        if (is.null(rownum)){
-          where_N = ""
-        }else{
-          where_N = paste0(" WHERE rownum <= ", rownum)
-        }
-        if(schema=="<NA>"){
-          qry = paste0("SELECT * from ",table_naked, where_N)
-        }else{
-          qry = paste0("SELECT * from ", schema, ".",table_naked, where_N)
-        }
-        result = thecmd(cxn, qry, rows_at_time = 1)
-        assign(table_naked, result, envir = env)
-        if(schema=="<NA>"){
-          save_encrypted(list = table_naked, file = file.path(data.dir, paste0(missingtables[i],".RData")), envir = env)
-        }else{
-          save_encrypted(list = table_naked, file = file.path(data.dir, paste0(schema,".",missingtables[i],".RData")), envir = env)
-        }
-        if (!quietly) message(paste("\n","Got", missingtables[i]))
-        assign(x = missingtables[i],value = result, envir = env)
-        if (!quietly) message(paste0("\n","Loaded ",missingtables[i]))
-      }
-    } 
-    t = timer.start - proc.time()
-    if (!quietly){
-      t = round(t[3], 0) * -1
-      if(!checkOnly) {
-        message(paste0("\n\n", t, " seconds to load..."))
-      }else{ 
-        if (all(res == 1)){
-          message(paste0("\n\n", t, " seconds to check..."))
-        }else{
-          message(paste0("\n\n", t, " seconds to check and download..."))
-        }
-      }
-    } 
   }
   
+  if (!is.null(cxn)) {
+    command = Mar.utils::connectionCheck(cxn)
+  } else {
+    message("\nCan't get the data without a DB connection. Aborting.\n")
+    return(NULL)
+  }
   
+  missingtables = if (force.extract) tables else tables[which(loadsuccess == -1)]
+  
+  for (i in seq_along(missingtables)) {
+    if (!quietly) message(paste0("\nVerifying access to ", missingtables[i], " ..."))
+    table_naked = gsub(paste0(schema, "."), "", missingtables[i])
+    qry = if (schema == "<NA>") {
+      paste0("SELECT * FROM ", table_naked, " WHERE ROWNUM <= 1")
+    } else {
+      paste0("SELECT * FROM ", schema, ".", table_naked, " WHERE ROWNUM <= 1")
+    }
+    
+    m = tryCatch(command(cxn, qry, rows_at_time = 1), error = function(e) -1)
+    
+    if (is.numeric(m) && m == -1) {
+      message("\nCan't find or access the specified table")
+      next
+    } else if (is.data.frame(m) && nrow(m) == 0) {
+      message("\nTable exists but contains no data")
+      next
+    }
+    
+    if (!checkOnly) {
+      message(paste0("\nExtracting ", missingtables[i], "..."))
+      qry = if (is.null(rownum)) {
+        if (schema == "<NA>") {
+          paste0("SELECT * FROM ", table_naked)
+        } else {
+          paste0("SELECT * FROM ", schema, ".", table_naked)
+        }
+      } else {
+        where_N = paste0(" WHERE ROWNUM <= ", rownum)
+        if (schema == "<NA>") {
+          paste0("SELECT * FROM ", table_naked, where_N)
+        } else {
+          paste0("SELECT * FROM ", schema, ".", table_naked, where_N)
+        }
+      }
+      
+      result = command(cxn, qry, rows_at_time = 1)
+      assign(table_naked, result, envir = env)
+      rdata_file = file.path(data.dir, paste0(schema, ".", missingtables[i], ".RData"))
+      save_encrypted(list = table_naked, file = rdata_file, envir = env)
+      if (!quietly) message(paste("\nGot", missingtables[i]))
+    }
+  }
+  
+  t = proc.time() - timer.start
+  t = round(t[3], 0)
+  if (!quietly) message(paste0("\n\n", t, " seconds to complete operation."))
 }
