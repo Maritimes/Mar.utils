@@ -21,12 +21,19 @@ ISSETPROFILE_enwidener <- function(df) {
   dt[ , `:=`(
     SETDATE   = as.Date(SETDATE),
     DATE_TIME = as.POSIXct(
-      paste(SETDATE, sprintf("%04d", as.numeric(SETTIME))),
-      format = "%Y-%m-%d %H%M", tz = "America/Halifax"
+      paste(
+        SETDATE,
+        paste0(
+          substr(sprintf("%04d", as.numeric(SETTIME)), 1, 2), ":",
+          substr(sprintf("%04d", as.numeric(SETTIME)), 3, 4), ":00"
+        )
+      ),
+      format = "%Y-%m-%d %H:%M:%S", tz = "America/Halifax"
     ),
-    LONGITUDE = -LONGITUDE
+      LONGITUDE = -LONGITUDE
   )]
-  
+  dt[ , DATE_TIME := as.numeric(DATE_TIME)]
+
   agg <- dt[ , .(
     DATE_TIME = max(DATE_TIME,       na.rm=TRUE),
     LAT       = max(LATITUDE,        na.rm=TRUE),
@@ -38,7 +45,6 @@ ISSETPROFILE_enwidener <- function(df) {
     WAT_TMP   = max(WATER_TEMPERATURE,na.rm=TRUE),
     BAR_PRESS = max(BAR_PRESSURE,    na.rm=TRUE)
   ), by=.(FISHSET_ID, SET_NO, PNTCD_ID)]
-  
   # turn any “all-NA → -Inf” back into NA_real_
   for (nm in c("LAT","LONG","DEP","VESS_SPD",
                "AIR_TMP","NET_TMP","WAT_TMP","BAR_PRESS")) {
@@ -58,12 +64,17 @@ ISSETPROFILE_enwidener <- function(df) {
     value.var = c("DATE_TIME","LAT","LONG","DEP",
                   "VESS_SPD","AIR_TMP","NET_TMP","WAT_TMP","BAR_PRESS"),
     sep  = "",
-    fill = NA
+    fill = NA_real_
   )
   
   # break any shallow‐copy flag so the next := doesn’t warn
   wide <- data.table::copy(wide)
-  
+  for (nm in paste0("DATE_TIME", 1:4)) {
+    data.table::set(wide, j = nm,
+                    value = as.POSIXct(wide[[nm]], origin = "1970-01-01", tz = "America/Halifax")
+    )
+  }
+
   # 4a) durations in minutes
   data.table::set(wide, j="DUR_32",
                   value = as.integer(
@@ -147,7 +158,6 @@ ISSETPROFILE_enwidener <- function(df) {
   
   # 6) convert in‐place to a base data.frame and return
   data.table::setDF(wide)
-  message("ISSETPROFILE has been enwidened (i.e. one record per set)")
-          # are in 'local time', and in this data have been set to 'America/Halifax'")
+  message("ISSETPROFILE has been enwidened (i.e. one record per set); times were reported as 'local time', so the timezone for all data has been set to 'America/Halifax'")
   return(wide)
 }
