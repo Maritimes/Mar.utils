@@ -48,7 +48,6 @@ get_data_tables <- function(schema = NULL,
                             quietly = TRUE,
                             extract_user = NULL,
                             extract_computer = NULL) {
-  
   schema = toupper(schema)
   tables = toupper(tables)
   if (!quietly) {
@@ -58,7 +57,6 @@ get_data_tables <- function(schema = NULL,
   timer.start = proc.time()
   
   try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
-    
     loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
@@ -80,7 +78,6 @@ get_data_tables <- function(schema = NULL,
       }
       
       thisP = gsub(pattern = "//", replacement = "/", x = thisP)
-      
       tryCatch({
         if (checkOnly) {
           if (file.exists(thisP)) {
@@ -92,7 +89,6 @@ get_data_tables <- function(schema = NULL,
           load_encrypted(file = thisP, envir = env, extract_user = extract_user, extract_computer = extract_computer)
           if (!quietly) message(paste0("\nLoaded ", x, "... "))
         }
-        
         fileAge = file.info(thisP)$mtime
         fileAge = round(difftime(Sys.time(), fileAge, units = "days"), 0)
         if (!quietly) message(paste0(" (Data modified ", fileAge, " days ago.)"))
@@ -101,95 +97,55 @@ get_data_tables <- function(schema = NULL,
           stop("Incorrect decryption credentials provided. Please provide valid credentials or a cxn object with the necessary permissions.")
         } else {
           if (!quietly) message(paste0("\nFailed to load ", x, " due to unexpected error: ", e$message))
-          stop(e) # Re-throw the error if it's not related to decryption failure
+          stop(e)
         }
       })
     }
-    
     sapply(tables, simplify = TRUE, loadit, data.dir, checkOnly)
     if (!quietly) return(TRUE)
   }
   
   reqd = if (schema == "<NA>") toupper(tables) else toupper(paste0(schema, ".", tables))
   
-  for (r in seq_along(reqd)) {
-    loadsuccess = tryCatch({
-      try_load(reqd[r], data.dir, checkOnly)
-      1
-    }, error = function(e) {
-      if (grepl("Incorrect decryption credentials", e$message)) {
-        stop(e$message)
-      }
-      -1
-    })
+  command <- Mar.utils::connectionCheck(cxn)
     
-    if (loadsuccess == -1 && !is.null(cxn) && !force.extract) {
-      message("\nCan't proceed without a DB connection to retrieve missing data. Aborting.\n")
-      return(invisible(NULL))
-    }
-  }
-  
-  if (!force.extract) {
-    t = proc.time() - timer.start
-    t = round(t[3], 0)
-    if (!quietly) message(paste0("\n\n", t, " seconds to complete operation."))
-    return(invisible(NULL))
-  }
-  
-  if (!is.null(cxn)) {
-    command = Mar.utils::connectionCheck(cxn)
-  } else {
-    message("\nCan't get the data without a DB connection. Aborting.\n")
-    return(NULL)
-  }
-  
-  missingtables = if (force.extract) tables else tables[which(loadsuccess == -1)]
-  
-  for (i in seq_along(missingtables)) {
-    if (!quietly) message(paste0("\nVerifying access to ", missingtables[i], " ..."))
-    table_naked = gsub(paste0(schema, "."), "", missingtables[i])
-    qry = if (schema == "<NA>") {
-      paste0("SELECT * FROM ", table_naked, " WHERE ROWNUM <= 1")
-    } else {
-      paste0("SELECT * FROM ", schema, ".", table_naked, " WHERE ROWNUM <= 1")
-    }
+    loadsuccess <- integer(length(reqd))
+    for (r in seq_along(reqd)) {
+          loadsuccess[r] <- tryCatch({
+                try_load(reqd[r], data.dir, checkOnly)
+                1
+              }, error = function(e) {
+                    if (grepl("Incorrect decryption credentials", e$message)) stop(e$message)
+                    0
+                  })
+          }
     
-    m = tryCatch(command(cxn, qry, rows_at_time = 1), error = function(e) -1)
-    
-    if (is.numeric(m) && m == -1) {
-      message("\nCan't find or access the specified table")
-      next
-    } else if (is.data.frame(m) && nrow(m) == 0) {
-      message("\nTable exists but contains no data")
-      next
-    }
-    
-    if (!checkOnly) {
-      message(paste0("\nExtracting ", missingtables[i], "..."))
-      qry = if (is.null(rownum)) {
-        if (schema == "<NA>") {
-          paste0("SELECT * FROM ", table_naked)
-        } else {
-          paste0("SELECT * FROM ", schema, ".", table_naked)
+    missing_ <- reqd[which(loadsuccess == 0)]
+    if (length(missing_) == 0 && !force.extract) {
+          t_elapsed <- round((proc.time() - timer.start)[3], 0)
+            if (!quietly) message(paste0("\n\n", t_elapsed, " seconds to complete operation."))
+            return(invisible(NULL))
+          }
+    if (is.null(cxn)) {
+          message("\nCan't get the data without a DB connection. Aborting.\n")
+          return(invisible(NULL))
         }
-      } else {
-        where_N = paste0(" WHERE ROWNUM <= ", rownum)
-        if (schema == "<NA>") {
-          paste0("SELECT * FROM ", table_naked, where_N)
-        } else {
-          paste0("SELECT * FROM ", schema, ".", table_naked, where_N)
-        }
-      }
-      
-      result = command(cxn, qry, rows_at_time = 1)
+    
+    to_extract_ <- if (force.extract) reqd else missing_
+    
+    for (tab in to_extract_) {
+      message(paste0("\nExtracting ", tab, "..."))
+      table_naked <- sub(paste0(schema, "\\."), "", tab)
+      wclause <- if (is.null(rownum)) "" else paste0(" WHERE ROWNUM <= ", rownum)
+      qry_base <- if (schema == "<NA>") table_naked else paste0(schema, ".", table_naked)
+      result <- command(cxn, paste0("SELECT * FROM ", qry_base, wclause), rows_at_time = 1)
       assign(table_naked, result, envir = env)
-      rdata_file = file.path(data.dir, paste0(schema, ".", missingtables[i], ".RData"))
-      save_encrypted(list = table_naked, file = rdata_file, envir = env)
-      if (!quietly) message(paste("\nGot", missingtables[i]))
+      save_encrypted(list = table_naked,
+                     file = file.path(data.dir, paste0(tab, ".RData")),
+                     envir = env)
+      if (!quietly) message(paste0("\nGot ", tab))
     }
-  }
   
-  t = proc.time() - timer.start
-  t = round(t[3], 0)
-  if (!quietly) message(paste0("\n\n", t, " seconds to complete operation."))
+  t_elapsed <- round((proc.time() - timer.start)[3], 0)
+  if (!quietly) message(paste0("\n\n", t_elapsed, " seconds to complete operation."))
 }

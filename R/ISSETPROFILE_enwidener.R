@@ -11,12 +11,10 @@
 #' @import data.table
 #' @export
 ISSETPROFILE_enwidener <- function(df) {
-
   if ("DUR_32" %in% names(df)) {
     # message("ISSETPROFILE already enwidened, returning unchanged.")
     return(df)
   }
-  
   # 1) bring in as data.table, drop NA codes
   dt <- data.table::as.data.table(df)
   dt <- dt[!is.na(PNTCD_ID) & PNTCD_ID %in% 1:4]
@@ -149,6 +147,7 @@ ISSETPROFILE_enwidener <- function(df) {
   
   # 6) convert in‐place to a base data.frame and return
   data.table::setDF(wide)
-  message("All times in ISSETPROFILE are in 'local time', and in this data have been set to 'America/Halifax'")
+  message("ISSETPROFILE has been enwidened (i.e. one record per set)")
+          # are in 'local time', and in this data have been set to 'America/Halifax'")
   return(wide)
 }
