@@ -22,6 +22,7 @@
 #' land to return the value "<LAND>" in the resulting dataframe.  
 #' but would require updating 
 #' @return a DataFrame with the column \code{agg.poly.field} added
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 identify_area <- function(df = NULL,

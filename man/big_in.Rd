@@ -53,7 +53,9 @@ AND ('_dOh_', field2) IN (('_dOh_',1),('_dOh_',2),<...>('_dOh_',2000))
 Other util: 
 \code{\link{Mode}()},
 \code{\link{SQL_in}()},
-\code{\link{st_err}()}
+\code{\link{combine_lists}()},
+\code{\link{st_err}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

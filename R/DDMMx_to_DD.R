@@ -15,7 +15,7 @@
 #' Longitudes are negative.  If false, the original sign is retained.
 #' @return the original dataframe is returned, but it will have 2 additional fields  - LAT_DD and 
 #' LON_DD
-#' @family general_use
+#' @family data_manipulation
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 DDMMx_to_DD <- function(df=NULL, format="DDMMMM", lat.field=NULL, lon.field=NULL, WestHemisphere = T){

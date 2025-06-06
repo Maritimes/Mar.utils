@@ -37,6 +37,7 @@
 #' you can specify a name for them here.  They will also get a timestamp. 
 #' @param create.spatial default is \code{TRUE}.  This indicates whether or not to create a gpkg 
 #' file in your working directory.
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 make_segments_isdb <- function(isdb.df, 

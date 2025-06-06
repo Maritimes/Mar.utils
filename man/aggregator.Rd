@@ -52,20 +52,11 @@ Any numeric field can be aggregated, and aggregate values can be one or more of 
 and/or COUNTs
 }
 \seealso{
-Other general_use: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{clip_by_poly}()},
-\code{\link{combine_lists}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sf}()},
-\code{\link{drop_cols}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{subset_by_time}()},
-\code{\link{updateCheck}()}
+Other privacy: 
+\code{\link{assess_privacy}()},
+\code{\link{plot_hex_data}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{privacy}

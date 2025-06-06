@@ -129,6 +129,7 @@ fields plus 3 or 4 additional housekeeping fields.
 }
 \seealso{
 Other privacy: 
+\code{\link{aggregator}()},
 \code{\link{plot_hex_data}()}
 }
 \author{

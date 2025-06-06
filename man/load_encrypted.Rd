@@ -26,3 +26,12 @@ Names of loaded objects (invisibly)
 \description{
 Loads data files, handling both encrypted and unencrypted formats
 }
+\seealso{
+Other file_management: 
+\code{\link{data.dir_valet}()},
+\code{\link{save_encrypted}()}
+}
+\author{
+Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
+}
+\concept{file_management}

@@ -6,7 +6,7 @@
 #' @param ancilliary default is \code{NULL}
 #' @param quietly default is \code{FALSE}.  By default, this function will indicate the names and values of duplicated (i.e. ancilliary) list elements that will be dropped 
 #' @return list of all of the arguments
-#' @family general_use
+#' @family util
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 combine_lists <- function(primary = NULL, ancilliary = NULL, quietly=FALSE){ 

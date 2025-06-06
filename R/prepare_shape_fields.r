@@ -5,7 +5,7 @@
 #' understood and are not simply truncated.
 #' @param shape a dataframe or spatial object whose fieldnames are to be processed
 #' @return a dataframe - spatial or otherwise
-#' @family general_use
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 prepare_shape_fields <- function(shape){

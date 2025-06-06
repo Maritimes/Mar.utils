@@ -47,6 +47,18 @@ discrete polygon contains each point from the df, and appends a new field
 containing this value.  
 If no polygon is provided, the df will be assessed against NAFO subdivisions.
 }
+\seealso{
+Other spatial: 
+\code{\link{clip_by_poly}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{df_sf_to_gpkg}()},
+\code{\link{df_to_sf}()},
+\code{\link{gpkglayers_to_shapefiles}()},
+\code{\link{make_segments}()},
+\code{\link{make_segments_isdb}()},
+\code{\link{prepare_shape_fields}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{spatial}

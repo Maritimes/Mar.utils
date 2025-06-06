@@ -49,6 +49,18 @@ Each line will have the following columns in the resulting data frame:
  position of a set
  }
 }
+\seealso{
+Other spatial: 
+\code{\link{clip_by_poly}()},
+\code{\link{df_qc_spatial}()},
+\code{\link{df_sf_to_gpkg}()},
+\code{\link{df_to_sf}()},
+\code{\link{gpkglayers_to_shapefiles}()},
+\code{\link{identify_area}()},
+\code{\link{make_segments}()},
+\code{\link{prepare_shape_fields}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{spatial}

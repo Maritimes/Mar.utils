@@ -22,7 +22,9 @@ stolen from https://stackoverflow.com/questions/2547402/how-to-find-the-statisti
 Other util: 
 \code{\link{SQL_in}()},
 \code{\link{big_in}()},
-\code{\link{st_err}()}
+\code{\link{combine_lists}()},
+\code{\link{st_err}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

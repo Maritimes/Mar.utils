@@ -1,4 +1,4 @@
-#' @title export_gpkglayers_to_shapefiles
+#' @title gpkglayers_to_shapefiles
 #' @description This function converts the layers within a gpkg file into shapefiles
 #' @param gpkg_path This is a gpkg file with 1 or more layers inside that should be 
 #' extracted to shapefiles
@@ -6,9 +6,10 @@
 #' @param crs the default is \code{NULL}.  This is the coordinate system  you would 
 #' like the output shapefiles to be converted to (e.g. \code{4326}).  If left NULL,
 #' no transformation will be attempted
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
-export_gpkglayers_to_shapefiles <- function(gpkg_path = NULL, output_dir = NULL, crs = NULL) {
+gpkglayers_to_shapefiles <- function(gpkg_path = NULL, output_dir = NULL, crs = NULL) {
   # List all layer names in the GPKG file
   layer_names <- sf::st_layers(gpkg_path)$name
   

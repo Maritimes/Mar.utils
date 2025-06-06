@@ -70,6 +70,8 @@ from Oracle.
 }
 \seealso{
 Other dfo_extractions: 
+\code{\link{connectionCheck}()},
+\code{\link{deprecationCheck}()},
 \code{\link{make_oracle_cxn}()}
 }
 \author{

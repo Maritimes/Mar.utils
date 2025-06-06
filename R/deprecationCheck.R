@@ -2,6 +2,7 @@
 #' @description This function checks for deprecated parameters and issues a 
 #' warning if any are found.  
 #' @param ... Parameters to check for deprecation.
+#' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}l
 #' @export
 deprecationCheck <- function(...) {

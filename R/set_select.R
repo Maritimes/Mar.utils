@@ -79,6 +79,7 @@
 #'                              addExtDataFields2 = c("NAME_E","ZONE_E"), 
 #'                              avoid_sf = this_avoid_sf)
 #'                        }
+#' @family surveys
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 

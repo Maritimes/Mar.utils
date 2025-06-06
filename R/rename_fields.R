@@ -7,6 +7,7 @@
 #' @param newFields default is \code{NULL}. This is a vector of the new fieldnames 
 #' you want to use. 
 #' @return returns a data.frame with the new names.
+#' @family data_manipulation
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @note The number of items in oldFields and newFields must be identical, and 
 #' the order matters in that newFields[3] will replace oldFields[3].

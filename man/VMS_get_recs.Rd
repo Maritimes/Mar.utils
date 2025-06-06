@@ -65,7 +65,9 @@ of interest, but give context to the path.
 }
 \seealso{
 Other vms: 
-\code{\link{VMS_clean_recs}()}
+\code{\link{VMS_clean_recs}()},
+\code{\link{VMS_from_MARFIS}()},
+\code{\link{subset_by_time}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

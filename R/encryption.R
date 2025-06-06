@@ -2,6 +2,7 @@
 #' @description supports encryption for data files
 #' @param user Optional username override
 #' @param host Optional hostname override
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @keywords internal
 .get_machine_id <- function(user = NULL, host = NULL) {
   if(is.null(user)) user <- Sys.info()["user"]
@@ -22,6 +23,8 @@
 #' @param compress logical or character string specifying the compression method.
 #' @param envir Environment to look in for objects (when using list)
 #' @param encrypt Logical. If TRUE (default), performs encryption. If FALSE, saves normally via base::save.
+#' @family file_management
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 save_encrypted <- function(object = NULL,
                            list = NULL,
@@ -86,6 +89,8 @@ save_encrypted <- function(object = NULL,
 #' @param extract_computer Optional hostname of original file creator
 #' @param envir Environment where loaded objects will be assigned
 #' @return Names of loaded objects (invisibly)
+#' @family file_management
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, envir = parent.frame()) {
   if (!file.exists(file)) {

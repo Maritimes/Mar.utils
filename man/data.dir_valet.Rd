@@ -17,7 +17,12 @@ This cleans up the data.dir folder for use by various Mar.* packages
 data is not added to the global environment by this function - changes are made, saved, and
 dropped.
 }
+\seealso{
+Other file_management: 
+\code{\link{load_encrypted}()},
+\code{\link{save_encrypted}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{internal}
+\concept{file_management}

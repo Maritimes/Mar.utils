@@ -9,7 +9,7 @@
 #' @param WestHemisphere the default is \code{TRUE}.  It true, this ensure that all returned 
 #' Longitudes are negative.  If false, the original sign is retained.
 #' @return a data.frame
-#' @family general_use
+#' @family data_manipulation
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 DDMMSS_to_DD <- function(df = NULL, lat.field = "LATITUDE", lon.field="LONGITUDE", WestHemisphere = T){

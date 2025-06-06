@@ -24,6 +24,7 @@
 #'  \item \code{"SUM_DOC_ENTR_DETS"}
 #'  }
 #' The data must retain the formatting of the original Oracle objects (i.e. column names)
+#' @family data_manipulation
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 dets_defuddler <- function(marfName = NULL, df = NULL){

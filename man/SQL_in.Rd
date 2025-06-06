@@ -22,7 +22,9 @@ Converts a vector of characters into something that an "IN" statement can use
 Other util: 
 \code{\link{Mode}()},
 \code{\link{big_in}()},
-\code{\link{st_err}()}
+\code{\link{combine_lists}()},
+\code{\link{st_err}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l

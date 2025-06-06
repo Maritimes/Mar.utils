@@ -43,6 +43,7 @@ are for a single polygon and the position are in the correct order.
 }
 \seealso{
 Other privacy: 
+\code{\link{aggregator}()},
 \code{\link{assess_privacy}()}
 }
 \author{

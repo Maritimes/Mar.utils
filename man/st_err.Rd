@@ -18,7 +18,9 @@ Calculates the standard error
 Other util: 
 \code{\link{Mode}()},
 \code{\link{SQL_in}()},
-\code{\link{big_in}()}
+\code{\link{big_in}()},
+\code{\link{combine_lists}()},
+\code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

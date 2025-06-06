@@ -8,6 +8,8 @@
 #' columns SETDATE, SETTIME, LATITUDE, LONGITUDE, DEPTH, VESSEL_SPEED, AIR_TEMPERATURE, 
 #' NET_TEMPERATURE, WATER_TEMPERATURE, BAR_PRESSURE, FISHSET_ID, SET_NO, PNTCD_ID.
 #' @return A dataframe.
+#' @family data_manipulation
+#' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @import data.table
 #' @export
 ISSETPROFILE_enwidener <- function(df) {

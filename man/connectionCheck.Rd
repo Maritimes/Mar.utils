@@ -16,6 +16,13 @@ The command function corresponding to the connection type.
 This function checks the type of the provided connection and 
 returns the appropriate command function.
 }
+\seealso{
+Other dfo_extractions: 
+\code{\link{deprecationCheck}()},
+\code{\link{get_data_tables}()},
+\code{\link{make_oracle_cxn}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l
 }
+\concept{dfo_extractions}

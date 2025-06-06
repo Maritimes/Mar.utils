@@ -31,7 +31,7 @@
 #' and sum of both of these fields is calculated for every polygon.
 
 #' @return a data frame
-#' @family general_use
+#' @family privacy
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 #' 

@@ -14,4 +14,7 @@
 \description{
 supports encryption for data files
 }
+\author{
+Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
+}
 \keyword{internal}

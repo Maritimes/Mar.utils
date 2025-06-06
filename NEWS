@@ -1,27 +1,80 @@
-Mar.utils 
-==============
+CHANGES IN Mar.utils VERSION 2.0.0
 
-Changes:
-2019.12.19
-* Changed 'quiet' parameter to 'quietly' for consistency with other Mar.* functions.
-2019.12.10
-* Adds option to prevent status message output from make_oracle_cxn()
-2019.07.29
-* Removes @importFrom from all documentation so external functions aren't exported
-2019.07.04
-* Adds total_fishng_picture()
-2019.06.27
-* Vast improvement to VMS_clean_recs()
-* Improves make_segments()
-2019.06.24
-* Moves data files to external repos (Mar.data)
-* Adds VMS_clean_recs
-2019.06.07
-* Replaced drop_NA_cols() with much more flexible drop_cols()
-2019.03.28
-* Added hex data
-2019.03.12
-* Added updateCheck() function
-2018.04.06 
-* Added method for extracting VMS data by area
-* Added function for plotting line segments
+  BREAKING CHANGES:
+
+  o Most database functions no longer accept Oracle credentials directly
+  o New requirement to establish Oracle connection before calling functions
+  o Functions that save Protected B data now use encryption by default
+  o Some legacy parameter names and unused options removed
+  o See README.md for migration examples using ROracle::dbConnect()
+
+  NEW FEATURES:
+
+  o Added save_encrypted() and load_encrypted() functions for Protected B data
+  o Enhanced security for sensitive data storage following DFO protocols
+
+CHANGES IN Mar.utils VERSION 2019.12.19
+
+  IMPROVEMENTS:
+
+  o Changed 'quiet' parameter to 'quietly' for consistency with other Mar.* functions
+
+CHANGES IN Mar.utils VERSION 2019.12.10
+
+  NEW FEATURES:
+
+  o Adds option to prevent status message output from make_oracle_cxn()
+
+CHANGES IN Mar.utils VERSION 2019.07.29
+
+  IMPROVEMENTS:
+
+  o Removes @importFrom from all documentation so external functions aren't exported
+
+CHANGES IN Mar.utils VERSION 2019.07.04
+
+  NEW FEATURES:
+
+  o Adds total_fishing_picture()
+
+CHANGES IN Mar.utils VERSION 2019.06.27
+
+  IMPROVEMENTS:
+
+  o Vast improvement to VMS_clean_recs()
+  o Improves make_segments()
+
+CHANGES IN Mar.utils VERSION 2019.06.24
+
+  NEW FEATURES:
+
+  o Adds VMS_clean_recs()
+
+  IMPROVEMENTS:
+
+  o Moves data files to external repos (Mar.data)
+
+CHANGES IN Mar.utils VERSION 2019.06.07
+
+  IMPROVEMENTS:
+
+  o Replaced drop_NA_cols() with much more flexible drop_cols()
+
+CHANGES IN Mar.utils VERSION 2019.03.28
+
+  NEW FEATURES:
+
+  o Added hex data
+
+CHANGES IN Mar.utils VERSION 2019.03.12
+
+  NEW FEATURES:
+
+  o Added updateCheck() function
+
+CHANGES IN Mar.utils VERSION 2018.04.06
+
+  NEW FEATURES:
+
+  o Added method for extracting VMS data by area
+  o Added function for plotting line segments

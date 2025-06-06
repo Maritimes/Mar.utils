@@ -37,20 +37,17 @@ hemisphere (i.e. LAT between 0 and 90) and aren't in the western hemisphere
 the "return.bad" flag allows it to return only the "bad" points.
 }
 \seealso{
-Other general_use: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{aggregator}()},
+Other spatial: 
 \code{\link{clip_by_poly}()},
-\code{\link{combine_lists}()},
 \code{\link{df_sf_to_gpkg}()},
 \code{\link{df_to_sf}()},
-\code{\link{drop_cols}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{subset_by_time}()},
-\code{\link{updateCheck}()}
+\code{\link{gpkglayers_to_shapefiles}()},
+\code{\link{identify_area}()},
+\code{\link{make_segments}()},
+\code{\link{make_segments_isdb}()},
+\code{\link{prepare_shape_fields}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{spatial}

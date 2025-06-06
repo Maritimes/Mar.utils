@@ -28,26 +28,18 @@ of positions that should be subset.}
 a data.frame
 }
 \description{
-This function take a databframe (e.g. from VMS_get_recs), and can return a subset
+This function take a dataframe (e.g. from VMS_get_recs), and can return a subset
 of the original records, ensuring that each is at least some amount of time from the previous.  
 Specifically, by providing a \code{min_minutes}, it will return only those records that are at 
 least that amount of time apart.
 }
 \seealso{
-Other general_use: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{aggregator}()},
-\code{\link{clip_by_poly}()},
-\code{\link{combine_lists}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sf}()},
-\code{\link{drop_cols}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{updateCheck}()}
+Other vms: 
+\code{\link{VMS_clean_recs}()},
+\code{\link{VMS_from_MARFIS}()},
+\code{\link{VMS_get_recs}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{vms}

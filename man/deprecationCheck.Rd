@@ -13,6 +13,13 @@ deprecationCheck(...)
 This function checks for deprecated parameters and issues a 
 warning if any are found.
 }
+\seealso{
+Other dfo_extractions: 
+\code{\link{connectionCheck}()},
+\code{\link{get_data_tables}()},
+\code{\link{make_oracle_cxn}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l
 }
+\concept{dfo_extractions}

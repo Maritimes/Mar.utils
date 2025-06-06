@@ -13,7 +13,7 @@
 #' (i.e. Latitude between 0 and 90N) and the western hemisphere (i.e. Longitude
 #' between -180 and 0W) 
 #' @return data.frame contents depend of the return.bad parameter
-#' @family general_use
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 df_qc_spatial <-function(df, lat.field = "LATITUDE", lon.field = "LONGITUDE", return.bad=FALSE, autoQC=T){

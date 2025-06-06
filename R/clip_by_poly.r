@@ -27,7 +27,7 @@
 #' @param return.sf default is \code{TRUE}.  By default, the returned object will be an sf object.  
 #' Set to FALSE to return a dataframe only. 
 #' @return sf object
-#' @family general_use
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 #' @note If the input polygon has no projection assigned, it will be assumed to be in Geographic, 

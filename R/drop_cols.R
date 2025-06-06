@@ -19,7 +19,7 @@
 #' @param quietly default is \code{FALSE}.  By default, this function will not output messages,
 #' but they can be turned on by setting this to TRUE
 #' @return dataframe
-#' @family general_use
+#' @family data_manipulation
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 drop_cols<-function(df = NULL, justDropNAs = TRUE, uniformFields = 'retain', keepFields = NULL, quietly=T){

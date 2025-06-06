@@ -21,7 +21,7 @@
 #' will hold the spatial layers.  If this file already exists in \code{path}, the layer will be 
 #' added to the existing file.  If the file does not exist, it will be created.
 #' @return NULL - writes shapefile to current working directory
-#' @family general_use
+#' @family spatial
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 df_sf_to_gpkg<- function(df = NULL, lat.field = "LATITUDE", lon.field = "LONGITUDE", crs=4326, 

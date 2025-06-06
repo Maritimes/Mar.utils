@@ -1,5 +1,5 @@
 #' @title subset_by_time
-#' @description This function take a databframe (e.g. from VMS_get_recs), and can return a subset
+#' @description This function take a dataframe (e.g. from VMS_get_recs), and can return a subset
 #' of the original records, ensuring that each is at least some amount of time from the previous.  
 #' Specifically, by providing a \code{min_minutes}, it will return only those records that are at 
 #' least that amount of time apart. 
@@ -12,7 +12,7 @@
 #' @param group_field the default is \code{"VR_NUMBER"}.  This is a field that identifies the group 
 #' of positions that should be subset.  
 #' @return a data.frame
-#' @family general_use
+#' @family vms
 #' @author Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 

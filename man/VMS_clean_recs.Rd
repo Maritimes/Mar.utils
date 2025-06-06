@@ -73,7 +73,9 @@ duplicate records (i.e. the more recent record will is retained.
 }
 \seealso{
 Other vms: 
-\code{\link{VMS_get_recs}()}
+\code{\link{VMS_from_MARFIS}()},
+\code{\link{VMS_get_recs}()},
+\code{\link{subset_by_time}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

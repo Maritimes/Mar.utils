@@ -51,6 +51,8 @@ existed.
 }
 \seealso{
 Other dfo_extractions: 
+\code{\link{connectionCheck}()},
+\code{\link{deprecationCheck}()},
 \code{\link{get_data_tables}()}
 }
 \author{

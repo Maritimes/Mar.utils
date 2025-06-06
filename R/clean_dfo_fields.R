@@ -8,6 +8,7 @@
 #' want removed from your dataframe.
 #' @return returns a data.frame without the columns CUSER, CDATE, UUSER, UDATE,
 #' or any of the ones specified in customCrap.
+#' @family data_manipulation
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 clean_dfo_fields<- function(df = NULL, customCrap = NULL){

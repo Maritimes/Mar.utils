@@ -2,7 +2,7 @@
 #' @description This cleans up the data.dir folder for use by various Mar.* packages 
 #' @param data.dir  The default is a "data" folder within your working directory. This is the path to where you want the
 #' extracted files to go.
-#' @family internal
+#' @family file_management
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 #' @note data is not added to the global environment by this function - changes are made, saved, and

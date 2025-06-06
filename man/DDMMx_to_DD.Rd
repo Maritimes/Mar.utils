@@ -39,20 +39,15 @@ This utility will convert coordinates from various DDMM formats to Decimal degre
 The new decimal degrees fields will be added as new columns called "LAT_DD" and "LON_DD".
 }
 \seealso{
-Other general_use: 
+Other data_manipulation: 
 \code{\link{DDMMSS_to_DD}()},
-\code{\link{aggregator}()},
-\code{\link{clip_by_poly}()},
-\code{\link{combine_lists}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sf}()},
+\code{\link{ISSETPROFILE_enwidener}()},
+\code{\link{clean_dfo_fields}()},
+\code{\link{dets_defuddler}()},
 \code{\link{drop_cols}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{subset_by_time}()},
-\code{\link{updateCheck}()}
+\code{\link{rename_fields}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{data_manipulation}

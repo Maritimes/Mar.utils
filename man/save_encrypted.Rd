@@ -30,3 +30,12 @@ save_encrypted(
 Saves data files encrypted or unencrypted based on a toggle such
 that they can't be easily loaded by other users.
 }
+\seealso{
+Other file_management: 
+\code{\link{data.dir_valet}()},
+\code{\link{load_encrypted}()}
+}
+\author{
+Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
+}
+\concept{file_management}

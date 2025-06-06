@@ -27,6 +27,7 @@
 #' if \code{make_segments} is TRUE, an sp object called "marf_VMS_segments". Additionally, if 
 #' make_segments and make_segments_shp are both TRUE, a shapefile will be created in the working 
 #' directory.
+#' @family vms
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 VMS_from_MARFIS <- function(df = NULL,

@@ -21,7 +21,7 @@
 #' @return an sf object
 #' @note this function was modified from 
 #' https://github.com/Mar-scal/Assessment_fns/blob/master/Maps/pbs_2_sf.R 
-#' @family general_use
+#' @family spatial
 #' @author  Dave Keith \email{Dave.Keith@@dfo-mpo.gc.ca}, Freya Keyser \email{Freya.Keyser@@dfo-mpo.gc.ca} and adapted by Mike McMahon \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 df_to_sf <- function(df = NULL, 

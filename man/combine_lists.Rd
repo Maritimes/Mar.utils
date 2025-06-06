@@ -22,20 +22,14 @@ elements from both lists have the same name, the values from the primary list
 will be retained.
 }
 \seealso{
-Other general_use: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{aggregator}()},
-\code{\link{clip_by_poly}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sf}()},
-\code{\link{drop_cols}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{subset_by_time}()},
+Other util: 
+\code{\link{Mode}()},
+\code{\link{SQL_in}()},
+\code{\link{big_in}()},
+\code{\link{st_err}()},
 \code{\link{updateCheck}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{util}

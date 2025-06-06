@@ -3,6 +3,7 @@
 #' returns the appropriate command function. 
 #' @param cxn The connection object to check.
 #' @return The command function corresponding to the connection type.
+#' @family dfo_extractions
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}l
 #' @export
 connectionCheck <- function(cxn) {

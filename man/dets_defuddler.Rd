@@ -36,6 +36,16 @@ The data must retain the formatting of the original Oracle objects (i.e. column 
 This function decodes the various marfis *_DETS table from long to wide, associating 
 all of the data available for each discrete record.
 }
+\seealso{
+Other data_manipulation: 
+\code{\link{DDMMSS_to_DD}()},
+\code{\link{DDMMx_to_DD}()},
+\code{\link{ISSETPROFILE_enwidener}()},
+\code{\link{clean_dfo_fields}()},
+\code{\link{drop_cols}()},
+\code{\link{rename_fields}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{data_manipulation}

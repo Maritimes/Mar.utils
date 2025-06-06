@@ -22,6 +22,16 @@ This function facilitates the dropping of fields from a dataframe.
 It was built for specific fields in MARFIS that I never wanted (i.e. CUSER, 
 CDATE, UUSER, UDATE), but can also drop other fields easily.
 }
+\seealso{
+Other data_manipulation: 
+\code{\link{DDMMSS_to_DD}()},
+\code{\link{DDMMx_to_DD}()},
+\code{\link{ISSETPROFILE_enwidener}()},
+\code{\link{dets_defuddler}()},
+\code{\link{drop_cols}()},
+\code{\link{rename_fields}()}
+}
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
+\concept{data_manipulation}

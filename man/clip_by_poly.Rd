@@ -60,20 +60,17 @@ WGS84. FYI, during buffering, the polygon is briefly converted to UTMZone20 sinc
 distances requires projecting the data.
 }
 \seealso{
-Other general_use: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{aggregator}()},
-\code{\link{combine_lists}()},
+Other spatial: 
 \code{\link{df_qc_spatial}()},
 \code{\link{df_sf_to_gpkg}()},
 \code{\link{df_to_sf}()},
-\code{\link{drop_cols}()},
-\code{\link{prepare_shape_fields}()},
-\code{\link{subset_by_time}()},
-\code{\link{updateCheck}()}
+\code{\link{gpkglayers_to_shapefiles}()},
+\code{\link{identify_area}()},
+\code{\link{make_segments}()},
+\code{\link{make_segments_isdb}()},
+\code{\link{prepare_shape_fields}()}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
 }
-\concept{general_use}
+\concept{spatial}
