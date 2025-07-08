@@ -57,10 +57,10 @@ get_data_tables <- function(schema = NULL,
   timer.start = proc.time()
   
   try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
+    
     loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
       thisP = file.path(data.dir, this)
-      
       if (fuzzyMatch) {
         if (grepl(x = thisP, pattern = "MARFIS\\.|MARFISSCI\\.")) {
           if (!file.exists(thisP) & file.exists(gsub(x = thisP, pattern = "MARFISSCI", replacement = "MARFIS", ignore.case = TRUE))) {
@@ -106,45 +106,43 @@ get_data_tables <- function(schema = NULL,
   }
   
   reqd = if (schema == "<NA>") toupper(tables) else toupper(paste0(schema, ".", tables))
+  command <- connectionCheck(cxn)
+  loadsuccess <- integer(length(reqd))
+  for (r in seq_along(reqd)) {
+    loadsuccess[r] <- tryCatch({
+      try_load(reqd[r], data.dir, checkOnly)
+      1
+    }, error = function(e) {
+      if (grepl("Incorrect decryption credentials", e$message)) stop(e$message)
+      0
+    })
+  }
   
-  command <- Mar.utils::connectionCheck(cxn)
-    
-    loadsuccess <- integer(length(reqd))
-    for (r in seq_along(reqd)) {
-          loadsuccess[r] <- tryCatch({
-                try_load(reqd[r], data.dir, checkOnly)
-                1
-              }, error = function(e) {
-                    if (grepl("Incorrect decryption credentials", e$message)) stop(e$message)
-                    0
-                  })
-          }
-    
-    missing_ <- reqd[which(loadsuccess == 0)]
-    if (length(missing_) == 0 && !force.extract) {
-          t_elapsed <- round((proc.time() - timer.start)[3], 0)
-            if (!quietly) message(paste0("\n\n", t_elapsed, " seconds to complete operation."))
-            return(invisible(NULL))
-          }
-    if (is.null(cxn)) {
-          message("\nCan't get the data without a DB connection. Aborting.\n")
-          return(invisible(NULL))
-        }
-    
-    to_extract_ <- if (force.extract) reqd else missing_
-    
-    for (tab in to_extract_) {
-      message(paste0("\nExtracting ", tab, "..."))
-      table_naked <- sub(paste0(schema, "\\."), "", tab)
-      wclause <- if (is.null(rownum)) "" else paste0(" WHERE ROWNUM <= ", rownum)
-      qry_base <- if (schema == "<NA>") table_naked else paste0(schema, ".", table_naked)
-      result <- command(cxn, paste0("SELECT * FROM ", qry_base, wclause), rows_at_time = 1)
-      assign(table_naked, result, envir = env)
-      save_encrypted(list = table_naked,
-                     file = file.path(data.dir, paste0(tab, ".RData")),
-                     envir = env)
-      if (!quietly) message(paste0("\nGot ", tab))
-    }
+  missing_ <- reqd[which(loadsuccess == 0)]
+  if (length(missing_) == 0 && !force.extract) {
+    t_elapsed <- round((proc.time() - timer.start)[3], 0)
+    if (!quietly) message(paste0("\n\n", t_elapsed, " seconds to complete operation."))
+    return(invisible(NULL))
+  }
+  if (is.null(cxn)) {
+    message("\nCan't get the data without a DB connection. Aborting.\n")
+    return(invisible(NULL))
+  }
+  
+  to_extract_ <- if (force.extract) reqd else missing_
+  
+  for (tab in to_extract_) {
+    message(paste0("\nExtracting ", tab, "..."))
+    table_naked <- sub(paste0(schema, "\\."), "", tab)
+    wclause <- if (is.null(rownum)) "" else paste0(" WHERE ROWNUM <= ", rownum)
+    qry_base <- if (schema == "<NA>") table_naked else paste0(schema, ".", table_naked)
+    result <- command(cxn, paste0("SELECT * FROM ", qry_base, wclause), rows_at_time = 1)
+    assign(table_naked, result, envir = env)
+    save_encrypted(list = table_naked,
+                   file = file.path(data.dir, paste0(tab, ".RData")),
+                   envir = env)
+    if (!quietly) message(paste0("\nGot ", tab))
+  }
   
   t_elapsed <- round((proc.time() - timer.start)[3], 0)
   if (!quietly) message(paste0("\n\n", t_elapsed, " seconds to complete operation."))

@@ -16,7 +16,8 @@ connectionCheck <- function(cxn) {
   } else if (inherits(cxn, "JDBCConnection")) {
     thecmd = RJDBC::dbGetQuery
   } else {
-    stop("Invalid connection object provided.")
+    thecmd = NULL
+    warning("Invalid connection object provided.")
   }
   return(thecmd)
 }
