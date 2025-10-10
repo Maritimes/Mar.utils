@@ -9,10 +9,17 @@
 #' @seealso \code{\link{debugMode}}
 #' @keywords internal
 #' @noRd
-enableDebug <- function(fn_names) {
+enableDebug <- function(fn_names, where = .GlobalEnv) {
   for (fn_name in fn_names) {
+    # Try to find where the function actually lives
+    fn_env <- tryCatch(
+      environment(get(fn_name)),
+      error = function(e) where
+    )
+    
     try({
-      trace(fn_name, 
+      trace(fn_name,
+            where = fn_env,
             tracer = bquote({
               .depth <- length(sys.calls()) - 1
               .indent <- paste(rep("  ", .depth), collapse = "")
@@ -112,12 +119,16 @@ debugMode <- function(enable = TRUE, package = NULL, r_dir = "R", package_path =
   all_functions <- unique(all_functions)
   
   if (enable) {
-    enableDebug(all_functions)
+    # Determine the environment
+    if (!is.null(package)) {
+      pkg_env <- asNamespace(package)
+    } else {
+      pkg_env <- .GlobalEnv
+    }
+    
+    enableDebug(all_functions, where = pkg_env)
     message("Debug mode ON for ", length(all_functions), " functions in ", full_r_dir)
     message("Functions: ", paste(all_functions, collapse = ", "))
-  } else {
-    for (fn in all_functions) try(untrace(fn), silent = TRUE)
-    message("Debug mode OFF")
   }
   
   invisible(all_functions)
