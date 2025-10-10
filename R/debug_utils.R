@@ -14,12 +14,16 @@ enableDebug <- function(fn_names) {
     try({
       trace(fn_name, 
             tracer = bquote({
-              message("\u2192 Entering ", .(fn_name))# →
+              .depth <- length(sys.calls()) - 1
+              .indent <- paste(rep("  ", .depth), collapse = "")
+              message(.indent, "\u2192 Entering ", .(fn_name))
               .t1 <- proc.time()
             }),
             exit = bquote({
               .elapsed <- proc.time() - .t1
-              message("\u2190 Exiting ", .(fn_name), " (", # ←
+              .depth <- length(sys.calls()) - 1
+              .indent <- paste(rep("  ", .depth), collapse = "")
+              message(.indent, "\u2190 Exiting ", .(fn_name), " (", 
                       round(.elapsed[3], 2), "s elapsed)")
             }),
             print = FALSE)
