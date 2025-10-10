@@ -129,6 +129,13 @@ debugMode <- function(enable = TRUE, package = NULL, r_dir = "R", package_path =
     enableDebug(all_functions, where = pkg_env)
     message("Debug mode ON for ", length(all_functions), " functions in ", full_r_dir)
     message("Functions: ", paste(all_functions, collapse = ", "))
+  } else {
+    # Disable debugging
+    for (fn in all_functions) {
+      try(untrace(fn, where = .GlobalEnv), silent = TRUE)
+      try(untrace(fn), silent = TRUE)
+    }
+    message("Debug mode OFF for ", length(all_functions), " functions")
   }
   
   invisible(all_functions)
