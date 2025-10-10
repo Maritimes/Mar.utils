@@ -16,9 +16,25 @@ proc.time, facilitating timing of functions}
 nothing, it just writes messages to the screen
 }
 \description{
-This function indicates which function has been reached.
+**DEPRECATED:** This function indicates which function has been reached.
+
+**This function is deprecated and will be removed in a future version.** 
+Please use \code{\link{debugMode}} instead, which provides similar functionality without 
+requiring code changes to your functions.
+
+To replace \code{where_now()} calls:
+\itemize{
+  \item Remove all \code{where_now()} calls from your functions
+  \item Use \code{debugMode(TRUE)} to enable debugging for all package functions
+  \item Use \code{debugMode(FALSE)} to disable debugging
+}
+
+The new approach provides automatic entry/exit messages with timing for all functions,
+eliminating the need to manually add debugging code.
 }
 \seealso{
+\code{\link{debugMode}} for the replacement debugging approach
+
 Other debugging: 
 \code{\link{changeDetector}()},
 \code{\link{updateExpected}()}
