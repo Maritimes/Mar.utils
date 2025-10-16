@@ -45,7 +45,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
   trekMax <- trekMin <- cnt <- NULL
   `:=` <- function (x, value) value
   name=""
-  ts = format(Sys.time(), "%Y%m%d_%H%M")
+  ts = format(Sys.time(), "%Y%m%d_%H%M%S%OS3")
   if (is.null(filename)) {
     name = ts
   }else{
