@@ -105,7 +105,7 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     dataLines = as.data.frame(dataLines)
     lineData <- mergeableData(dataLines)
     segs = unique(dataLines[,objField])
-    plotLines <- df_to_sf(df = dataLines, primary.object.field = "trek", order.field = "POSITION_UTC_DATE", type= "lines")
+    plotLines <- df_to_sf(df = dataLines, primary.object.field = objField, order.field = seqField, type= "lines", lat.field = lat.field,  lon.field = lon.field)
     plotLines <- sf::st_transform(plotLines, crs = the.crs)
     plotLines<-merge(plotLines, lineData)
     res[["segments"]] <- plotLines
