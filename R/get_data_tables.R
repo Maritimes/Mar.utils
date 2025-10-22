@@ -86,7 +86,7 @@ get_data_tables <- function(schema = NULL,
             stop("\nMissing ", x, " (download will be attempted)... ")
           }
         } else {
-          load_encrypted(file = thisP, envir = env, extract_user = extract_user, extract_computer = extract_computer)
+          load_encrypted(file = thisP, envir = thisenv, extract_user = extract_user, extract_computer = extract_computer)
           if (!quietly) message(paste0("\nLoaded ", x, "... "))
         }
         fileAge = file.info(thisP)$mtime
