@@ -56,7 +56,7 @@ get_data_tables <- function(schema = NULL,
   
   timer.start = proc.time()
   
-  try_load <- function(tables, data.dir, checkOnly, thisenv = env) {
+  try_load <- function(tables, data.dir, checkOnly, thisenv) {
     
     loadit <- function(x, data.dir, checkOnly) {
       this = paste0(x, ".RData")
@@ -110,7 +110,7 @@ get_data_tables <- function(schema = NULL,
   loadsuccess <- integer(length(reqd))
   for (r in seq_along(reqd)) {
     loadsuccess[r] <- tryCatch({
-      try_load(reqd[r], data.dir, checkOnly)
+      try_load(reqd[r], data.dir, checkOnly, thisenv = env)
       1
     }, error = function(e) {
       if (grepl("Incorrect decryption credentials", e$message)) stop(e$message)
