@@ -124,9 +124,15 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
       # Convert the encrypted base64 back to raw bytes for decryption
       encrypted <- base64enc::base64decode(encrypted_base64)
       
-      serialized <- openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = first_line_raw)
+      serialized <- tryCatch(
+        openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = first_line_raw),
+        error = function(e) {
+          stop("Unable to decrypt ",file,".  If you did not extract this data yourself, please ensure that you are supplying the values of 'extract_user' and 'extract_computer' of the person who did.", call. = FALSE)
+        }
+      )
       decompressed <- memDecompress(serialized, type = "gzip")
       obj_data <- unserialize(decompressed)
+      
       
       for (name in names(obj_data)) {
         assign(name, obj_data[[name]], envir = envir)
