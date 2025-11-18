@@ -29,7 +29,6 @@
 save_encrypted <- function(object = NULL,
                            list = NULL,
                            file,
-                           compress = TRUE,
                            envir = parent.frame(),
                            encrypt = TRUE) {
   if (!is.null(object)) {
@@ -44,9 +43,9 @@ save_encrypted <- function(object = NULL,
   
   if (!encrypt) {
     if (!is.null(list)) {
-      save(list = list, file = file, envir = envir, compress = compress)
+      save(list = list, file = file, envir = envir)
     } else {
-      save(list = names(obj_data), file = file, envir = list2env(obj_data, parent = emptyenv()), compress = compress)
+      save(list = names(obj_data), file = file, envir = list2env(obj_data, parent = emptyenv()))
     }
     return(invisible(NULL))
   }
@@ -56,26 +55,9 @@ save_encrypted <- function(object = NULL,
   iv <- openssl::rand_bytes(16)
   
   serialized <- serialize(obj_data, NULL)
-  
-  if (compress) {
-    if (is.logical(compress)) {
-      serialized <- memCompress(serialized, "gzip")
-    } else if (is.character(compress)) {
-      if (!compress %in% c("gzip", "bzip2", "xz")) {
-        stop("If character, 'compress' must be one of: 'gzip', 'bzip2', or 'xz'")
-      }
-      serialized <- memCompress(serialized, compress)
-    } else {
-      stop("'compress' must be logical or character")
-    }
-  }
-  
   encrypted <- openssl::aes_cbc_encrypt(serialized, key = raw_key, iv = iv)
-  
-  # Convert encrypted raw vector to base64 string
   encrypted_base64 <- base64enc::base64encode(encrypted)
   
-  # Combine IV and encrypted_base64 as strings and write to file
   writeLines(c(base64enc::base64encode(iv), encrypted_base64), con = file)
   
   invisible(NULL)
@@ -97,7 +79,6 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     stop("File does not exist: ", file)
   }
   
-  # Attempt to read and identify first line as an IV header
   first_line_raw <- NULL
   encrypted_format_detected <- FALSE
   
@@ -106,33 +87,31 @@ load_encrypted <- function(file, extract_user = NULL, extract_computer = NULL, e
     if (length(first_line_raw) == 16) {
       encrypted_format_detected <- TRUE
     }
-  }, warning = function(w) {
-   # cat("Not a valid encrypted header found, treating as unencrypted file:", file, "\n")
-  }, error = function(e) {
-  #  cat("Error detecting file encryption status. Treating as unencrypted:", file, "\n")
-  })
+  }, warning = function(w) {}, error = function(e) {})
   
   if (encrypted_format_detected) {
     tryCatch({
       key_str <- .get_machine_id(user = extract_user, host = extract_computer)
       raw_key <- openssl::sha256(charToRaw(key_str))
       
-      # Read the remaining encrypted base64 content
       lines <- readLines(con = file)
       encrypted_base64 <- lines[2]
-      
-      # Convert the encrypted base64 back to raw bytes for decryption
       encrypted <- base64enc::base64decode(encrypted_base64)
       
-      serialized <- tryCatch(
+      decrypted <- tryCatch(
         openssl::aes_cbc_decrypt(encrypted, key = raw_key, iv = first_line_raw),
         error = function(e) {
-          stop("Unable to decrypt ",file,".  If you did not extract this data yourself, please ensure that you are supplying the values of 'extract_user' and 'extract_computer' of the person who did.", call. = FALSE)
+          stop("Unable to decrypt ", file, ".  If you did not extract this data yourself, please ensure that you are supplying the values of 'extract_user' and 'extract_computer' of the person who did.", call. = FALSE)
         }
       )
-      decompressed <- memDecompress(serialized, type = "gzip")
-      obj_data <- unserialize(decompressed)
       
+      is_compressed <- length(decrypted) >= 2 && decrypted[1] == 0x1f && decrypted[2] == 0x8b
+      
+      if (is_compressed) {
+        decrypted <- memDecompress(decrypted, type = "gzip")
+      }
+      
+      obj_data <- unserialize(decrypted)
       
       for (name in names(obj_data)) {
         assign(name, obj_data[[name]], envir = envir)
