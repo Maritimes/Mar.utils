@@ -8,7 +8,6 @@ save_encrypted(
   object = NULL,
   list = NULL,
   file,
-  compress = TRUE,
   envir = parent.frame(),
   encrypt = TRUE
 )
@@ -19,8 +18,6 @@ save_encrypted(
 \item{list}{Character vector of object names to save (NULL if using 'object')}
 
 \item{file}{Path to save to}
-
-\item{compress}{logical or character string specifying the compression method.}
 
 \item{envir}{Environment to look in for objects (when using list)}
 
