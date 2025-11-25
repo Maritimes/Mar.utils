@@ -13,27 +13,33 @@
 #' @import data.table
 #' @export
 ISSETPROFILE_enwidener <- function(df) {
+
   if ("DUR_32" %in% names(df)) {
     # message("ISSETPROFILE already enwidened, returning unchanged.")
     return(df)
   }
-  # 1) bring in as data.table, drop NA codes
-  dt <- data.table::as.data.table(df)
+
+  dt <- as.data.table(df)
   dt <- dt[!is.na(PNTCD_ID) & PNTCD_ID %in% 1:4]
-  dt[ , `:=`(
-    SETDATE   = as.Date(SETDATE),
-    DATE_TIME = as.POSIXct(
-      paste(
-        SETDATE,
-        paste0(
-          substr(sprintf("%04d", as.numeric(SETTIME)), 1, 2), ":",
-          substr(sprintf("%04d", as.numeric(SETTIME)), 3, 4), ":00"
-        )
+  
+  dt[, `:=`(
+    DATE_TIME = fifelse(
+      !is.na(SETTIME),
+      as.POSIXct(
+        paste(
+          format(SETDATE, "%Y-%m-%d"),  # only the date part
+          paste0(
+            substr(sprintf("%04s", SETTIME), 1, 2), ":",
+            substr(sprintf("%04s", SETTIME), 3, 4), ":00"
+          )
+        ),
+        format = "%Y-%m-%d %H:%M:%S", tz = "America/Halifax"
       ),
-      format = "%Y-%m-%d %H:%M:%S", tz = "America/Halifax"
+      as.POSIXct(NA)
     ),
-      LONGITUDE = -LONGITUDE
+    LONGITUDE = -LONGITUDE
   )]
+  
   dt[ , DATE_TIME := as.numeric(DATE_TIME)]
 
   agg <- dt[ , .(
