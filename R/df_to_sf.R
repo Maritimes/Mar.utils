@@ -73,6 +73,12 @@ df_to_sf <- function(df = NULL,
       sid <- pid[pid[[secondary.object.field]]==unique(pid[,secondary.object.field])[j],]
       if(type=="polys"){
         if(nrow(sid)<4) next
+        
+        sid <- sid[order(sid[[order.field]]), ]
+        if (!all(sid[1, c(lon.field, lat.field)] == sid[nrow(sid), c(lon.field, lat.field)])) {
+          sid <- rbind(sid, sid[1, ]) # Close the ring if last != first
+        }
+        
         sid$hole <- ifelse(sid[,order.field][1]<sid[,order.field][2],"N","Y")
         sid <- sid |>
           sf::st_as_sf(coords=c(lon.field, lat.field), crs=user.crs) |>

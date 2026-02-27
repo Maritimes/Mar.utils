@@ -1,11 +1,12 @@
 #' @title DDMMx_to_DD
 #' @description This utility will convert coordinates from various DDMM formats to Decimal degrees.
 #' The new decimal degrees fields will be added as new columns called "LAT_DD" and "LON_DD". 
-#' @param format the default is \code{"DDMMMM"}, but \code{"DDMMSS"} is also valid.  \code{'DDMMMM'} 
-#' values are typically cases where the degrees are followed by decimal minutes (with or without the decimal), 
+#' @param format the default is \code{"DDMMMM"}, but \code{"DDMMSS"} and \code{"DDMM.MM"} are also valid.  
+#' \code{'DDMMMM'} values are typically cases where the degrees are followed by decimal minutes (with or without the decimal), 
 #' such as 44°4.7' is written as "44047", "4404.7", "440470", or "4404.70".  \code{"DDMMSS"} values can look identical, 
 #' but the last four digits represent minutes and seconds.  For example, the value of 44°4'42" 
-#' would be written as "440442". 
+#' would be written as "440442". \code{"DDMM.MM"} values have an explicit decimal point separating minutes 
+#' from fractional minutes, such as 44°4.7' written as "4404.7" (supports 0 or more decimal places).
 #' @param df a dataframe to be analyzed. If left \code{NULL}, a value for \code{db} should be provided
 #' @param lat.field the default is \code{"LATITUDE"}. This is the name of the 
 #' field holding latitude values (in decimal degrees)
@@ -19,28 +20,53 @@
 #' @author  Mike McMahon, \email{Mike.McMahon@@dfo-mpo.gc.ca}
 #' @export
 DDMMx_to_DD <- function(df=NULL, format="DDMMMM", lat.field=NULL, lon.field=NULL, WestHemisphere = T){
-
+  
   #this function will fail west of Manitoba - it can't handle 3 digit longitudes) (e.g.-127MM.MMM)
   makeDD <- function(DDMM= NULL, WestHemisphere =FALSE){
     #capture original sign, then remove sign
     osigns<-substr(DDMM, 1, 1)=="-"
     osigns[is.na(osigns)]<- FALSE
-    DDMM <- as.numeric(gsub("^-", "", DDMM))
-    DDMM <- as.numeric(gsub("\\.", "", DDMM))
+    DDMM <- as.character(gsub("^-", "", DDMM))
     
-    #get value to 6 digits long (without turning to character)
-    n <- 6 - nchar(DDMM)
-    tt<- data.frame(DDMM=DDMM, nchar=n)
-    tt[!is.na(tt$DDMM), "DDMM"]<- tt[!is.na(tt$DDMM), "DDMM"]*10^tt[!is.na(tt$DDMM), "nchar"]
-    DDMM <- tt$DDMM
-    if(format=="DDMMMM"){
+    if (format == "DDMM.MM") {
+      # Handle DDMM.MM format where decimal represents fractional minutes
+      # Supports 0 to any number of decimal places
+      dd <- numeric(length(DDMM))
       
-      #add decimal in correct spot (i.e. DDMM(.)MM); convert to dd (ie DD+MM.MM/60)
-      pre_dd <- paste0(substr(DDMM, 1, 4), ".", substr(DDMM, 5, nchar(DDMM)))
-      pre_dd[pre_dd=="NA.NA"]<-NA
-      dd <- round(as.numeric(substr(pre_dd, 1, 2))+ (as.numeric(substr(pre_dd, 3, nchar(pre_dd)))/60),6)
-    } else if(format=="DDMMSS"){
-      dd <- round(as.numeric(substr(DDMM, 1, 2)) + as.numeric(substr(DDMM, 3, 4))/60 + as.numeric(substr(DDMM, 5, 6))/3600 ,6)
+      for (i in seq_along(DDMM)) {
+        if (is.na(DDMM[i]) || DDMM[i] == "" || DDMM[i] == "NA") {
+          dd[i] <- NA
+        } else {
+          parts <- strsplit(DDMM[i], "\\.", fixed = TRUE)[[1]]
+          ddmm_part <- as.numeric(parts[1])
+          decimal_part <- if (length(parts) > 1 && parts[2] != "") {
+            as.numeric(paste0("0.", parts[2]))
+          } else {
+            0
+          }
+          
+          degrees <- floor(ddmm_part / 100)
+          minutes <- (ddmm_part %% 100) + decimal_part
+          dd[i] <- round(degrees + minutes / 60, 6)
+        }
+      }
+    } else {
+      DDMM <- as.numeric(gsub("\\.", "", DDMM))
+      
+      #get value to 6 digits long (without turning to character)
+      n <- 6 - nchar(DDMM)
+      tt<- data.frame(DDMM=DDMM, nchar=n)
+      tt[!is.na(tt$DDMM), "DDMM"]<- tt[!is.na(tt$DDMM), "DDMM"]*10^tt[!is.na(tt$DDMM), "nchar"]
+      DDMM <- tt$DDMM
+      
+      if(format=="DDMMMM"){
+        #add decimal in correct spot (i.e. DDMM(.)MM); convert to dd (ie DD+MM.MM/60)
+        pre_dd <- paste0(substr(DDMM, 1, 4), ".", substr(DDMM, 5, nchar(DDMM)))
+        pre_dd[pre_dd=="NA.NA"]<-NA
+        dd <- round(as.numeric(substr(pre_dd, 1, 2))+ (as.numeric(substr(pre_dd, 3, nchar(pre_dd)))/60),6)
+      } else if(format=="DDMMSS"){
+        dd <- round(as.numeric(substr(DDMM, 1, 2)) + as.numeric(substr(DDMM, 3, 4))/60 + as.numeric(substr(DDMM, 5, 6))/3600 ,6)
+      }
     }
     
     # if requested, make all values negative; otherwise, reapply original sign
@@ -51,7 +77,7 @@ DDMMx_to_DD <- function(df=NULL, format="DDMMMM", lat.field=NULL, lon.field=NULL
     }
     return(dd)
   }
-  df$LAT_DD <- makeDD(df[,lat.field], WestHemisphere = FALSE)
-  df$LON_DD <- makeDD(df[,lon.field], WestHemisphere )
+  df$LAT_DD <- makeDD(df[[lat.field]], WestHemisphere = FALSE)
+  df$LON_DD <- makeDD(df[[lon.field]], WestHemisphere )
   return(df)
 }
