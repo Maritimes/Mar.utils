@@ -104,10 +104,12 @@ make_segments <- function(df, objField = "SEGMID", seqField ="POSITION_UTC_DATE"
     dataLines[ , cnt := length(get(objField)), by = objField]
     dataLines = as.data.frame(dataLines)
     lineData <- mergeableData(dataLines)
+    lineData <- lineData[ , !(names(lineData) %in% seqField) ]
+    lineData <- unique(lineData)
     segs = unique(dataLines[,objField])
     plotLines <- df_to_sf(df = dataLines, primary.object.field = objField, order.field = seqField, type= "lines", lat.field = lat.field,  lon.field = lon.field)
     plotLines <- sf::st_transform(plotLines, crs = the.crs)
-    plotLines<-merge(plotLines, lineData)
+    plotLines<-merge(plotLines, lineData, all.x=T)
     res[["segments"]] <- plotLines
     if (create.spatial) {
       df_sf_to_gpkg(plotLines, layerName = paste0(name,"_line"), gpkgName = gpkgName, , path=path)
