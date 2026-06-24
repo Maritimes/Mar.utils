@@ -128,5 +128,6 @@ df_to_sf <- function(df = NULL,
   }else{
     .Options$sf_use_s2 <- initState
   }
+  pids <- pids[!duplicated(pids[[primary.object.field]]), , drop = FALSE]
   return(pids)
 }
