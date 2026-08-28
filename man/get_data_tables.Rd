@@ -69,10 +69,10 @@ This function allows users to extract tables for which they have select permissi
 from Oracle.
 }
 \seealso{
-Other dfo_extractions: 
-\code{\link{connectionCheck}()},
-\code{\link{deprecationCheck}()},
-\code{\link{make_oracle_cxn}()}
+Other dfo_extractions:
+\code{\link[=connectionCheck]{connectionCheck()}},
+\code{\link[=deprecationCheck]{deprecationCheck()}},
+\code{\link[=make_oracle_cxn]{make_oracle_cxn()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

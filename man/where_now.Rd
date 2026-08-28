@@ -35,9 +35,9 @@ eliminating the need to manually add debugging code.
 \seealso{
 \code{\link{debugMode}} for the replacement debugging approach
 
-Other debugging: 
-\code{\link{changeDetector}()},
-\code{\link{updateExpected}()}
+Other debugging:
+\code{\link[=changeDetector]{changeDetector()}},
+\code{\link[=updateExpected]{updateExpected()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

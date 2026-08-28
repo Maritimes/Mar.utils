@@ -50,12 +50,12 @@ AND ('_dOh_', field2) IN (('_dOh_',1),('_dOh_',2),<...>('_dOh_',2000))
 }
 }
 \seealso{
-Other util: 
-\code{\link{Mode}()},
-\code{\link{SQL_in}()},
-\code{\link{combine_lists}()},
-\code{\link{st_err}()},
-\code{\link{updateCheck}()}
+Other util:
+\code{\link[=Mode]{Mode()}},
+\code{\link[=SQL_in]{SQL_in()}},
+\code{\link[=combine_lists]{combine_lists()}},
+\code{\link[=st_err]{st_err()}},
+\code{\link[=updateCheck]{updateCheck()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

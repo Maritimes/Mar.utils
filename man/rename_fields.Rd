@@ -27,13 +27,13 @@ The number of items in oldFields and newFields must be identical, and
 the order matters in that newFields[3] will replace oldFields[3].
 }
 \seealso{
-Other data_manipulation: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{ISSETPROFILE_enwidener}()},
-\code{\link{clean_dfo_fields}()},
-\code{\link{dets_defuddler}()},
-\code{\link{drop_cols}()}
+Other data_manipulation:
+\code{\link[=DDMMSS_to_DD]{DDMMSS_to_DD()}},
+\code{\link[=DDMMx_to_DD]{DDMMx_to_DD()}},
+\code{\link[=ISSETPROFILE_enwidener]{ISSETPROFILE_enwidener()}},
+\code{\link[=clean_dfo_fields]{clean_dfo_fields()}},
+\code{\link[=dets_defuddler]{dets_defuddler()}},
+\code{\link[=drop_cols]{drop_cols()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -64,10 +64,10 @@ A time buffer can be added returns other points that are not within the area
 of interest, but give context to the path.
 }
 \seealso{
-Other vms: 
-\code{\link{VMS_clean_recs}()},
-\code{\link{VMS_from_MARFIS}()},
-\code{\link{subset_by_time}()}
+Other vms:
+\code{\link[=VMS_clean_recs]{VMS_clean_recs()}},
+\code{\link[=VMS_from_MARFIS]{VMS_from_MARFIS()}},
+\code{\link[=subset_by_time]{subset_by_time()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

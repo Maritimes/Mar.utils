@@ -23,13 +23,13 @@ It was built for specific fields in MARFIS that I never wanted (i.e. CUSER,
 CDATE, UUSER, UDATE), but can also drop other fields easily.
 }
 \seealso{
-Other data_manipulation: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{ISSETPROFILE_enwidener}()},
-\code{\link{dets_defuddler}()},
-\code{\link{drop_cols}()},
-\code{\link{rename_fields}()}
+Other data_manipulation:
+\code{\link[=DDMMSS_to_DD]{DDMMSS_to_DD()}},
+\code{\link[=DDMMx_to_DD]{DDMMx_to_DD()}},
+\code{\link[=ISSETPROFILE_enwidener]{ISSETPROFILE_enwidener()}},
+\code{\link[=dets_defuddler]{dets_defuddler()}},
+\code{\link[=drop_cols]{drop_cols()}},
+\code{\link[=rename_fields]{rename_fields()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

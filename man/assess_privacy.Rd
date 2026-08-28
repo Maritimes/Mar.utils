@@ -128,9 +128,9 @@ there are 30 unique values in the \code{facet.field}, this will result in (3*3*3
 fields plus 3 or 4 additional housekeeping fields.
 }
 \seealso{
-Other privacy: 
-\code{\link{aggregator}()},
-\code{\link{plot_hex_data}()}
+Other privacy:
+\code{\link[=aggregator]{aggregator()}},
+\code{\link[=plot_hex_data]{plot_hex_data()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

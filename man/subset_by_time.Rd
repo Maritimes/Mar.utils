@@ -34,10 +34,10 @@ Specifically, by providing a \code{min_minutes}, it will return only those recor
 least that amount of time apart.
 }
 \seealso{
-Other vms: 
-\code{\link{VMS_clean_recs}()},
-\code{\link{VMS_from_MARFIS}()},
-\code{\link{VMS_get_recs}()}
+Other vms:
+\code{\link[=VMS_clean_recs]{VMS_clean_recs()}},
+\code{\link[=VMS_from_MARFIS]{VMS_from_MARFIS()}},
+\code{\link[=VMS_get_recs]{VMS_get_recs()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

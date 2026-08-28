@@ -15,12 +15,12 @@ st_err(x = NULL, na.rm = FALSE)
 Calculates the standard error
 }
 \seealso{
-Other util: 
-\code{\link{Mode}()},
-\code{\link{SQL_in}()},
-\code{\link{big_in}()},
-\code{\link{combine_lists}()},
-\code{\link{updateCheck}()}
+Other util:
+\code{\link[=Mode]{Mode()}},
+\code{\link[=SQL_in]{SQL_in()}},
+\code{\link[=big_in]{big_in()}},
+\code{\link[=combine_lists]{combine_lists()}},
+\code{\link[=updateCheck]{updateCheck()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -18,9 +18,9 @@ data is not added to the global environment by this function - changes are made,
 dropped.
 }
 \seealso{
-Other file_management: 
-\code{\link{load_encrypted}()},
-\code{\link{save_encrypted}()}
+Other file_management:
+\code{\link[=load_encrypted]{load_encrypted()}},
+\code{\link[=save_encrypted]{save_encrypted()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

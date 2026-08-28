@@ -15,11 +15,12 @@ DDMMx_to_DD(
 \arguments{
 \item{df}{a dataframe to be analyzed. If left \code{NULL}, a value for \code{db} should be provided}
 
-\item{format}{the default is \code{"DDMMMM"}, but \code{"DDMMSS"} is also valid.  \code{'DDMMMM'} 
-values are typically cases where the degrees are followed by decimal minutes (with or without the decimal), 
+\item{format}{the default is \code{"DDMMMM"}, but \code{"DDMMSS"} and \code{"DDMM.MM"} are also valid.
+\code{'DDMMMM'} values are typically cases where the degrees are followed by decimal minutes (with or without the decimal), 
 such as 44°4.7' is written as "44047", "4404.7", "440470", or "4404.70".  \code{"DDMMSS"} values can look identical, 
 but the last four digits represent minutes and seconds.  For example, the value of 44°4'42" 
-would be written as "440442".}
+would be written as "440442". \code{"DDMM.MM"} values have an explicit decimal point separating minutes 
+from fractional minutes, such as 44°4.7' written as "4404.7" (supports 0 or more decimal places).}
 
 \item{lat.field}{the default is \code{"LATITUDE"}. This is the name of the 
 field holding latitude values (in decimal degrees)}
@@ -39,13 +40,13 @@ This utility will convert coordinates from various DDMM formats to Decimal degre
 The new decimal degrees fields will be added as new columns called "LAT_DD" and "LON_DD".
 }
 \seealso{
-Other data_manipulation: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{ISSETPROFILE_enwidener}()},
-\code{\link{clean_dfo_fields}()},
-\code{\link{dets_defuddler}()},
-\code{\link{drop_cols}()},
-\code{\link{rename_fields}()}
+Other data_manipulation:
+\code{\link[=DDMMSS_to_DD]{DDMMSS_to_DD()}},
+\code{\link[=ISSETPROFILE_enwidener]{ISSETPROFILE_enwidener()}},
+\code{\link[=clean_dfo_fields]{clean_dfo_fields()}},
+\code{\link[=dets_defuddler]{dets_defuddler()}},
+\code{\link[=drop_cols]{drop_cols()}},
+\code{\link[=rename_fields]{rename_fields()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

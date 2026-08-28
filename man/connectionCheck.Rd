@@ -17,10 +17,10 @@ This function checks the type of the provided connection and
 returns the appropriate command function.
 }
 \seealso{
-Other dfo_extractions: 
-\code{\link{deprecationCheck}()},
-\code{\link{get_data_tables}()},
-\code{\link{make_oracle_cxn}()}
+Other dfo_extractions:
+\code{\link[=deprecationCheck]{deprecationCheck()}},
+\code{\link[=get_data_tables]{get_data_tables()}},
+\code{\link[=make_oracle_cxn]{make_oracle_cxn()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l

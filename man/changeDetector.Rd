@@ -24,9 +24,9 @@ This function compares a dataframe before and after something has been done to i
 if \code{fields} are specified, it will also indicate how many unique values of each of the specified fields were present before and after the change.
 }
 \seealso{
-Other debugging: 
-\code{\link{updateExpected}()},
-\code{\link{where_now}()}
+Other debugging:
+\code{\link[=updateExpected]{updateExpected()}},
+\code{\link[=where_now]{where_now()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

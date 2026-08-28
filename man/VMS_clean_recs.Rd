@@ -72,10 +72,10 @@ If a field called  "UPDATE_DATE" exists, it will be used to "break ties" in the 
 duplicate records (i.e. the more recent record will is retained.
 }
 \seealso{
-Other vms: 
-\code{\link{VMS_from_MARFIS}()},
-\code{\link{VMS_get_recs}()},
-\code{\link{subset_by_time}()}
+Other vms:
+\code{\link[=VMS_from_MARFIS]{VMS_from_MARFIS()}},
+\code{\link[=VMS_get_recs]{VMS_get_recs()}},
+\code{\link[=subset_by_time]{subset_by_time()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -19,15 +19,15 @@ attempts to ensure that the shortened names that result from calls to writeOGR()
 understood and are not simply truncated.
 }
 \seealso{
-Other spatial: 
-\code{\link{clip_by_poly}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sf}()},
-\code{\link{gpkglayers_to_shapefiles}()},
-\code{\link{identify_area}()},
-\code{\link{make_segments}()},
-\code{\link{make_segments_isdb}()}
+Other spatial:
+\code{\link[=clip_by_poly]{clip_by_poly()}},
+\code{\link[=df_qc_spatial]{df_qc_spatial()}},
+\code{\link[=df_sf_to_gpkg]{df_sf_to_gpkg()}},
+\code{\link[=df_to_sf]{df_to_sf()}},
+\code{\link[=gpkglayers_to_shapefiles]{gpkglayers_to_shapefiles()}},
+\code{\link[=identify_area]{identify_area()}},
+\code{\link[=make_segments]{make_segments()}},
+\code{\link[=make_segments_isdb]{make_segments_isdb()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

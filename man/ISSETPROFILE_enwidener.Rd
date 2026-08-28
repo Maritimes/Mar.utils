@@ -22,13 +22,13 @@ now become AIR_TMP1 through AIR_TMP4.  Additionally, LATITUDE, LONGITUDE and YEA
 fields are added using the first value for each of P1-P4 for each set.
 }
 \seealso{
-Other data_manipulation: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{clean_dfo_fields}()},
-\code{\link{dets_defuddler}()},
-\code{\link{drop_cols}()},
-\code{\link{rename_fields}()}
+Other data_manipulation:
+\code{\link[=DDMMSS_to_DD]{DDMMSS_to_DD()}},
+\code{\link[=DDMMx_to_DD]{DDMMx_to_DD()}},
+\code{\link[=clean_dfo_fields]{clean_dfo_fields()}},
+\code{\link[=dets_defuddler]{dets_defuddler()}},
+\code{\link[=drop_cols]{drop_cols()}},
+\code{\link[=rename_fields]{rename_fields()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -19,12 +19,12 @@ numeric values (e.g. (1,2,3,4,5))}
 Converts a vector of characters into something that an "IN" statement can use
 }
 \seealso{
-Other util: 
-\code{\link{Mode}()},
-\code{\link{big_in}()},
-\code{\link{combine_lists}()},
-\code{\link{st_err}()},
-\code{\link{updateCheck}()}
+Other util:
+\code{\link[=Mode]{Mode()}},
+\code{\link[=big_in]{big_in()}},
+\code{\link[=combine_lists]{combine_lists()}},
+\code{\link[=st_err]{st_err()}},
+\code{\link[=updateCheck]{updateCheck()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}l

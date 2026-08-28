@@ -31,13 +31,13 @@ This is a utility that will replace the DDMMSS columns of a dataframe with the s
 coordinates in decimal degrees.
 }
 \seealso{
-Other data_manipulation: 
-\code{\link{DDMMx_to_DD}()},
-\code{\link{ISSETPROFILE_enwidener}()},
-\code{\link{clean_dfo_fields}()},
-\code{\link{dets_defuddler}()},
-\code{\link{drop_cols}()},
-\code{\link{rename_fields}()}
+Other data_manipulation:
+\code{\link[=DDMMx_to_DD]{DDMMx_to_DD()}},
+\code{\link[=ISSETPROFILE_enwidener]{ISSETPROFILE_enwidener()}},
+\code{\link[=clean_dfo_fields]{clean_dfo_fields()}},
+\code{\link[=dets_defuddler]{dets_defuddler()}},
+\code{\link[=drop_cols]{drop_cols()}},
+\code{\link[=rename_fields]{rename_fields()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

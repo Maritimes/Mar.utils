@@ -67,10 +67,10 @@ This function takes a dataframe (with coordinate fields in decimal
 degrees), and extracts asssociated VMS data
 }
 \seealso{
-Other vms: 
-\code{\link{VMS_clean_recs}()},
-\code{\link{VMS_get_recs}()},
-\code{\link{subset_by_time}()}
+Other vms:
+\code{\link[=VMS_clean_recs]{VMS_clean_recs()}},
+\code{\link[=VMS_get_recs]{VMS_get_recs()}},
+\code{\link[=subset_by_time]{subset_by_time()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

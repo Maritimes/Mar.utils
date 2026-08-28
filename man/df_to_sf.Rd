@@ -53,15 +53,15 @@ this function was modified from
 https://github.com/Mar-scal/Assessment_fns/blob/master/Maps/pbs_2_sf.R
 }
 \seealso{
-Other spatial: 
-\code{\link{clip_by_poly}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{gpkglayers_to_shapefiles}()},
-\code{\link{identify_area}()},
-\code{\link{make_segments}()},
-\code{\link{make_segments_isdb}()},
-\code{\link{prepare_shape_fields}()}
+Other spatial:
+\code{\link[=clip_by_poly]{clip_by_poly()}},
+\code{\link[=df_qc_spatial]{df_qc_spatial()}},
+\code{\link[=df_sf_to_gpkg]{df_sf_to_gpkg()}},
+\code{\link[=gpkglayers_to_shapefiles]{gpkglayers_to_shapefiles()}},
+\code{\link[=identify_area]{identify_area()}},
+\code{\link[=make_segments]{make_segments()}},
+\code{\link[=make_segments_isdb]{make_segments_isdb()}},
+\code{\link[=prepare_shape_fields]{prepare_shape_fields()}}
 }
 \author{
 Dave Keith \email{Dave.Keith@dfo-mpo.gc.ca}, Freya Keyser \email{Freya.Keyser@dfo-mpo.gc.ca} and adapted by Mike McMahon \email{Mike.McMahon@dfo-mpo.gc.ca}

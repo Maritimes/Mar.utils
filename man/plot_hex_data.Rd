@@ -42,9 +42,9 @@ if no  PID or POS is provided, it is assumed that the provided positions
 are for a single polygon and the position are in the correct order.
 }
 \seealso{
-Other privacy: 
-\code{\link{aggregator}()},
-\code{\link{assess_privacy}()}
+Other privacy:
+\code{\link[=aggregator]{aggregator()}},
+\code{\link[=assess_privacy]{assess_privacy()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

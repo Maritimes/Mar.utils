@@ -50,10 +50,10 @@ connection is established (or failes to be established), it restores the values 
 existed.
 }
 \seealso{
-Other dfo_extractions: 
-\code{\link{connectionCheck}()},
-\code{\link{deprecationCheck}()},
-\code{\link{get_data_tables}()}
+Other dfo_extractions:
+\code{\link[=connectionCheck]{connectionCheck()}},
+\code{\link[=deprecationCheck]{deprecationCheck()}},
+\code{\link[=get_data_tables]{get_data_tables()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

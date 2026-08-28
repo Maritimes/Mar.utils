@@ -52,9 +52,9 @@ Any numeric field can be aggregated, and aggregate values can be one or more of 
 and/or COUNTs
 }
 \seealso{
-Other privacy: 
-\code{\link{assess_privacy}()},
-\code{\link{plot_hex_data}()}
+Other privacy:
+\code{\link[=assess_privacy]{assess_privacy()}},
+\code{\link[=plot_hex_data]{plot_hex_data()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

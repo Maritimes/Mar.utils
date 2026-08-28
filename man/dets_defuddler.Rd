@@ -37,13 +37,13 @@ This function decodes the various marfis *_DETS table from long to wide, associa
 all of the data available for each discrete record.
 }
 \seealso{
-Other data_manipulation: 
-\code{\link{DDMMSS_to_DD}()},
-\code{\link{DDMMx_to_DD}()},
-\code{\link{ISSETPROFILE_enwidener}()},
-\code{\link{clean_dfo_fields}()},
-\code{\link{drop_cols}()},
-\code{\link{rename_fields}()}
+Other data_manipulation:
+\code{\link[=DDMMSS_to_DD]{DDMMSS_to_DD()}},
+\code{\link[=DDMMx_to_DD]{DDMMx_to_DD()}},
+\code{\link[=ISSETPROFILE_enwidener]{ISSETPROFILE_enwidener()}},
+\code{\link[=clean_dfo_fields]{clean_dfo_fields()}},
+\code{\link[=drop_cols]{drop_cols()}},
+\code{\link[=rename_fields]{rename_fields()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

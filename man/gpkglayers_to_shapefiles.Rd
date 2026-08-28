@@ -20,15 +20,15 @@ no transformation will be attempted}
 This function converts the layers within a gpkg file into shapefiles
 }
 \seealso{
-Other spatial: 
-\code{\link{clip_by_poly}()},
-\code{\link{df_qc_spatial}()},
-\code{\link{df_sf_to_gpkg}()},
-\code{\link{df_to_sf}()},
-\code{\link{identify_area}()},
-\code{\link{make_segments}()},
-\code{\link{make_segments_isdb}()},
-\code{\link{prepare_shape_fields}()}
+Other spatial:
+\code{\link[=clip_by_poly]{clip_by_poly()}},
+\code{\link[=df_qc_spatial]{df_qc_spatial()}},
+\code{\link[=df_sf_to_gpkg]{df_sf_to_gpkg()}},
+\code{\link[=df_to_sf]{df_to_sf()}},
+\code{\link[=identify_area]{identify_area()}},
+\code{\link[=make_segments]{make_segments()}},
+\code{\link[=make_segments_isdb]{make_segments_isdb()}},
+\code{\link[=prepare_shape_fields]{prepare_shape_fields()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

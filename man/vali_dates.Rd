@@ -23,8 +23,8 @@ is provided, \code{endDate}  will be for 1 year later. If \code{year} is provide
 \code{dateEnd} will be Jan 1 and Dec 31 of that year, respectively.
 }
 \seealso{
-Other datesAndTimes: 
-\code{\link{simple_date}()}
+Other datesAndTimes:
+\code{\link[=simple_date]{simple_date()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

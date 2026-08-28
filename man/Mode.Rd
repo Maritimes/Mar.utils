@@ -19,12 +19,12 @@ If several values share the mode, all will be returned.
 stolen from https://stackoverflow.com/questions/2547402/how-to-find-the-statistical-mode
 }
 \seealso{
-Other util: 
-\code{\link{SQL_in}()},
-\code{\link{big_in}()},
-\code{\link{combine_lists}()},
-\code{\link{st_err}()},
-\code{\link{updateCheck}()}
+Other util:
+\code{\link[=SQL_in]{SQL_in()}},
+\code{\link[=big_in]{big_in()}},
+\code{\link[=combine_lists]{combine_lists()}},
+\code{\link[=st_err]{st_err()}},
+\code{\link[=updateCheck]{updateCheck()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

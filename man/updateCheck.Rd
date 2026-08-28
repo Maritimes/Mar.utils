@@ -15,12 +15,12 @@ This function compares the package with the available version on
 github, and prompts the user to update.
 }
 \seealso{
-Other util: 
-\code{\link{Mode}()},
-\code{\link{SQL_in}()},
-\code{\link{big_in}()},
-\code{\link{combine_lists}()},
-\code{\link{st_err}()}
+Other util:
+\code{\link[=Mode]{Mode()}},
+\code{\link[=SQL_in]{SQL_in()}},
+\code{\link[=big_in]{big_in()}},
+\code{\link[=combine_lists]{combine_lists()}},
+\code{\link[=st_err]{st_err()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}

@@ -93,9 +93,9 @@ expected example1 example2 example3
 }
 }
 \seealso{
-Other debugging: 
-\code{\link{changeDetector}()},
-\code{\link{where_now}()}
+Other debugging:
+\code{\link[=changeDetector]{changeDetector()}},
+\code{\link[=where_now]{where_now()}}
 }
 \author{
 Mike McMahon, \email{Mike.McMahon@dfo-mpo.gc.ca}
