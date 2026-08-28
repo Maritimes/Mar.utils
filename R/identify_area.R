@@ -38,7 +38,7 @@ identify_area <- function (df = NULL,
   badNames <- names(df)[!names(df) %in% c(lat.field, lon.field, "ID_", "tmp")]
   
   if(inherits(df, "sf")){
-    coord_df <-as.data.frame(st_coordinates(df))
+    coord_df <-as.data.frame(sf::st_coordinates(df))
     lat_vals <- coord_df$Y  # Now works
     lon_vals <- coord_df$X  # Now works
     df_sf <- df
@@ -47,7 +47,7 @@ identify_area <- function (df = NULL,
       mutate(lat_orig = .data[[lat.field]], lon_orig = .data[[lon.field]])
     lat_vals <- df[, lat.field]
     lon_vals <- df[, lon.field]
-    df_sf <- st_as_sf(df, coords = c(lon.field, lat.field), crs = "EPSG:4326")
+    df_sf <- sf::st_as_sf(df, coords = c(lon.field, lat.field), crs = "EPSG:4326")
   }
   
   df$tmp <- NA
@@ -108,12 +108,12 @@ identify_area <- function (df = NULL,
   res <- res[, !names(res) %in% badNames]
   res <- merge(df_Orig, res, by = "ID_")
   if(inherits(df, "sf")) {
-    bbox <- st_bbox(agg.poly)
-    res_coords <- as.data.frame(st_coordinates(res))
+    bbox <- sf::st_bbox(agg.poly)
+    res_coords <- as.data.frame(sf::st_coordinates(res))
     res[which(res_coords$Y > bbox[4] | res_coords$Y < bbox[2] | res_coords$X > bbox[3] | res_coords$X < bbox[1]),
         agg.poly.field] <- "<outside known areas>"
   } else {
-    bbox <- st_bbox(agg.poly)
+    bbox <- sf::st_bbox(agg.poly)
     res[which(res$lat_orig > bbox[4] | res$lat_orig < bbox[2] | res$lon_orig > bbox[3] | res$lon_orig < bbox[1]),
         agg.poly.field] <- "<outside known areas>"
   }
